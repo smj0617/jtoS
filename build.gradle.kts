@@ -25,6 +25,8 @@ dependencies {
     //         003-01에서 넣은 spring-boot-starter-jdbc 는 이 스타터 안에 들어 있으므로 지웠다
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-h2console")
+    // 007-01: 타임리프 템플릿 엔진. 컨트롤러가 넘긴 데이터를 HTML 템플릿에 채워 화면을 만든다
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     runtimeOnly("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
