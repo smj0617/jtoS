@@ -61,6 +61,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 017-02: 레이아웃을 통해 내비게이션 바가 붙었는지 확인
+                .andExpect(content().string(containsString("class=\"navbar-brand\"")))
                 // 016-04: 목록에 질문 등록 버튼이 있는지 확인
                 .andExpect(content().string(containsString("href=\"/questions/new\"")))
                 // 015-06: 레이아웃이 공통 자바스크립트를 불러오는지 확인

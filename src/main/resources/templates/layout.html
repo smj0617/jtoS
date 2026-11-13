@@ -16,6 +16,9 @@
     <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">SBB</title>
 </head>
 <body>
+<!-- 017-02: navbar.html 의 navbar 조각을 가져와 이 자리를 통째로 바꾼다 (th:replace) -->
+<!--         레이아웃에 한 번만 넣으므로 레이아웃을 쓰는 모든 화면 맨 위에 메뉴가 나온다 -->
+<nav th:replace="~{navbar :: navbar}"></nav>
 <!-- 015-02: 각 화면의 내용이 들어갈 자리 -->
 <div layout:fragment="content"></div>
 </body>
