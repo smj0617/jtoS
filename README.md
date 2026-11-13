@@ -525,3 +525,8 @@
 - 이유: 비밀번호를 평문으로 저장하면 DB가 유출됐을 때 그대로 드러난다 (책 3-06). 빈으로 등록해 가입(022-04)에서 암호화하고 로그인(023)에서 같은 도구로 비교한다
 - 결과: `"1234"`를 두 번 암호화하면 둘 다 `$2a$`로 시작하는 서로 다른 60자 문자열이 나온다. `matches("1234", 암호)`는 true, `matches("4321", 암호)`는 false. `gradlew test` 27개 통과
 - 메모: BCrypt는 매번 무작위 솔트를 섞어서 같은 비밀번호도 결과가 다르다. 되돌릴 수 없는 해시라서 비교는 "입력값을 같은 방식으로 다시 계산해 맞춰 보는" `matches`로 한다
+
+### 022-04 회원가입, MemberService.join 비밀번호 암호화 저장
+- 작업: `domain.member.member.service.MemberService.join(username, email, password)`. `PasswordEncoder`(022-03)를 주입받아 `passwordEncoder.encode(password)`를 저장한다. `@Transactional`. 테스트 `MemberServiceTests`
+- 이유: 회원가입 처리 (책 3-06의 `UserService.create`). 강사식으로 메서드 이름은 `join`. 컨트롤러가 아니라 서비스에서 암호화해서, 어디서 가입시키든 평문이 저장될 수 없게 한다
+- 결과: `join("user1", "user1@test.com", "1234")` 후 id와 가입일이 채워지고, DB의 비밀번호는 `"1234"`가 아닌 BCrypt 값이며 `matches("1234", 저장값)`이 true. `gradlew test` 28개 통과
