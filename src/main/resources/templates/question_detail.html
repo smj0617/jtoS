@@ -22,6 +22,12 @@
             <div class="d-flex justify-content-end" th:if="${question.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${question.author.username}"></span>
             </div>
+            <!-- 025-05: 글쓴이 본인에게만 보이는 수정 버튼 (책 3-09) -->
+            <!--         sec:authorize 로 로그인한 경우만, #authentication.name(로그인 아이디)과 글쓴이가 같을 때만 그린다 -->
+            <div class="my-2" sec:authorize="isAuthenticated()"
+                 th:if="${question.author != null and #authentication.name == question.author.username}">
+                <a th:href="@{|/questions/${question.id}/edit|}" class="btn btn-sm btn-outline-secondary">수정</a>
+            </div>
         </div>
     </div>
 

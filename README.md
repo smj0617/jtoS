@@ -646,3 +646,9 @@
 - 작업: `QuestionController.modify()`(`@PreAuthorize("isAuthenticated()")`, `@PutMapping("/{id}")`)가 질문을 찾고 `checkAuthor`(025-03)로 본인 확인, `@Valid QuestionForm` 검증 실패면 수정 화면을 다시, 성공하면 `questionService.modify`(025-02) 후 `redirect:/questions/{id}`
 - 이유: 질문 수정 저장 (책 3-09의 `POST /question/modify/{id}`). REST 규칙으로 수정은 `PUT /questions/{id}`
 - 결과: 테스트에서 수정 화면 폼과 똑같이 `POST /questions/{id}` + `_method=put`으로 보내자 025-01 필터가 PUT으로 바꿔 이 메서드가 받았고, 302로 상세 이동, 제목이 "수정된 제목"으로 바뀌었다. 다른 회원이 PUT을 보내면 403이고 제목은 그대로. `gradlew test` 51개 통과
+
+### 025-05 수정·삭제, 상세 화면에 글쓴이 전용 수정 버튼
+- 작업: 상세의 질문 카드에 `/questions/{id}/edit`로 가는 "수정" 버튼(`btn btn-sm btn-outline-secondary`). `sec:authorize="isAuthenticated()"`와 `th:if="${question.author != null and #authentication.name == question.author.username}"`로 글쓴이 본인에게만 그린다
+- 이유: 수정 화면으로 가는 버튼 (책 3-09). 남에게 버튼을 보여 줘도 025-03, 025-04가 403으로 막지만, 누를 수 없는 버튼은 아예 보이지 않게 한다
+- 결과: 글쓴이 `user1`이 상세를 열면 `href="/questions/{id}/edit"` 버튼이 있고, 다른 회원 `other`나 로그인 전에는 없다. `gradlew test` 52개 통과
+- 메모: 화면에서 숨기는 것은 편의, 서버의 `checkAuthor`가 진짜 방어다(016-07 브라우저 검증과 서버 검증의 관계와 같다)

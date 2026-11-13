@@ -194,6 +194,19 @@ class QuestionControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // 025-05: 상세의 수정 버튼은 글쓴이에게만
+    @Test
+    @DisplayName("상세 화면의 수정 버튼은 글쓴이에게만 보인다")
+    void modifyButton() throws Exception {
+        String editLink = "href=\"/questions/" + q1.getId() + "/edit\"";
+        mvc.perform(get("/questions/" + q1.getId()).with(user("user1")))
+                .andExpect(content().string(containsString(editLink)));
+        mvc.perform(get("/questions/" + q1.getId()).with(user("other")))
+                .andExpect(content().string(not(containsString(editLink))));
+        mvc.perform(get("/questions/" + q1.getId()))
+                .andExpect(content().string(not(containsString(editLink))));
+    }
+
     // 025-04: 수정 처리. 폼처럼 POST + _method=put 으로 보내 필터가 PUT 으로 바꾸는지까지 확인
     @Test
     @DisplayName("글쓴이가 POST + _method=put 으로 보내면 수정되고 상세로 이동, 다른 회원은 403")
