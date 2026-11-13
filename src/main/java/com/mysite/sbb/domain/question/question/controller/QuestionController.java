@@ -6,6 +6,7 @@ import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 // 007-03: 새 파일. 질문 화면을 담당하는 컨트롤러 (책 2-07)
 //         @RequiredArgsConstructor → final 필드를 받는 생성자를 Lombok이 만들고, 스프링이 그 생성자로 빈을 주입한다
@@ -35,7 +34,9 @@ public class QuestionController {
     @GetMapping
     public String list(Model model) {
         // 009-02: questionRepository.findAll() → questionService.getList()
-        List<Question> questionList = questionService.getList();
+        // 018-01: 서비스가 Page 를 돌려준다. 우선 첫 페이지(0)만 보여 준다 (page 값 받기는 018-03)
+        //         Page 도 반복할 수 있어서 템플릿의 th:each 는 그대로 동작한다
+        Page<Question> questionList = questionService.getList(0);
         model.addAttribute("questionList", questionList);
         return "question_list";
     }

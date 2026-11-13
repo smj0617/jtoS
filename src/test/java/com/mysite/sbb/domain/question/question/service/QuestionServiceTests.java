@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,15 +34,17 @@ class QuestionServiceTests {
         return questionRepository.save(q);
     }
 
+    // 018-01: 전체 목록 테스트 → 페이지 단위 조회 테스트로 바꿨다
     @Test
-    @DisplayName("getList는 저장된 질문을 모두 돌려준다")
+    @DisplayName("getList(page)는 한 페이지에 10개씩 돌려준다")
     void getList() {
-        saveQuestion("질문1");
-        saveQuestion("질문2");
+        for (int i = 1; i <= 12; i++) saveQuestion("질문" + i);
 
-        assertThat(questionService.getList())
-                .extracting(Question::getSubject)
-                .containsExactly("질문1", "질문2");
+        Page<Question> first = questionService.getList(0);
+        assertThat(first.getContent()).hasSize(10);
+        assertThat(first.getTotalElements()).isEqualTo(12);
+        assertThat(first.getTotalPages()).isEqualTo(2);
+        assertThat(questionService.getList(1).getContent()).hasSize(2);
     }
 
     // 016-01: 질문 등록

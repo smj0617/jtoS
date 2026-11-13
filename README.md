@@ -419,3 +419,8 @@
 - 작업: `layout.html`에 `bootstrap.bundle.min.js`(5.3.3, cdnjs, `defer`)
 - 이유: CSS는 모양만, 펼치기 같은 동작은 JS가 한다 (책 3-01)
 - 결과: 테스트 20개 통과
+
+### 018-01 페이징, 서비스가 한 페이지(10개)씩 조회
+- 작업: `getList()` → `getList(int page)`가 `PageRequest.of(page, 10)`으로 `Page<Question>` 반환. 컨트롤러는 우선 0페이지
+- 이유: 전체 조회 대신 페이지 단위 조회 (책 3-02)
+- 결과: 테스트 20개 통과 (12개 → 10개 + 2개, 전체 12개, 2페이지)
