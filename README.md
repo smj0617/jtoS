@@ -120,3 +120,10 @@
 - 이유: 테스트가 개발 DB를 건드리지 않고 매번 깨끗한 DB에서 돌게 하려고. 강사 강의의 dev/test 분리 방식을 따름 (14158 JPA 기초)
 - 결과: `gradlew test` 통과(1개), 로그 `The following 1 profile is active: "test"`, `url=jdbc:h2:mem:db_test`. `bootRun` 로그 `profile is active: "dev"`, `url=jdbc:h2:./db_dev`. `git status`에 `db_dev.mv.db`가 더 이상 보이지 않음
 - 메모: `@ActiveProfiles("test")`는 `application.yaml`의 `active: dev`보다 우선한다. `application-test.yaml`은 `src/test/resources`에 있어 테스트 실행 때만 읽힌다
+### 003-03 JPA, JPA 스타터 추가와 ddl-auto 설정
+- 작업: `spring-boot-starter-data-jpa` 추가, `spring-boot-starter-jdbc` 삭제. `application-dev.yaml`에 `ddl-auto: update`, `application-test.yaml`에 `ddl-auto: create-drop`
+- 이유: 004부터 엔티티 클래스를 테이블에 연결해 SQL 없이 저장·조회하려고 (책 2-03, 14158 JPA 기초). dev는 데이터를 유지해야 하고 test는 매번 빈 테이블에서 시작해야 해서 값을 나눴다
+- 결과: `gradlew test` 통과, `bootRun`·테스트 모두 `Hibernate ORM core version 7.4.13.Final`, `Initialized JPA EntityManagerFactory` 로그. 엔티티가 아직 없어 테이블은 생기지 않는다
+- 메모 1: JPA 스타터에 JDBC·HikariCP가 들어 있어 003-01의 `starter-jdbc`는 지웠다. DB 연결과 `db_dev.mv.db` 생성은 그대로 된다
+- 메모 2: 책의 `hibernate.dialect: H2Dialect` 설정은 넣지 않았다. Hibernate 7은 DB 종류를 스스로 알아낸다
+- 메모 3: 시작 로그에 `spring.jpa.open-in-view is enabled by default` 경고가 뜬다. 지금은 그대로 두고, 화면(템플릿)을 만드는 단계에서 다룬다

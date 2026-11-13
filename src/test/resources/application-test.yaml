@@ -8,3 +8,9 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  # 003-03: JPA 설정 추가
+  jpa:
+    hibernate:
+      # 003-03: create-drop → 테스트 시작 때 테이블을 새로 만들고, 끝나면 지운다
+      #         테스트는 매번 빈 테이블에서 시작해야 결과가 서로 영향을 주지 않는다
+      ddl-auto: create-drop

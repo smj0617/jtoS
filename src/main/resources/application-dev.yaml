@@ -7,3 +7,9 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  # 003-03: JPA 설정 추가
+  jpa:
+    hibernate:
+      # 003-03: update → 엔티티가 바뀐 부분만 테이블에 반영하고, 들어 있던 데이터는 그대로 둔다
+      #         개발 중에는 서버를 껐다 켜도 데이터가 남아야 하므로 update 를 쓴다
+      ddl-auto: update
