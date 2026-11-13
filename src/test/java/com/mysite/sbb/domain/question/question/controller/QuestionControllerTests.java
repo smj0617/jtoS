@@ -85,7 +85,10 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_form"))
                 .andExpect(content().string(containsString("<title>질문 등록 | SBB</title>")))
-                .andExpect(content().string(containsString("action=\"/questions\"")));
+                .andExpect(content().string(containsString("action=\"/questions\"")))
+                // 016-07: 브라우저 검증 속성 확인
+                .andExpect(content().string(containsString("maxlength=\"200\"")))
+                .andExpect(content().string(containsString("required")));
     }
 
     // 016-03: 질문 저장

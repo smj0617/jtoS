@@ -17,13 +17,16 @@
             <!-- 016-06: th:field="*{subject}" → id, name, value 를 한 번에 채운다 -->
             <!--         검증에 실패해 폼이 다시 열려도 사용자가 입력한 값이 그대로 남는다 -->
             <!--         th:errorclass → 이 필드에 오류가 있을 때만 is-invalid(빨간 테두리) 클래스를 더한다 -->
-            <input type="text" th:field="*{subject}" class="form-control" th:errorclass="is-invalid">
+            <!-- 016-07: 브라우저(클라이언트) 검증. required → 비어 있으면 전송 자체를 막는다, maxlength → 200자 넘게 입력이 안 된다 -->
+            <!--         서버 검증(016-05)과 같은 규칙. 브라우저 검증은 편의용이고 우회할 수 있으므로 서버 검증은 그대로 둔다 -->
+            <input type="text" th:field="*{subject}" class="form-control" th:errorclass="is-invalid" required maxlength="200">
             <!-- 016-06: 이 필드의 오류 메시지 (QuestionForm 에 적은 message). 오류가 없으면 아예 그리지 않는다 -->
             <div class="invalid-feedback" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></div>
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea th:field="*{content}" class="form-control" th:errorclass="is-invalid" rows="10"></textarea>
+            <!-- 016-07: 내용도 비어 있으면 전송을 막는다 -->
+            <textarea th:field="*{content}" class="form-control" th:errorclass="is-invalid" rows="10" required></textarea>
             <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
         </div>
         <input type="submit" value="저장하기" class="btn btn-primary my-2">
