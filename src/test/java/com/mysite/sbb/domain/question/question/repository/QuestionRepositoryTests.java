@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,33 @@ class QuestionRepositoryTests {
         q.setSubject(subject);
         q.setContent(content);
         return questionRepository.save(q);
+    }
+
+    // 029-01: 검색 쿼리
+    @Test
+    @DisplayName("search 는 제목·내용·글쓴이·답변 내용·답변 글쓴이에서 검색어를 찾고, 같은 질문은 한 번만")
+    void search() {
+        Member writer = new Member();
+        writer.setUsername("searchwriter");
+        writer.setPassword("x");
+        writer.setEmail("sw@test.com");
+        memberRepository.save(writer);
+
+        Question bySubject = saveQuestion("스프링 검색 제목", "내용");
+        Question byContent = saveQuestion("다른 제목", "스프링 내용");
+        Question byAuthor = saveQuestion("세 번째", "내용");
+        byAuthor.setAuthor(writer);
+        Question byAnswer = saveQuestion("네 번째", "내용");
+        byAnswer.addAnswer("스프링 답변").setAuthor(writer);
+        byAnswer.addAnswer("스프링 또 답변");
+        saveQuestion("관계없음", "내용");
+        questionRepository.flush();
+
+        PageRequest page = PageRequest.of(0, 10);
+        assertThat(questionRepository.search("스프링", page).getContent())
+                .containsExactlyInAnyOrder(bySubject, byContent, byAnswer);
+        assertThat(questionRepository.search("searchwriter", page).getContent())
+                .containsExactlyInAnyOrder(byAuthor, byAnswer);
     }
 
     // 024-01: 질문에 글쓴이 회원을 연결해 저장하고 다시 읽을 수 있다

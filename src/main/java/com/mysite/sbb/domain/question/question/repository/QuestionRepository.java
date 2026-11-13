@@ -3,7 +3,11 @@ package com.mysite.sbb.domain.question.question.repository;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +24,22 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     // 005-01: where subject like ? (% 는 호출하는 쪽에서 붙인다)
     List<Question> findBySubjectLike(String subject);
+
+    // 029-01: 검색 (책 3-13). 질문 제목·내용·글쓴이, 답변 내용·답변 글쓴이 중 하나라도 검색어를 포함하면 찾는다
+    //         @Query → 메서드 이름 규칙으로 표현하기 어려운 조건을 JPQL(엔티티 기준 SQL)로 직접 쓴다
+    //         left join → 글쓴이·답변이 없는 질문도 빠지지 않게 한다. 답변이 여러 개면 같은 질문이 여러 줄 나오므로 distinct
+    //         Pageable → 018 페이징·정렬이 그대로 적용된다
+    @Query("""
+            select distinct q
+            from Question q
+            left join q.author qa
+            left join q.answerList a
+            left join a.author aa
+            where q.subject like %:kw%
+               or q.content like %:kw%
+               or qa.username like %:kw%
+               or a.content like %:kw%
+               or aa.username like %:kw%
+            """)
+    Page<Question> search(@Param("kw") String kw, Pageable pageable);
 }

@@ -737,3 +737,9 @@
 - 이유: 마크다운으로 쓴 내용을 서식대로 보여 준다 (책 3-12). 처음에는 책처럼 `${@markdownService.markdown(...)}`(템플릿에서 스프링 빈 직접 호출)로 썼는데, 이 버전의 타임리프(3.1)가 `th:utext` 안의 빈 참조를 보안상 막아 "Instantiation of new objects and access to static classes or parameters is forbidden" 오류가 났다. 그래서 컨트롤러 공통 설정으로 모델에 담아 넘겼다
 - 결과: 처음 방식에서는 상세 화면을 그리는 테스트 10개가 모두 실패했고, 모델 속성 방식으로 바꾸자 모두 통과했다. 내용 `**굵게**`는 화면에 `<strong>굵게</strong>`로, 직접 쓴 `<script>alert('x')</script>`는 실행되지 않는 `&lt;script&gt;` 글자로 나온다. `gradlew test` 65개 통과
 - 메모: `th:utext`는 HTML을 그대로 넣으므로 위험하다. 028-01 `escapeHtml(true)`로 사용자가 쓴 HTML을 먼저 막아 두었기 때문에 안전하게 쓸 수 있다
+
+### 029-01 검색, QuestionRepository.search 검색 쿼리
+- 작업: `QuestionRepository.search(kw, pageable)`를 `@Query`(JPQL)로 작성. `select distinct q from Question q left join q.author qa left join q.answerList a left join a.author aa where` 제목·내용·질문 글쓴이·답변 내용·답변 글쓴이 중 하나라도 `like %:kw%`. 테스트 추가
+- 이유: 검색 (책 3-13). 다섯 군데를 한꺼번에 찾는 조건은 메서드 이름 규칙(005-01)으로는 표현할 수 없어 JPQL로 직접 쓴다. `left join`이어야 글쓴이나 답변이 없는 질문도 빠지지 않고, 답변이 여러 개면 같은 질문이 여러 줄 나오므로 `distinct`
+- 결과: 질문 5개 중 "스프링"으로 찾으면 제목에 있는 것, 내용에 있는 것, 답변 2개에 있는 것 3개(답변 두 개가 걸린 질문도 한 번만). "searchwriter"로 찾으면 질문 글쓴이인 것과 답변 글쓴이인 것 2개. 관계없는 질문은 나오지 않는다. `gradlew test` 66개 통과
+- 메모: 책은 `Specification`(자바 코드로 조건 조립)과 `@Query` 두 방법을 소개한다. 여기서는 SQL과 비슷해 읽기 쉬운 `@Query`를 썼다
