@@ -1,0 +1,13 @@
+/* 013-01: 새 파일. 모든 화면이 함께 쓰는 스타일 (책 2-13의 style.css) */
+/*         src/main/resources/static 아래 파일은 주소 / 부터 그대로 제공된다 → /resource/global.css */
+/*         강사식: 정적 파일을 static/resource 폴더에 모아 컨트롤러 주소와 겹치지 않게 한다 */
+
+/* 013-01: 답변 입력칸을 화면 가로 폭에 맞춘다 */
+textarea {
+    width: 100%;
+}
+
+/* 013-01: 답변등록 버튼 위에 여백을 둔다 */
+input[type=submit] {
+    margin-top: 10px;
+}

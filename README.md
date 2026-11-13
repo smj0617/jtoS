@@ -288,3 +288,9 @@
 - 이유: 등록된 답변 보기 (책 2-12)
 - 결과: 테스트 13개 통과 (답변 1개 → "1개의 답변이 있습니다.", 답변 내용 표시)
 - 메모: `answerList`는 LAZY라 템플릿에서 처음 쓸 때 조회된다. 화면을 그리는 동안에도 DB 연결이 열려 있는 것은 `open-in-view`(003-03 경고) 기본값 덕분이다
+
+### 013-01 웹 디자인, 공통 CSS 파일 static/resource/global.css
+- 작업: `src/main/resources/static/resource/global.css`(textarea 가로 100%, 제출 버튼 위 여백) 추가. `/resource/global.css` 제공 테스트
+- 이유: 스타일을 한 파일에 모은다 (책 2-13의 `style.css`). 정적 파일은 `static/resource`에 둔다(강사식)
+- 결과: 테스트 14개 통과
+- 메모: `static` 폴더의 파일은 컨트롤러 없이 그 경로 그대로 주소가 된다
