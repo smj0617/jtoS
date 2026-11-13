@@ -343,3 +343,8 @@
 - 작업: `question_detail.html`에 `layout:decorate="~{layout}"`, 바깥 `div`에 `layout:fragment="content"`. 링크 3줄 삭제
 - 이유: 이제 공통 `<head>`는 `layout.html` 한 곳에서만 관리한다
 - 결과: 테스트 14개 통과 (상세 HTML에도 레이아웃의 부트스트랩 링크 포함)
+
+### 015-05 레이아웃, 화면 제목 패턴 layout:title-pattern
+- 작업: `layout.html`의 `<title>`에 `layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE"`
+- 이유: 탭 제목을 "화면 이름 | SBB"로 통일 (강사식)
+- 결과: 테스트 14개 통과 (목록 `<title>질문 목록 | SBB</title>`)
