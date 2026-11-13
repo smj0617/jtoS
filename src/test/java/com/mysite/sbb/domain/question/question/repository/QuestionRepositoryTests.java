@@ -1,6 +1,8 @@
 // 006-02: 테스트도 질문 리포지터리와 같은 패키지로 이동
 package com.mysite.sbb.domain.question.question.repository;
 
+import com.mysite.sbb.domain.member.member.entity.Member;
+import com.mysite.sbb.domain.member.member.repository.MemberRepository;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.answer.repository.AnswerRepository;
@@ -29,12 +31,35 @@ class QuestionRepositoryTests {
     @Autowired
     private AnswerRepository answerRepository;
 
+    // 024-01: 글쓴이 저장 테스트용
+    @Autowired
+    private MemberRepository memberRepository;
+
     // 005-01: 테스트용 질문 하나를 저장해 돌려준다
     private Question saveQuestion(String subject, String content) {
         Question q = new Question();
         q.setSubject(subject);
         q.setContent(content);
         return questionRepository.save(q);
+    }
+
+    // 024-01: 질문에 글쓴이 회원을 연결해 저장하고 다시 읽을 수 있다
+    @Test
+    @DisplayName("질문의 author 에 회원을 넣어 저장하면 글쓴이가 함께 저장된다")
+    void saveWithAuthor() {
+        Member member = new Member();
+        member.setUsername("writer1");
+        member.setPassword("x");
+        member.setEmail("writer1@test.com");
+        memberRepository.save(member);
+
+        Question q = new Question();
+        q.setSubject("글쓴이 있는 질문");
+        q.setContent("내용");
+        q.setAuthor(member);
+        questionRepository.saveAndFlush(q);
+
+        assertThat(questionRepository.findById(q.getId()).get().getAuthor().getUsername()).isEqualTo("writer1");
     }
 
     @Test

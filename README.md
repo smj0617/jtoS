@@ -584,3 +584,9 @@
 - 이유: 로그인 여부에 맞는 메뉴만 보여 준다 (책 3-07). 023-04에서 로그아웃을 POST로만 받게 했으므로 링크가 아니라 폼 버튼으로 만들었다(CSRF 토큰 자동 포함)
 - 결과: dev 서버를 다시 켜서 한 세션으로 확인했다. 로그인 전 목록 화면 메뉴에는 로그인·회원가입 링크, `devuser`로 로그인한 뒤에는 로그아웃 버튼만(가입·로그인 링크 사라짐), 그 버튼으로 로그아웃하자 다시 로그인·회원가입 링크. 테스트에서 로그인 사용자 `user1`의 아이디가 메뉴에 `>user1</span>`으로 나오는 것도 확인. `gradlew test` 43개 통과
 - 메모: 처음 테스트는 실패했다. navbar의 HTML 주석에 "로그아웃" 글자가 있어서 "로그아웃 글자가 없어야 한다"는 검사에 걸렸다. HTML 주석도 응답에 그대로 나가므로, 글자 대신 로그아웃 폼 주소(`action="/members/logout"`)로 검사하도록 바꿨다
+
+### 024-01 글쓴이, 질문에 글쓴이 author 필드
+- 작업: `Question`에 `@ManyToOne(fetch = FetchType.LAZY) private Member author;`. 저장 테스트 추가
+- 이유: 누가 쓴 질문인지 저장한다 (책 3-08). 회원 한 명이 질문 여러 개를 쓰므로 `@ManyToOne`. 강사식으로 LAZY(004-03과 같은 이유: 질문만 볼 때는 회원을 읽지 않는다)
+- 결과: `question` 테이블에 `author_id` 외래키 컬럼이 생긴다. 회원 `writer1`을 글쓴이로 넣어 저장하고 다시 읽으면 `getAuthor().getUsername()`이 `writer1`. dev DB의 기존 질문은 `author_id`가 비어 있다(null 허용). `gradlew test` 44개 통과
+- 메모: dev 서버의 `ddl-auto: update`가 기존 `question` 테이블에 `author_id` 컬럼만 추가하고 데이터는 그대로 둔다

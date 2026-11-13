@@ -2,7 +2,10 @@
 package com.mysite.sbb.domain.question.question.entity;
 
 import com.mysite.sbb.domain.question.answer.entity.Answer;
+import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.global.jpa.entity.BaseEntity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,6 +32,12 @@ public class Question extends BaseEntity {
     // 004-01: 내용. 길이 제한 없는 글 → TEXT 타입
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    // 024-01: 글쓴이 (책 3-08). 회원 한 명(One)이 질문 여러 개(Many)를 쓴다 → question 테이블에 author_id 외래키
+    //         강사식: LAZY → 질문만 볼 때는 회원을 조회하지 않는다 (004-03 과 같은 이유)
+    //         024 이전에 저장된 질문(샘플 데이터)은 글쓴이가 없으므로 비어 있을 수 있다(null 허용)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member author;
 
     // 004-01: 이 질문에 달린 답변 목록. 테이블에 컬럼이 생기지 않는다
     //         mappedBy = "question" → 관계의 주인은 Answer.question (FK는 answer 테이블에 있다)
