@@ -229,3 +229,8 @@
 - 작업: `QuestionController`가 `QuestionRepository` 대신 `QuestionService`를 주입받고, `list()`에서 `getList()`를 호출
 - 이유: 컨트롤러는 DB를 직접 다루지 않고 서비스에 처리를 맡긴다 (책 2-09)
 - 결과: 테스트 통과. 목록 화면 결과는 그대로
+
+### 009-03 서비스, QuestionService 테스트 추가
+- 작업: `QuestionServiceTests`에서 질문 2개를 저장한 뒤 `getList()`가 두 제목을 순서대로 돌려주는지 확인
+- 이유: 컨트롤러 테스트와 서비스 테스트를 나눠 두면 실패했을 때 화면 문제인지 처리 문제인지 바로 알 수 있다
+- 결과: 테스트 9개 통과
