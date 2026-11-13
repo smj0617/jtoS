@@ -1,7 +1,7 @@
 package com.mysite.sbb.domain.question.question.controller;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
-import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.domain.question.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,13 +14,15 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class QuestionController {
-    private final QuestionRepository questionRepository;
+    // 009-02: 리포지터리 대신 서비스를 주입받는다 → 컨트롤러는 DB를 직접 모르고, 처리는 서비스에 맡긴다
+    private final QuestionService questionService;
 
     // 007-03: @ResponseBody 가 없으므로 반환한 문자열은 템플릿 이름 → templates/question_list.html 을 그린다
     //         Model 에 담은 값은 템플릿에서 ${questionList} 로 꺼내 쓴다
     @GetMapping("/question/list")
     public String list(Model model) {
-        List<Question> questionList = questionRepository.findAll();
+        // 009-02: questionRepository.findAll() → questionService.getList()
+        List<Question> questionList = questionService.getList();
         model.addAttribute("questionList", questionList);
         return "question_list";
     }

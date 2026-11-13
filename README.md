@@ -224,3 +224,8 @@
 - 작업: `domain.question.question.service.QuestionService` 추가(`@Service`, `@RequiredArgsConstructor` + `final QuestionRepository`). 목록 조회 메서드 `getList()`
 - 이유: 컨트롤러(요청·응답), 서비스(업무 처리), 리포지터리(DB 접근)로 역할을 나누려고 (책 2-09). 생성자 주입은 강사식
 - 결과: 컴파일과 기존 테스트 8개 통과. 아직 컨트롤러는 리포지터리를 직접 쓴다(009-02에서 교체)
+
+### 009-02 서비스, 컨트롤러가 리포지터리 대신 서비스 사용
+- 작업: `QuestionController`가 `QuestionRepository` 대신 `QuestionService`를 주입받고, `list()`에서 `getList()`를 호출
+- 이유: 컨트롤러는 DB를 직접 다루지 않고 서비스에 처리를 맡긴다 (책 2-09)
+- 결과: 테스트 통과. 목록 화면 결과는 그대로
