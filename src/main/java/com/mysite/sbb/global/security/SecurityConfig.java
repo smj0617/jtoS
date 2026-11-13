@@ -2,6 +2,7 @@ package com.mysite.sbb.global.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 //         여러 도메인에 걸친 설정이라 global.security 에 둔다
 @Configuration
 @EnableWebSecurity
+// 024-06: 메서드에 붙인 @PreAuthorize 를 검사하도록 켠다 (책 3-08의 @EnableMethodSecurity(prePostEnabled = true))
+@EnableMethodSecurity
 public class SecurityConfig {
     // 021-01: SecurityFilterChain → 모든 요청이 컨트롤러에 닿기 전에 거치는 보안 필터들의 규칙
     @Bean

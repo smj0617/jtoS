@@ -128,7 +128,7 @@ class QuestionControllerTests {
     @Test
     @DisplayName("GET /questions/new 는 질문 등록 폼을 보여 준다")
     void showCreate() throws Exception {
-        mvc.perform(get("/questions/new"))
+        mvc.perform(get("/questions/new").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_form"))
                 .andExpect(content().string(containsString("<title>질문 등록 | SBB</title>")))
@@ -157,7 +157,7 @@ class QuestionControllerTests {
     @Test
     @DisplayName("질문 등록 폼과 답변 폼에 _csrf 숨은 입력칸이 들어 있다")
     void formsHaveCsrfToken() throws Exception {
-        mvc.perform(get("/questions/new"))
+        mvc.perform(get("/questions/new").with(user("user1")))
                 .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")));
         mvc.perform(get("/questions/" + q1.getId()))
                 .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")));
@@ -169,6 +169,22 @@ class QuestionControllerTests {
     void frameOptions() throws Exception {
         mvc.perform(get("/questions"))
                 .andExpect(header().string("X-Frame-Options", "SAMEORIGIN"));
+    }
+
+    // 024-06: 로그인하지 않으면 등록 화면·등록 요청이 로그인 화면으로 보내진다
+    @Test
+    @DisplayName("로그인 전에는 질문 등록 화면과 등록 요청이 로그인 화면으로 리다이렉트되고 저장되지 않는다")
+    void createRequiresLogin() throws Exception {
+        mvc.perform(get("/questions/new"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/members/login"));
+
+        mvc.perform(post("/questions").with(csrf())
+                        .param("subject", "비로그인 질문").param("content", "내용"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/members/login"));
+
+        assertThat(questionRepository.findBySubject("비로그인 질문")).isEmpty();
     }
 
     // 021-01: CSRF 토큰 없이 보낸 POST 는 시큐리티가 막는다

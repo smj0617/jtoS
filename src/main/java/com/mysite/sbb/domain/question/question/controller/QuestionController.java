@@ -9,6 +9,7 @@ import com.mysite.sbb.domain.question.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -56,6 +57,8 @@ public class QuestionController {
     //         /{id} 보다 위에 두지 않아도 스프링은 글자 그대로인 /new 를 {id} 보다 먼저 맞춘다
     // 016-06: 빈 QuestionForm 을 받아 두면 모델에 "questionForm" 이름으로 담긴다
     //         → 템플릿의 th:object="${questionForm}" 이 처음 열 때도 쓸 객체가 생긴다 (값은 모두 null)
+    // 024-06: 로그인한 사용자만. 로그인 전이면 시큐리티가 로그인 화면으로 보낸다
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/new")
     public String showCreate(QuestionForm questionForm) {
         return "question_form";
@@ -71,6 +74,8 @@ public class QuestionController {
     //         오류가 있으면 저장하지 않고 등록 폼을 다시 보여 준다 (오류 메시지 표시는 016-06)
     // 024-04: Principal → 스프링 시큐리티가 넣어 주는 "지금 로그인한 사용자" 정보. getName() 은 아이디
     //         아이디로 Member 를 찾아(024-03) 글쓴이로 저장한다
+    // 024-06: 로그인한 사용자만 등록 → principal 이 항상 있다 (024-04 의 null 오류가 생기지 않는다)
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public String create(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
         if (bindingResult.hasErrors()) {

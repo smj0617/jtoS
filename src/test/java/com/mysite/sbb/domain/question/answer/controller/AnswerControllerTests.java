@@ -63,6 +63,23 @@ class AnswerControllerTests {
         assertThat(q.getAnswerList().get(0).getAuthor().getUsername()).isEqualTo("user1");
     }
 
+    // 024-06: 로그인하지 않으면 답변 등록이 로그인 화면으로 보내진다
+    @Test
+    @DisplayName("로그인 전 답변 등록은 로그인 화면으로 리다이렉트되고 저장되지 않는다")
+    void createRequiresLogin() throws Exception {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf())
+                        .param("content", "비로그인 답변"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/members/login"));
+
+        assertThat(q.getAnswerList()).isEmpty();
+    }
+
     // 016-09: 답변 서버 검증 실패
     @Test
     @DisplayName("답변 내용이 비어 있으면 저장하지 않고 상세 화면을 다시 보여 준다")

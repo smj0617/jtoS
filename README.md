@@ -611,3 +611,9 @@
 - 작업: `AnswerService.create(question, content, author)`가 `addAnswer` 후 `answer.setAuthor(author)`. `AnswerController.create`가 `Principal`을 받아 `memberService.getMember(principal.getName())`로 글쓴이를 넘긴다. 답변 테스트도 `user1`로 로그인한 상태로 등록
 - 이유: 024-02에서 만든 답변 글쓴이를 실제로 채운다 (책 3-08). 024-04 질문과 같은 방식
 - 결과: 로그인한 `user1`이 `POST /questions/{id}/answers`로 등록하면 302로 상세 이동, 질문의 첫 답변 글쓴이가 `user1`. 서비스 테스트에서 글쓴이 `writer1` 확인. `gradlew test` 45개 통과
+
+### 024-06 글쓴이, 로그인한 사용자만 질문·답변 등록 (@PreAuthorize)
+- 작업: `SecurityConfig`에 `@EnableMethodSecurity`. 질문 등록 화면(`GET /questions/new`)과 등록(`POST /questions`), 답변 등록(`POST /questions/{id}/answers`)에 `@PreAuthorize("isAuthenticated()")`. 비로그인 테스트 2개 추가, 기존 폼 화면 테스트는 로그인 상태(`user("user1")`)로 변경
+- 이유: 024-04, 024-05 뒤로는 로그인하지 않은 사용자가 등록하면 `principal`이 없어 500 오류가 난다. 글쓴이 없는 글도 막아야 한다 (책 3-08). 021-01에서 "처음엔 전부 열고 필요한 곳만 막는다"고 한 그 "필요한 곳"을 메서드 단위로 막는다
+- 결과: 로그인 전에 `/questions/new`를 열거나 질문·답변을 등록하면 302로 `/members/login`(023-02 로그인 화면)으로 보내지고 아무것도 저장되지 않는다. 로그인한 사용자는 전처럼 등록된다. `gradlew test` 47개 통과
+- 메모: 처음 테스트는 리다이렉트 주소를 `**/members/login` 패턴으로 비교해 실패했다. 실제 주소가 `/members/login` 그대로라 정확한 주소 비교로 고쳤다
