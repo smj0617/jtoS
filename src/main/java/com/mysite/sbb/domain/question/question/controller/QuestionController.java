@@ -9,6 +9,7 @@ import com.mysite.sbb.domain.question.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -84,6 +86,27 @@ public class QuestionController {
         Member author = memberService.getMember(principal.getName());
         questionService.create(questionForm.subject(), questionForm.content(), author);
         return "redirect:/questions";
+    }
+
+    // 025-03: 질문 수정 화면 (책 3-09의 GET /question/modify/{id})
+    //         REST 규칙: 자원(/questions/{id})의 수정 입력 화면은 /edit
+    //         글쓴이 본인만 열 수 있다. 기존 제목·내용을 QuestionForm 에 담아 입력칸에 채워 보여 준다
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}/edit")
+    public String showModify(@PathVariable Integer id, Model model, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        checkAuthor(question, principal);
+        model.addAttribute("questionForm", new QuestionForm(question.getSubject(), question.getContent()));
+        model.addAttribute("questionId", id);
+        return "question_modify";
+    }
+
+    // 025-03: 글쓴이 본인인지 확인. 아니면 403(권한 없음)
+    //         글쓴이가 없는 옛 질문(024 이전)은 누구의 것도 아니므로 아무도 수정할 수 없다
+    private void checkAuthor(Question question, Principal principal) {
+        if (question.getAuthor() == null || !question.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "수정·삭제 권한이 없습니다.");
+        }
     }
 
     // 010-03: 질문 상세 화면 (책 2-10)

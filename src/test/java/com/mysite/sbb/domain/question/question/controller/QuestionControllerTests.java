@@ -177,6 +177,22 @@ class QuestionControllerTests {
                 .andExpect(header().string("X-Frame-Options", "SAMEORIGIN"));
     }
 
+    // 025-03: 수정 화면은 글쓴이 본인만
+    @Test
+    @DisplayName("글쓴이는 수정 화면에서 기존 제목·내용을 보고, 다른 사람은 403")
+    void showModify() throws Exception {
+        mvc.perform(get("/questions/%d/edit".formatted(q1.getId())).with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("question_modify"))
+                .andExpect(content().string(containsString("value=\"sbb가 무엇인가요?\"")))
+                .andExpect(content().string(containsString("name=\"_method\" value=\"put\"")))
+                .andExpect(content().string(containsString("action=\"/questions/" + q1.getId() + "\"")));
+
+        memberService.join("other", "other@test.com", "1234");
+        mvc.perform(get("/questions/%d/edit".formatted(q1.getId())).with(user("other")))
+                .andExpect(status().isForbidden());
+    }
+
     // 024-06: 로그인하지 않으면 등록 화면·등록 요청이 로그인 화면으로 보내진다
     @Test
     @DisplayName("로그인 전에는 질문 등록 화면과 등록 요청이 로그인 화면으로 리다이렉트되고 저장되지 않는다")

@@ -635,3 +635,9 @@
 - 이유: 질문 수정 처리 (책 3-09). JPA는 트랜잭션 안에서 읽은 엔티티의 값이 바뀌면 끝날 때 알아서 `update`를 보낸다(변경 감지). 수정일시는 004-02 `@LastModifiedDate`가 자동으로 갱신한다(책은 `setModifyDate` 직접 호출)
 - 결과: "수정 전" 질문을 "수정 후"/"바뀐 내용"으로 바꾸고 DB에 반영(`flush`)한 뒤 다시 읽으면 제목·내용이 바뀌어 있고, `modifyDate`가 `createDate`보다 늦다. `gradlew test` 49개 통과
 - 메모: 테스트에서 생성 직후 바로 수정하면 두 시각이 같을 수 있어 5ms 기다렸다
+
+### 025-03 수정·삭제, 질문 수정 화면 GET /questions/{id}/edit
+- 작업: `QuestionController.showModify()`(`@PreAuthorize("isAuthenticated()")`, `GET /questions/{id}/edit`)가 글쓴이 본인인지 `checkAuthor`로 확인(아니면 `ResponseStatusException(FORBIDDEN)`)하고, 기존 제목·내용으로 `QuestionForm`을 만들어 `question_modify.html`을 보여 준다. 템플릿은 등록 폼과 같은 모양에 `<input type="hidden" name="_method" value="put">`과 `action="/questions/{id}"`
+- 이유: 질문 수정 입력 화면 (책 3-09의 `GET /question/modify/{id}`). REST 규칙에서 자원의 수정 화면은 `/{id}/edit`. 남의 글은 열 수 없어야 한다
+- 결과: 글쓴이 `user1`이 열면 200, 제목 칸에 `value="sbb가 무엇인가요?"`가 채워져 있고 `_method=put` 숨은 값과 `action="/questions/{id}"`가 있다. 다른 회원 `other`가 열면 403. `gradlew test` 50개 통과
+- 메모: 글쓴이가 없는 옛 질문(024 이전)은 아무도 수정할 수 없게 했다. 저장(PUT)은 025-04

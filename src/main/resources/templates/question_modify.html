@@ -1,0 +1,28 @@
+<!-- 025-03: 새 파일. 질문 수정 화면 (책 3-09는 question_form 을 같이 쓴다). 016 등록 폼과 같은 모양에 기존 값이 채워져 있다 -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>질문 수정</title>
+</head>
+<body>
+<div layout:fragment="content" class="container my-3">
+    <h5 class="my-3 border-bottom pb-2">질문수정</h5>
+    <!-- 025-03: POST 로 보내지만 _method=put 숨은 값이 있어 025-01 필터가 PUT /questions/{id} 로 바꾼다 (받는 쪽은 025-04) -->
+    <form th:action="@{|/questions/${questionId}|}" th:object="${questionForm}" method="post">
+        <input type="hidden" name="_method" value="put">
+        <div class="mb-3">
+            <label for="subject" class="form-label">제목</label>
+            <input type="text" th:field="*{subject}" class="form-control" th:errorclass="is-invalid" required maxlength="200">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea th:field="*{content}" class="form-control" th:errorclass="is-invalid" rows="10" required></textarea>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+        </div>
+        <input type="submit" value="수정하기" class="btn btn-primary my-2">
+    </form>
+</div>
+</body>
+</html>
