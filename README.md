@@ -271,3 +271,9 @@
 - 작업: `domain.question.answer.service.AnswerService.create(question, content)`가 `question.addAnswer(content)`로 답변을 만들고 저장. `@Transactional`
 - 이유: 답변 저장 처리 (책 2-12). 책처럼 `setQuestion`, `setCreateDate`를 직접 하지 않고 004-03의 `addAnswer`와 004-02 Auditing을 쓴다
 - 결과: 테스트 12개 통과 (id·생성일시가 채워지고, 답변↔질문 양쪽 관계가 맞음)
+
+### 012-02 답변, AnswerController 답변 등록 요청 처리
+- 작업: `POST /questions/{questionId}/answers`가 `content`를 받아 저장하고 `redirect:/questions/{questionId}`
+- 이유: 답변 폼이 보낼 요청 처리 (책 2-12). 답변은 질문에 속한 자원이라 질문 주소 아래에 둔다(강사식, 책은 `/answer/create/{id}`)
+- 결과: 테스트 13개 통과 (302 → 상세 주소, 질문의 답변 목록에 내용 추가)
+- 메모: 저장 후 화면을 바로 그리지 않고 리다이렉트하는 것을 PRG(Post-Redirect-Get)라 한다. 새로고침해도 POST가 다시 가지 않는다
