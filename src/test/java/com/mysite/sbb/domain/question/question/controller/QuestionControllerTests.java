@@ -62,6 +62,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 020-01: setUp 의 질문(답변 1개) 제목 옆에 답변 개수 1
+                .andExpect(content().string(containsString("<span class=\"text-danger small ms-2\">1</span>")))
                 // 017-03: 부트스트랩 JS 를 불러오는지 확인
                 .andExpect(content().string(containsString("bootstrap/5.3.3/js/bootstrap.bundle.min.js")))
                 // 017-02: 레이아웃을 통해 내비게이션 바가 붙었는지 확인

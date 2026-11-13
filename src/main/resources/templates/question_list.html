@@ -37,6 +37,10 @@
         <!-- 019-01: 제목은 왼쪽 정렬 -->
         <td class="text-start">
             <a th:href="@{|/questions/${question.id}|}" th:text="${question.subject}"></a>
+            <!-- 020-01: 답변이 있으면 제목 옆에 개수를 빨간 작은 글씨로 (책 3-04) -->
+            <!--         question.answerList(@OneToMany 컬렉션)의 크기를 그대로 쓴다. 답변이 0개면 th:if 로 그리지 않는다 -->
+            <span class="text-danger small ms-2" th:if="${#lists.size(question.answerList) > 0}"
+                  th:text="${#lists.size(question.answerList)}"></span>
         </td>
         <td th:text="${question.createDate}"></td>
     </tr>
