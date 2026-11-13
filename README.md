@@ -266,3 +266,8 @@
 - 이유: 강사식 REST 규칙. 자원은 복수형 명사로 쓰고 `list`, `detail` 같은 동작은 주소에 넣지 않는다. 동작은 HTTP 메서드(GET 조회, POST 생성, PUT 수정, DELETE 삭제)로 구분한다
 - 결과: 테스트 11개 통과
 - 메모: 책은 `/question/list`, `/question/detail/{id}`를 계속 쓴다. 이후 단계의 주소는 모두 REST 규칙으로 바꿔 적용한다
+
+### 012-01 답변, AnswerService.create 답변 저장
+- 작업: `domain.question.answer.service.AnswerService.create(question, content)`가 `question.addAnswer(content)`로 답변을 만들고 저장. `@Transactional`
+- 이유: 답변 저장 처리 (책 2-12). 책처럼 `setQuestion`, `setCreateDate`를 직접 하지 않고 004-03의 `addAnswer`와 004-02 Auditing을 쓴다
+- 결과: 테스트 12개 통과 (id·생성일시가 채워지고, 답변↔질문 양쪽 관계가 맞음)
