@@ -348,3 +348,8 @@
 - 작업: `layout.html`의 `<title>`에 `layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE"`
 - 이유: 탭 제목을 "화면 이름 | SBB"로 통일 (강사식)
 - 결과: 테스트 14개 통과 (목록 `<title>질문 목록 | SBB</title>`)
+
+### 015-06 레이아웃, 공통 자바스크립트 global.js
+- 작업: `static/resource/global.js`(`onReady` 도우미) 추가, `layout.html`에서 `<script defer>`로 불러옴
+- 이유: 여러 화면이 함께 쓸 JS를 한 곳에 모은다 (강사식). 016, 025에서 함수를 더한다
+- 결과: 테스트 15개 통과

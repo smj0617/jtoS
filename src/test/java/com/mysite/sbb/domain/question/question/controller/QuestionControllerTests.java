@@ -59,6 +59,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 015-06: 레이아웃이 공통 자바스크립트를 불러오는지 확인
+                .andExpect(content().string(containsString("src=\"/resource/global.js\"")))
                 // 015-05: 화면 제목과 사이트 제목이 패턴대로 합쳐지는지 확인
                 .andExpect(content().string(containsString("<title>질문 목록 | SBB</title>")))
                 // 014-03: 목록 표에 부트스트랩 클래스가 붙었는지 확인

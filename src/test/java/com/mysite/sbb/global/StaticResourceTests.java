@@ -30,4 +30,13 @@ class StaticResourceTests {
                 // 014-02: 글꼴 지정이 들어 있는지 확인
                 .andExpect(content().string(containsString("Pretendard")));
     }
+
+    // 015-06: 공통 자바스크립트 제공 확인
+    @Test
+    @DisplayName("/resource/global.js 가 제공된다")
+    void globalJs() throws Exception {
+        mvc.perform(get("/resource/global.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("function onReady")));
+    }
 }
