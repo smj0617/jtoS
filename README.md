@@ -77,3 +77,9 @@
 - 작업: git 저장소 생성, README에 목표·진행 규칙·기술 스택·참고 자료·작업 계획 작성
 - 이유: 코드를 쓰기 전에 무엇을 어떤 순서로, 어떤 규칙으로 할지 정해 두기 위해
 - 결과: GitHub 공개 저장소 `smj0617/jtoS`에 push
+
+### 001-01 프로젝트 생성, Spring Boot 4.1.2 프로젝트 생성
+- 작업: IntelliJ로 Spring Boot 프로젝트 생성 (Java 25, Gradle Kotlin DSL, YAML 설정, 의존성 Spring Web·Lombok·DevTools)
+- 이유: 강사(14163 2강)와 같은 최신 환경으로 시작하기 위해. JPA·H2·Thymeleaf는 책 순서대로 003·007에서 추가한다
+- 결과: `localhost:8080` 접속 시 Whitelabel Error Page(404). 컨트롤러가 없으니 정상
+- 메모: IntelliJ는 Artifact가 아니라 Name(`jtoS`)으로 메인 클래스 이름을 지어서 `JtoSApplication`이 됨 → 001-02에서 변경
