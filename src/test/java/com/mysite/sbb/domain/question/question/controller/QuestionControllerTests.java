@@ -216,7 +216,10 @@ class QuestionControllerTests {
     void modifyButton() throws Exception {
         String editLink = "href=\"/questions/" + q1.getId() + "/edit\"";
         mvc.perform(get("/questions/" + q1.getId()).with(user("user1")))
-                .andExpect(content().string(containsString(editLink)));
+                .andExpect(content().string(containsString(editLink)))
+                // 025-07: 글쓴이에게는 삭제 링크(method="DELETE")와 CSRF 메타 태그
+                .andExpect(content().string(containsString("method=\"DELETE\"")))
+                .andExpect(content().string(containsString("<meta name=\"_csrf\" content=\"")));
         mvc.perform(get("/questions/" + q1.getId()).with(user("other")))
                 .andExpect(content().string(not(containsString(editLink))));
         mvc.perform(get("/questions/" + q1.getId()))

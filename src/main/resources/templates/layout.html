@@ -5,6 +5,10 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
+    <!-- 025-07: global.js 가 만드는 DELETE 폼에 넣을 CSRF 토큰 (폼이 아닌 링크라 th:action 자동 삽입을 쓸 수 없다) -->
+    <!--         _csrf → 스프링 시큐리티가 요청마다 넣어 주는 토큰 객체 -->
+    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}">
+    <meta name="_csrf" th:content="${_csrf.token}">
     <!-- 015-02: 화면마다 반복되던 <head> 3줄을 이곳 한 군데로 옮겨 온다 (014-01, 014-02, 013-02) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">

@@ -658,3 +658,9 @@
 - 이유: 질문 삭제 (책 3-09). REST 규칙으로 삭제는 `DELETE /questions/{id}`. 책처럼 GET 링크로 삭제하면 다른 사이트의 링크·이미지 하나로 글이 지워질 수 있다
 - 결과: 다른 회원 `other`의 DELETE는 403이고 질문이 남아 있다. 글쓴이 `user1`의 DELETE는 302로 목록 이동, 질문이 사라진다(답변 1개도 004-03 cascade REMOVE로 함께 삭제). `gradlew test` 53개 통과
 - 메모: 화면의 삭제 버튼(025-07)은 `<a method="DELETE">` 링크를 `global.js`가 DELETE 요청 폼으로 바꿔 보낸다
+
+### 025-07 수정·삭제, <a method="DELETE"> 삭제 버튼과 global.js 처리
+- 작업: `global.js`에 클릭 처리 추가. `method` 속성이 있는 `<a>`를 누르면 `data-confirm` 확인창을 띄우고, 확인하면 숨은 폼을 만들어 `POST` + `_method=DELETE`(025-01) + CSRF 토큰으로 링크 주소에 보낸다. 토큰은 `layout.html`에 추가한 `<meta name="_csrf_parameter">`, `<meta name="_csrf">`에서 읽는다. 상세의 글쓴이 전용 영역에 `<a th:href="/questions/{id}" method="DELETE" data-confirm="정말로 삭제하시겠습니까?">삭제</a>`
+- 이유: 삭제 버튼을 링크처럼 간단히 쓰면서 실제 요청은 DELETE로 보낸다 (강사식 `<a method="DELETE">`). 책 3-09는 GET 삭제 링크에 JS로 확인창만 띄운다. 링크는 `th:action` 폼이 아니어서 CSRF 토큰이 자동으로 들어가지 않으므로 메타 태그로 넘긴다
+- 결과: dev 서버에서 `devuser`가 쓴 "글쓴이 확인 질문"(305번) 상세에 삭제 링크가 보이고, `global.js`와 같은 요청(POST + `_method=DELETE` + 메타 태그 토큰)을 보내자 302로 목록 이동, 그 뒤 `/questions/305`는 404. 테스트에서 삭제 링크와 CSRF 메타 태그, `global.js`의 `a[method]` 처리 코드 확인. `gradlew test` 53개 통과
+- 메모: 확인창과 클릭 처리는 자바스크립트라 MockMvc로는 실행할 수 없다. 서버 쪽 흐름은 같은 요청을 직접 보내 확인했다

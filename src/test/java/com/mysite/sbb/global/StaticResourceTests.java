@@ -39,6 +39,8 @@ class StaticResourceTests {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("function onReady")))
                 // 016-08: 첫 오류 칸 focus 코드가 들어 있는지 확인
-                .andExpect(content().string(containsString("querySelector(\".is-invalid\")")));
+                .andExpect(content().string(containsString("querySelector(\".is-invalid\")")))
+                // 025-07: method 속성 링크 처리 코드
+                .andExpect(content().string(containsString("a[method]")));
     }
 }

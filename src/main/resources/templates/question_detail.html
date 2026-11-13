@@ -27,6 +27,9 @@
             <div class="my-2" sec:authorize="isAuthenticated()"
                  th:if="${question.author != null and #authentication.name == question.author.username}">
                 <a th:href="@{|/questions/${question.id}/edit|}" class="btn btn-sm btn-outline-secondary">수정</a>
+                <!-- 025-07: 삭제 버튼. method="DELETE" 링크를 global.js 가 확인창 후 DELETE /questions/{id} 요청으로 보낸다 -->
+                <a th:href="@{|/questions/${question.id}|}" method="DELETE" data-confirm="정말로 삭제하시겠습니까?"
+                   class="btn btn-sm btn-outline-danger">삭제</a>
             </div>
         </div>
     </div>

@@ -14,6 +14,38 @@ function onReady(fn) {
     }
 }
 
+// 025-07: <a href="..." method="DELETE"> 링크를 DELETE 요청으로 보낸다 (강사식)
+//         링크는 GET 만 보낼 수 있으므로, 누르는 순간 숨은 폼을 만들어 POST + _method=DELETE(025-01 필터) + CSRF 토큰으로 보낸다
+//         data-confirm="..." 이 있으면 먼저 확인창을 띄우고, 취소하면 아무것도 하지 않는다
+//         CSRF 토큰은 layout.html 의 <meta name="_csrf"> 에서 읽는다
+document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[method]");
+    if (!link) return;
+    const method = link.getAttribute("method").toUpperCase();
+    if (method === "GET") return;
+
+    e.preventDefault();
+    const confirmMsg = link.dataset.confirm;
+    if (confirmMsg && !confirm(confirmMsg)) return;
+
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = link.href;
+    const addHidden = (name, value) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    };
+    addHidden("_method", method);
+    const csrfParam = document.querySelector("meta[name='_csrf_parameter']");
+    const csrfToken = document.querySelector("meta[name='_csrf']");
+    if (csrfParam && csrfToken) addHidden(csrfParam.content, csrfToken.content);
+    document.body.appendChild(form);
+    form.submit();
+});
+
 // 016-08: 서버 검증에 실패해 폼이 다시 열렸을 때, 첫 번째 오류 입력칸에 커서를 둔다 (강사식)
 //         016-06 의 th:errorclass 가 오류 칸에 is-invalid 클래스를 붙이므로 그 클래스로 찾는다
 //         querySelector 는 화면 위에서부터 처음 만나는 하나를 돌려준다 → 첫 오류 칸
