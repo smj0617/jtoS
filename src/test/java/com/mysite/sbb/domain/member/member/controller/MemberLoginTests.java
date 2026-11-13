@@ -18,6 +18,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -68,6 +71,22 @@ class MemberLoginTests {
         mvc.perform(post("/members/logout").session(session).with(csrf()))
                 .andExpect(unauthenticated())
                 .andExpect(redirectedUrl("/"));
+    }
+
+    // 023-05: 로그인 상태에 따라 바뀌는 메뉴
+    @Test
+    @DisplayName("로그인 전 메뉴에는 로그인·회원가입, 로그인 후에는 아이디와 로그아웃 버튼이 보인다")
+    void navbarByLoginState() throws Exception {
+        mvc.perform(get("/questions"))
+                .andExpect(content().string(containsString("href=\"/members/login\">로그인</a>")))
+                .andExpect(content().string(containsString(">회원가입</a>")))
+                // 023-05: HTML 주석에도 "로그아웃" 글자가 있어서, 글자 대신 로그아웃 폼 주소로 확인한다
+                .andExpect(content().string(not(containsString("action=\"/members/logout\""))));
+
+        mvc.perform(get("/questions").with(user("user1")))
+                .andExpect(content().string(containsString(">user1</span>")))
+                .andExpect(content().string(containsString("action=\"/members/logout\"")))
+                .andExpect(content().string(not(containsString(">회원가입</a>"))));
     }
 
     @Test

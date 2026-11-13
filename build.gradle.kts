@@ -34,6 +34,8 @@ dependencies {
     // 015-01: 타임리프 레이아웃 다이얼렉트 (강사식). 공통 틀(layout.html) 하나에 각 화면의 내용만 끼워 넣는다
     //         버전은 Spring Boot 의존성 관리가 정해 준다. 라이브러리만 있으면 스프링이 자동으로 등록한다
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+    // 023-05: 타임리프에서 로그인 상태를 읽는 sec: 문법 (sec:authorize, sec:authentication)
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     runtimeOnly("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

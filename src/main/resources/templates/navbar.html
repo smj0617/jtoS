@@ -1,7 +1,9 @@
 <!-- 017-01: 새 파일. 내비게이션 바 조각 (책 3-01). 강사식: 레이아웃과 따로 파일로 분리한다 -->
 <!--         th:fragment="navbar" → 이 <nav> 를 "navbar" 라는 이름의 조각으로 등록한다 -->
 <!--         다른 템플릿에서 ~{navbar :: navbar} (파일 이름 :: 조각 이름) 으로 가져다 쓴다 (017-02) -->
-<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+<!-- 023-05: xmlns:sec → 로그인 상태를 읽는 sec: 문법을 쓰겠다는 선언 (thymeleaf-extras-springsecurity6) -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+     xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="container-fluid">
         <!-- 017-01: 왼쪽 로고. 누르면 첫 화면(질문 목록)으로 -->
         <a class="navbar-brand" th:href="@{/}">SBB</a>
@@ -11,15 +13,33 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <!-- 017-01: 메뉴 목록. 넓은 화면에서는 가로로 펼쳐지고, 좁은 화면에서는 접힌다 -->
-        <!--         로그인·회원가입 링크는 시큐리티(021~023)를 만든 뒤 주소를 연결한다 -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/questions}">질문 목록</a>
                 </li>
+            </ul>
+            <!-- 023-05: 오른쪽 회원 메뉴. sec:authorize 조건이 맞을 때만 그린다 (책 3-07) -->
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <!-- 023-05: 로그인 전(isAnonymous)에만 로그인·회원가입 -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/members/login}">로그인</a>
+                </li>
                 <!-- 022-08: 회원가입 화면(022-06 GET /members/new)으로 가는 메뉴 (책 3-06) -->
-                <li class="nav-item">
+                <!-- 023-05: 로그인 전에만 보이게, 오른쪽 회원 메뉴로 옮겼다 -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link" th:href="@{/members/new}">회원가입</a>
+                </li>
+                <!-- 023-05: 로그인 후(isAuthenticated)에는 아이디와 로그아웃 버튼 -->
+                <!--         sec:authentication="name" → 로그인한 사용자의 아이디 -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <span class="navbar-text me-2" sec:authentication="name"></span>
+                </li>
+                <!-- 023-05: 로그아웃은 023-04 에서 POST 만 받으므로 링크가 아니라 폼 버튼. th:action 이라 CSRF 토큰이 자동으로 들어간다 -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/members/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link nav-link">로그아웃</button>
+                    </form>
                 </li>
             </ul>
         </div>

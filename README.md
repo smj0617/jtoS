@@ -578,3 +578,9 @@
 - 이유: 로그아웃 (책 3-07). 책은 `GET /user/logout`으로 로그아웃하도록 설정을 바꾸지만, 시큐리티 기본대로 POST + CSRF 토큰으로만 받는다. GET이면 다른 사이트가 `<img src=".../logout">` 하나로 사용자를 몰래 로그아웃시킬 수 있다
 - 결과: 테스트에서 실제로 로그인해 받은 세션으로 `POST /members/logout`을 보내면 로그아웃(`unauthenticated()`)되고 302로 `/` 이동. 같은 주소를 GET으로 열면 404(로그아웃 처리 대상이 아님). 화면의 로그아웃 버튼은 023-05에서 POST 폼으로 만든다. `gradlew test` 42개 통과
 - 메모: `invalidateHttpSession(true)`는 서버 세션 자체를 없앤다. 세션에 담긴 로그인 정보도 함께 사라진다
+
+### 023-05 로그인, 로그인 상태에 따라 바뀌는 메뉴
+- 작업: `thymeleaf-extras-springsecurity6` 의존성 추가. `navbar.html` 오른쪽에 회원 메뉴를 두고 `sec:authorize="isAnonymous()"`이면 "로그인"(`/members/login`)·"회원가입", `sec:authorize="isAuthenticated()"`이면 `sec:authentication="name"`(아이디)과 "로그아웃" 버튼. 로그아웃 버튼은 `POST /members/logout`으로 보내는 `th:action` 폼
+- 이유: 로그인 여부에 맞는 메뉴만 보여 준다 (책 3-07). 023-04에서 로그아웃을 POST로만 받게 했으므로 링크가 아니라 폼 버튼으로 만들었다(CSRF 토큰 자동 포함)
+- 결과: dev 서버를 다시 켜서 한 세션으로 확인했다. 로그인 전 목록 화면 메뉴에는 로그인·회원가입 링크, `devuser`로 로그인한 뒤에는 로그아웃 버튼만(가입·로그인 링크 사라짐), 그 버튼으로 로그아웃하자 다시 로그인·회원가입 링크. 테스트에서 로그인 사용자 `user1`의 아이디가 메뉴에 `>user1</span>`으로 나오는 것도 확인. `gradlew test` 43개 통과
+- 메모: 처음 테스트는 실패했다. navbar의 HTML 주석에 "로그아웃" 글자가 있어서 "로그아웃 글자가 없어야 한다"는 검사에 걸렸다. HTML 주석도 응답에 그대로 나가므로, 글자 대신 로그아웃 폼 주소(`action="/members/logout"`)로 검사하도록 바꿨다
