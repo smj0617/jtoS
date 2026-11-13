@@ -59,6 +59,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 014-03: 목록 표에 부트스트랩 클래스가 붙었는지 확인
+                .andExpect(content().string(containsString("<table class=\"table\">")))
                 // 014-01: 부트스트랩 CDN 을 불러오는지 확인
                 .andExpect(content().string(containsString("bootstrap/5.3.3/css/bootstrap.min.css")))
                 // 013-02: 공통 CSS 를 불러오는지 확인

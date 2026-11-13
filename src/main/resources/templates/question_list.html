@@ -15,8 +15,12 @@
     <title>질문 목록</title>
 </head>
 <body>
-<table>
-    <thead>
+<!-- 014-03: 부트스트랩 클래스 적용 (책 2-14) -->
+<!--         container → 가운데 정렬된 고정 폭 상자, my-3 → 위아래 여백 -->
+<!--         table → 줄 간격과 구분선이 있는 표, table-dark → 머리줄을 어두운 색으로 -->
+<div class="container my-3">
+<table class="table">
+    <thead class="table-dark">
     <tr>
         <th>제목</th>
         <th>작성일시</th>
@@ -34,5 +38,6 @@
     </tr>
     </tbody>
 </table>
+</div>
 </body>
 </html>
