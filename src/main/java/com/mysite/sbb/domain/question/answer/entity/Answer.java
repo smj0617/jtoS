@@ -1,9 +1,8 @@
-package com.mysite.sbb;
+// 006-03: 답변은 질문의 하위 도메인 → domain.question.answer.entity
+package com.mysite.sbb.domain.question.answer.entity;
 
-// 006-01: BaseEntity 가 global.jpa.entity 로 옮겨져 import 추가
-import com.mysite.sbb.global.jpa.entity.BaseEntity;
-// 006-02: Question 이 domain.question.question.entity 로 옮겨져 import 추가
 import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.global.jpa.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -179,3 +179,8 @@
 - 이유: 강사식 3단 구조 `도메인.하위도메인.역할`. 질문 기능 파일을 한곳에 모으고, 역할(entity, repository, 이후 service·controller)로 한 단계 더 나눈다
 - 결과: 질문 관련 파일 3개 이동. 질문 저장·목록·이름 조회·수정·삭제 테스트가 새 패키지에서 그대로 통과(6개)
 - 메모: `domain.question.question`에서 첫 `question`은 큰 도메인(질문 게시판), 두 번째 `question`은 그 안의 하위 도메인(질문)이다. 답변은 같은 큰 도메인 아래 `domain.question.answer`가 된다
+
+### 006-03 도메인별 분류, 답변을 질문의 하위 도메인 domain.question.answer로
+- 작업: `Answer` → `domain.question.answer.entity`, `AnswerRepository` → `domain.question.answer.repository`. `Question`과 `QuestionRepositoryTests`가 쓰던 답변 import를 새 위치로 바꿨다
+- 이유: 답변은 질문 없이 존재하지 않는 질문의 일부라서, 별도의 큰 도메인이 아니라 `question` 도메인의 하위 도메인으로 둔다 (강사식)
+- 결과: 답변 파일 2개 이동. `addAnswer` 후 질문만 저장해도 답변이 함께 저장되는 테스트(004-03 cascade)가 그대로 통과(6개)

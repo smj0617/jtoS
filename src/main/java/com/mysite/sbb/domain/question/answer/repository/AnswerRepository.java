@@ -1,4 +1,7 @@
-package com.mysite.sbb;
+// 006-03: 답변은 질문의 하위 도메인 → domain.question.answer.repository
+package com.mysite.sbb.domain.question.answer.repository;
+
+import com.mysite.sbb.domain.question.answer.entity.Answer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,7 +1,7 @@
 // 006-02: 질문 도메인으로 이동 → domain.question.question.entity (강사식: 도메인 → 하위 도메인 → 역할)
 package com.mysite.sbb.domain.question.question.entity;
 
-import com.mysite.sbb.Answer;
+import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.global.jpa.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;

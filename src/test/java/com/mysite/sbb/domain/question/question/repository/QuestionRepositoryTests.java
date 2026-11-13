@@ -2,8 +2,8 @@
 package com.mysite.sbb.domain.question.question.repository;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
-import com.mysite.sbb.Answer;
-import com.mysite.sbb.AnswerRepository;
+import com.mysite.sbb.domain.question.answer.entity.Answer;
+import com.mysite.sbb.domain.question.answer.repository.AnswerRepository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
