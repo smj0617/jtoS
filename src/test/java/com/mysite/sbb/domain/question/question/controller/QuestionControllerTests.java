@@ -127,7 +127,7 @@ class QuestionControllerTests {
                 // 019-01: 1페이지 맨 위(가장 최신)가 12번
                 .andExpect(content().string(containsString("<td>12</td>")))
                 // 018-04: 페이지 버튼 확인 (2페이지 링크, 현재 페이지 active, 1페이지라 이전은 disabled)
-                .andExpect(content().string(containsString("href=\"/questions?page=2\"")))
+                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=\""))) // 029-03: 링크에 kw(빈 값)가 붙는다
                 .andExpect(content().string(containsString("page-item active")))
                 .andExpect(content().string(containsString("page-item disabled")));
     }
@@ -207,7 +207,24 @@ class QuestionControllerTests {
         mvc.perform(get("/questions").param("kw", "sbb"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
-                .andExpect(content().string(not(containsString("전혀 다른 글"))));
+                .andExpect(content().string(not(containsString("전혀 다른 글"))))
+                // 029-03: 검색창에 현재 검색어가 채워져 있다
+                .andExpect(content().string(containsString("name=\"kw\" class=\"form-control\" placeholder=\"검색어\" value=\"sbb\"")));
+    }
+
+    // 029-03: 검색 결과의 페이지 링크에도 검색어가 붙는다
+    @Test
+    @DisplayName("검색 결과가 여러 페이지면 페이지 링크에 kw 가 유지된다")
+    void searchPagingKeepsKw() throws Exception {
+        for (int i = 1; i <= 11; i++) {
+            Question q = new Question();
+            q.setSubject("sbb 검색 페이지 " + i);
+            q.setContent("내용");
+            questionRepository.save(q);
+        }
+
+        mvc.perform(get("/questions").param("kw", "sbb"))
+                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=sbb\"")));
     }
 
     // 028-02: 상세 화면 내용 마크다운
