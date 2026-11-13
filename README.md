@@ -152,3 +152,10 @@
 - 작업: `Answer.question`을 `@ManyToOne(fetch = LAZY)`로 변경. `Question.answerList`에 `cascade = {PERSIST, REMOVE}`, `orphanRemoval = true`, `new ArrayList<>()` 초기화. 양쪽 관계를 한 번에 맞추는 `Question.addAnswer(content)` 추가
 - 이유: EAGER는 답변을 읽을 때마다 질문까지 읽어 쿼리가 늘어난다(N+1). 답변은 질문을 통해서만 추가·삭제되게 해서 관계를 한쪽에서 관리하려고 (강사식 개선)
 - 결과: `gradlew test` 통과. 실제 동작(질문 저장 시 답변 함께 저장)은 005 테스트에서 확인
+
+
+### 005-01 리포지터리, QuestionRepository·AnswerRepository와 테스트
+- 작업: `JpaRepository`를 상속한 `QuestionRepository`(`findBySubject`, `findBySubjectAndContent`, `findBySubjectLike`), `AnswerRepository` 추가. 책 2-05의 테스트를 `QuestionRepositoryTests` 하나에 모으고 클래스에 `@Transactional`
+- 이유: 엔티티를 저장·조회할 통로가 필요하다(책 2-05). 테스트는 메서드마다 롤백해 서로의 데이터에 영향을 주지 않게 했다(강사식). 책은 남은 데이터 때문에 id를 맞춰 가며 테스트를 고쳐야 했다
+- 결과: 테스트 5개 통과. 저장 시 `createDate`·`modifyDate` 자동 기록(004-02), `addAnswer` 후 질문만 저장해도 답변 저장(004-03 cascade)까지 확인
+- 메모: 메서드 이름 규칙(`findBy` + 필드명 + `And`/`Like`)만으로 Spring Data JPA가 쿼리를 만든다
