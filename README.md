@@ -218,3 +218,9 @@
 - 이유: 사이트 첫 화면을 질문 목록으로 (책 2-08)
 - 결과: 테스트 `/ → 302, /question/list` 통과
 - 메모: `redirect:`는 서버가 화면을 그리지 않고 브라우저에 "이 주소로 다시 요청하라"(302)고 응답한다. 주소창도 바뀐다
+
+
+### 009-01 서비스, QuestionService 생성과 목록 조회
+- 작업: `domain.question.question.service.QuestionService` 추가(`@Service`, `@RequiredArgsConstructor` + `final QuestionRepository`). 목록 조회 메서드 `getList()`
+- 이유: 컨트롤러(요청·응답), 서비스(업무 처리), 리포지터리(DB 접근)로 역할을 나누려고 (책 2-09). 생성자 주입은 강사식
+- 결과: 컴파일과 기존 테스트 8개 통과. 아직 컨트롤러는 리포지터리를 직접 쓴다(009-02에서 교체)
