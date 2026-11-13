@@ -494,3 +494,9 @@
 - 결과: 화면(GET)은 전처럼 로그인 없이 열린다. 시큐리티를 넣은 직후 질문·답변 등록 POST 테스트 4개가 403(거부)으로 실패했다. 시큐리티는 CSRF 방어가 기본으로 켜져 있어, 토큰 없이 들어온 POST를 막기 때문이다. 테스트 요청에 `csrf()`로 토큰을 붙이자 통과했다. 토큰 없는 `POST /questions`는 403이고 질문이 저장되지 않는다. `gradlew test` 22개 통과
 - 메모 1: CSRF(사이트 간 요청 위조)는 다른 사이트가 사용자 브라우저를 이용해 몰래 POST를 보내는 공격이다. 서버가 내려 준 토큰이 있는 요청만 받아서 막는다
 - 메모 2: 실제 브라우저의 폼은 012-03, 016-02에서 `th:action`을 써 두었기 때문에 타임리프가 토큰을 자동으로 넣는다(021-03에서 확인)
+
+### 021-02 스프링 시큐리티, H2 콘솔 CSRF 예외와 같은 사이트 프레임 허용
+- 작업: `SecurityConfig`에 `.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))`와 `.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))`를 추가. 응답 헤더 테스트 추가
+- 이유: 021-01 뒤 H2 콘솔이 쓸 수 없게 됐다 (책 3-05). 콘솔은 우리 폼이 아니어서 CSRF 토큰을 보내지 못해 로그인 POST가 403으로 막혔고, 콘솔 화면은 frameset(여러 프레임)인데 시큐리티 기본 헤더 `X-Frame-Options: DENY`가 모든 프레임을 막았다
+- 결과: dev 서버를 다시 켜서 비교했다. 수정 전 `X-Frame-Options=DENY`, 콘솔 로그인 `POST /h2-console/login.do` → 403. 수정 후 `X-Frame-Options=SAMEORIGIN`, 같은 로그인 요청 → 200과 frameset 화면(로그인 성공). 질문 목록 등 다른 화면은 그대로 200. `gradlew test` 23개 통과
+- 메모: CSRF 예외는 `/h2-console/**`에만 줬다. 우리 화면의 POST는 계속 토큰을 검사한다. `SAMEORIGIN`은 같은 사이트 안의 프레임만 허용하므로, 다른 사이트가 우리 화면을 몰래 프레임에 넣는 클릭재킹은 계속 막힌다

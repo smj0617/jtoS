@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -141,6 +142,14 @@ class QuestionControllerTests {
                 .andExpect(redirectedUrl("/questions"));
 
         assertThat(questionRepository.findBySubject("새 질문")).isPresent();
+    }
+
+    // 021-02: 응답 헤더가 같은 사이트 프레임만 허용하는지 확인 (H2 콘솔 프레임 화면용)
+    @Test
+    @DisplayName("응답의 X-Frame-Options 는 SAMEORIGIN 이다")
+    void frameOptions() throws Exception {
+        mvc.perform(get("/questions"))
+                .andExpect(header().string("X-Frame-Options", "SAMEORIGIN"));
     }
 
     // 021-01: CSRF 토큰 없이 보낸 POST 는 시큐리티가 막는다

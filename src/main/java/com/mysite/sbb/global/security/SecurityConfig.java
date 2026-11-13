@@ -19,7 +19,16 @@ public class SecurityConfig {
         http
                 // 021-01: 어떤 주소든(/**) 로그인 없이 허용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll());
+                        .requestMatchers("/**").permitAll())
+                // 021-02: H2 콘솔은 우리 폼이 아니라 CSRF 토큰을 보내지 못한다 → /h2-console/** 만 CSRF 검사에서 뺀다
+                //         (그대로 두면 콘솔 로그인 POST 가 403 으로 막힌다)
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**"))
+                // 021-02: H2 콘솔 화면은 프레임(frameset)으로 나뉘어 있다
+                //         시큐리티 기본값 X-Frame-Options: DENY 는 모든 프레임을 막아 콘솔이 빈 화면이 된다
+                //         → 같은 사이트 안의 프레임만 허용(SAMEORIGIN). 다른 사이트가 우리 화면을 프레임에 넣는 공격(클릭재킹)은 계속 막힌다
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()));
         return http.build();
     }
 }
