@@ -144,6 +144,16 @@ class QuestionControllerTests {
         assertThat(questionRepository.findBySubject("새 질문")).isPresent();
     }
 
+    // 021-03: th:action 을 쓴 폼에는 타임리프가 CSRF 토큰 숨은 입력칸을 자동으로 넣는다
+    @Test
+    @DisplayName("질문 등록 폼과 답변 폼에 _csrf 숨은 입력칸이 들어 있다")
+    void formsHaveCsrfToken() throws Exception {
+        mvc.perform(get("/questions/new"))
+                .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")));
+        mvc.perform(get("/questions/" + q1.getId()))
+                .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")));
+    }
+
     // 021-02: 응답 헤더가 같은 사이트 프레임만 허용하는지 확인 (H2 콘솔 프레임 화면용)
     @Test
     @DisplayName("응답의 X-Frame-Options 는 SAMEORIGIN 이다")
