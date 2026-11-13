@@ -114,3 +114,9 @@
 - 메모 1: Boot 4는 H2 콘솔 자동 설정이 별도 모듈이라 `spring-boot-h2console` 의존성이 필요하다 (책 Boot 3에는 없음)
 - 메모 2: 처음에는 JDBC 없이 시도했더니 콘솔에서 `Database ... db_dev not found` 오류. H2는 콘솔(원격)에서 DB 파일을 새로 만들지 않는데, JDBC가 없으면 앱이 `datasource` 설정을 쓰지 않아 파일이 만들어지지 않았다. `starter-jdbc`를 추가하자 앱이 시작하면서 DB에 연결해 파일을 만들었다. 003-03에서 JPA 스타터(JDBC 포함)를 넣으면 이 줄은 지운다
 - 메모 3: `db_dev.mv.db`는 커밋하지 않는다. 003-02에서 `.gitignore`에 추가
+
+### 003-02 JPA, dev/test 프로파일 분리
+- 작업: DB 설정을 `application-dev.yaml`(파일 DB `jdbc:h2:./db_dev`)과 `src/test/resources/application-test.yaml`(메모리 DB `jdbc:h2:mem:db_test`)로 나눴다. `application.yaml`에 `spring.profiles.active: dev`, 테스트 클래스에 `@ActiveProfiles("test")`. `.gitignore`에 `db_dev.mv.db`, `db_dev.trace.db` 추가
+- 이유: 테스트가 개발 DB를 건드리지 않고 매번 깨끗한 DB에서 돌게 하려고. 강사 강의의 dev/test 분리 방식을 따름 (14158 JPA 기초)
+- 결과: `gradlew test` 통과(1개), 로그 `The following 1 profile is active: "test"`, `url=jdbc:h2:mem:db_test`. `bootRun` 로그 `profile is active: "dev"`, `url=jdbc:h2:./db_dev`. `git status`에 `db_dev.mv.db`가 더 이상 보이지 않음
+- 메모: `@ActiveProfiles("test")`는 `application.yaml`의 `active: dev`보다 우선한다. `application-test.yaml`은 `src/test/resources`에 있어 테스트 실행 때만 읽힌다

@@ -1,0 +1,9 @@
+# 003-02: 새 파일. dev 프로파일일 때만 application.yaml 위에 덧붙여 적용된다
+spring:
+  datasource:
+    # 003-02: application.yaml에서 옮겨 옴
+    #         파일 모드 → 프로젝트 폴더의 db_dev.mv.db 에 저장되어, 서버를 껐다 켜도 데이터가 남는다
+    url: jdbc:h2:./db_dev
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver

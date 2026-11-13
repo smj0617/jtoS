@@ -1,4 +1,8 @@
 HELP.md
+
+### 003-02: H2 개발 DB 파일 (실행할 때마다 내용이 바뀌는 데이터라서 커밋하지 않는다) ###
+db_dev.mv.db
+db_dev.trace.db
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

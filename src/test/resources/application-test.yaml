@@ -1,0 +1,10 @@
+# 003-02: 새 파일. test 프로파일일 때만 적용된다 (테스트 클래스의 @ActiveProfiles("test"))
+#         src/test/resources 에 있으므로 테스트 실행 때만 클래스패스에 올라간다
+spring:
+  datasource:
+    # 003-02: 메모리 모드 → 테스트가 끝나면 사라진다
+    #         개발 DB(db_dev)를 건드리지 않고, 테스트마다 깨끗한 DB에서 시작한다
+    url: jdbc:h2:mem:db_test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
