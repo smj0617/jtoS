@@ -212,6 +212,14 @@ class QuestionControllerTests {
                 .andExpect(content().string(containsString("name=\"kw\" class=\"form-control\" placeholder=\"검색어\" value=\"sbb\"")));
     }
 
+    // 029-05: 선택한 검색 대상이 select 의 data-value 로 화면에 담긴다 (global.js 가 이 값으로 선택)
+    @Test
+    @DisplayName("kwType=subject 로 검색하면 select 의 data-value 가 subject 다")
+    void kwTypeDataValue() throws Exception {
+        mvc.perform(get("/questions").param("kw", "sbb").param("kwType", "subject"))
+                .andExpect(content().string(containsString("name=\"kwType\" class=\"form-select\" data-value=\"subject\"")));
+    }
+
     // 029-03: 검색 결과의 페이지 링크에도 검색어가 붙는다
     @Test
     @DisplayName("검색 결과가 여러 페이지면 페이지 링크에 kw 가 유지된다")

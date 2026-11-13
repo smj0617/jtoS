@@ -759,3 +759,8 @@
 - 이유: 원하는 대상만 골라 검색한다 (강사식 검색 옵션 select). 책은 전체 대상 검색 하나만 있다
 - 결과: "자바"로 검색할 때 `subject`는 제목에 있는 질문 1개, `content`는 질문 내용·답변 내용에 있는 2개, `author`는 글쓴이 아이디가 "자바왕"인 1개, `all`은 4개 모두. 페이지 링크는 `/questions?page=2&kw=sbb&kwType=all` 형태. `gradlew test` 69개 통과
 - 메모: 선택 상자가 검색 후에도 고른 값을 유지하는 일은 029-05에서 JS로 한다. 지금은 `data-value`에 현재 값만 담아 두었다
+
+### 029-05 검색, 검색 대상 select 기본값을 JS 로 맞추기
+- 작업: `global.js`에 화면 준비 후 `select[data-value]`를 모두 찾아 `select.value = data-value`로 맞추는 코드. 029-04 목록의 검색 대상 select가 `th:data-value="${kwType}"`로 현재 값을 담아 두었다. 테스트 2개(JS 코드 포함 여부, `kwType=subject` 화면의 `data-value="subject"`)
+- 이유: 검색한 뒤 다시 그려진 화면에서 선택 상자가 "전체"로 돌아가면, 무엇으로 검색했는지 알 수 없고 다음 페이지로 갈 때도 헷갈린다. 강사식으로 option마다 `th:selected` 조건을 쓰는 대신 공통 JS 한 곳에서 맞춘다. 앞으로 다른 select도 `data-value`만 달면 된다
+- 결과: dev 서버(다시 켬)에서 `?kw=sbb&kwType=all`은 sbb 질문 1개와 `data-value=all`, `?kw=[300]&kwType=subject`는 "테스트 데이터입니다:[300]" 1개와 `data-value=subject`, `?kw=devuser&kwType=author`는 0개(devuser가 쓴 질문은 025-07 확인 때 삭제했다)와 `data-value=author`. 실제 선택 상자 표시는 브라우저에서 JS가 맞춘다. `gradlew test` 70개 통과

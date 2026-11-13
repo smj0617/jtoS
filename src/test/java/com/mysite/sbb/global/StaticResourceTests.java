@@ -41,6 +41,8 @@ class StaticResourceTests {
                 // 016-08: 첫 오류 칸 focus 코드가 들어 있는지 확인
                 .andExpect(content().string(containsString("querySelector(\".is-invalid\")")))
                 // 025-07: method 속성 링크 처리 코드
-                .andExpect(content().string(containsString("a[method]")));
+                .andExpect(content().string(containsString("a[method]")))
+                // 029-05: data-value select 기본값 맞추기 코드
+                .andExpect(content().string(containsString("select[data-value]")));
     }
 }

@@ -46,6 +46,18 @@ document.addEventListener("click", (e) => {
     form.submit();
 });
 
+// 029-05: data-value 가 있는 <select> 는 그 값을 선택된 상태로 맞춘다 (강사식: 검색 옵션 기본값을 JS 로)
+//         029-04 목록의 검색 대상 select 가 th:data-value="${kwType}" 로 현재 값을 담아 둔다
+//         → 검색 후 다시 그려진 화면에서도 방금 고른 "제목/내용/글쓴이" 가 그대로 보인다
+//         option 마다 th:selected 조건을 쓰지 않아도 되고, 앞으로 다른 select 에도 data-value 만 달면 된다
+onReady(() => {
+    document.querySelectorAll("select[data-value]").forEach((select) => {
+        if (select.dataset.value) {
+            select.value = select.dataset.value;
+        }
+    });
+});
+
 // 016-08: 서버 검증에 실패해 폼이 다시 열렸을 때, 첫 번째 오류 입력칸에 커서를 둔다 (강사식)
 //         016-06 의 th:errorclass 가 오류 칸에 is-invalid 클래스를 붙이므로 그 클래스로 찾는다
 //         querySelector 는 화면 위에서부터 처음 만나는 하나를 돌려준다 → 첫 오류 칸
