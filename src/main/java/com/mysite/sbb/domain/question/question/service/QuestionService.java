@@ -5,6 +5,7 @@ import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import com.mysite.sbb.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,16 @@ public class QuestionService {
     // 009-01: 질문 목록 조회. 지금은 findAll() 그대로지만, 018 페이징·029 검색 같은 규칙이 이 메서드 안에 쌓인다
     public List<Question> getList() {
         return questionRepository.findAll();
+    }
+
+    // 016-01: 질문 등록. 생성일시·수정일시는 BaseEntity 의 Auditing 이 채운다 (책은 setCreateDate 를 직접 호출)
+    //         @Transactional → 저장 중 예외가 나면 되돌린다
+    @Transactional
+    public Question create(String subject, String content) {
+        Question question = new Question();
+        question.setSubject(subject);
+        question.setContent(content);
+        return questionRepository.save(question);
     }
 
     // 010-02: id로 질문 하나 조회. findById 는 Optional 을 돌려주므로, 비어 있으면 DataNotFoundException(404)을 던진다

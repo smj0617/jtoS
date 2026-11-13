@@ -353,3 +353,8 @@
 - 작업: `static/resource/global.js`(`onReady` 도우미) 추가, `layout.html`에서 `<script defer>`로 불러옴
 - 이유: 여러 화면이 함께 쓸 JS를 한 곳에 모은다 (강사식). 016, 025에서 함수를 더한다
 - 결과: 테스트 15개 통과
+
+### 016-01 질문 등록, QuestionService.create 질문 저장
+- 작업: `QuestionService.create(subject, content)`(`@Transactional`) 추가와 테스트
+- 이유: 질문 등록 처리 (책 2-16). 생성일시는 004-02 Auditing이 채운다
+- 결과: 테스트 16개 통과

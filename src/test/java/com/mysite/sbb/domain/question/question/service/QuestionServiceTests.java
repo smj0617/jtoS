@@ -44,6 +44,17 @@ class QuestionServiceTests {
                 .containsExactly("질문1", "질문2");
     }
 
+    // 016-01: 질문 등록
+    @Test
+    @DisplayName("create는 질문을 저장하고 생성일시를 채운다")
+    void create() {
+        Question q = questionService.create("새 질문", "새 내용");
+
+        assertThat(q.getId()).isNotNull();
+        assertThat(q.getCreateDate()).isNotNull();
+        assertThat(questionService.getQuestion(q.getId()).getSubject()).isEqualTo("새 질문");
+    }
+
     // 010-02: 단건 조회 성공과 실패
     @Test
     @DisplayName("getQuestion은 id로 질문을 찾고, 없으면 DataNotFoundException을 던진다")
