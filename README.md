@@ -363,3 +363,8 @@
 - 작업: `GET /questions/new` → `question_form.html`(제목, 내용, `POST /questions`로 보내는 폼)
 - 이유: 질문 입력 화면 (책 2-16). REST 규칙으로 `/questions/new` (책은 `/question/create`)
 - 결과: 테스트 17개 통과
+
+### 016-03 질문 등록, 저장 요청 POST /questions
+- 작업: `POST /questions`가 `subject`, `content`를 받아 저장하고 `redirect:/questions`
+- 이유: 등록 폼의 질문 저장 (책 2-16). 같은 자원 주소에 POST = 생성(REST)
+- 결과: 테스트 18개 통과

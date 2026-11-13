@@ -12,7 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -82,6 +84,19 @@ class QuestionControllerTests {
                 .andExpect(view().name("question_form"))
                 .andExpect(content().string(containsString("<title>질문 등록 | SBB</title>")))
                 .andExpect(content().string(containsString("action=\"/questions\"")));
+    }
+
+    // 016-03: 질문 저장
+    @Test
+    @DisplayName("POST /questions 는 질문을 저장하고 목록으로 리다이렉트한다")
+    void create() throws Exception {
+        mvc.perform(post("/questions")
+                        .param("subject", "새 질문")
+                        .param("content", "새 내용"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions"));
+
+        assertThat(questionRepository.findBySubject("새 질문")).isPresent();
     }
 
     // 010-03: 상세 화면과 없는 질문의 404

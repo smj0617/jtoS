@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -41,6 +43,16 @@ public class QuestionController {
     @GetMapping("/new")
     public String showCreate() {
         return "question_form";
+    }
+
+    // 016-03: 질문 저장 (책 2-16)
+    //         REST 규칙: 같은 자원 주소에 POST → POST /questions = 질문 하나 생성
+    //         폼의 name="subject", name="content" 값을 @RequestParam 으로 받는다 (016-05 에서 폼 객체로 바꾼다)
+    //         저장 후 목록으로 redirect → 새로고침해도 다시 저장되지 않는다 (012-02 PRG 와 같다)
+    @PostMapping
+    public String create(@RequestParam String subject, @RequestParam String content) {
+        questionService.create(subject, content);
+        return "redirect:/questions";
     }
 
     // 010-03: 질문 상세 화면 (책 2-10)
