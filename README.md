@@ -234,3 +234,8 @@
 - 작업: `QuestionServiceTests`에서 질문 2개를 저장한 뒤 `getList()`가 두 제목을 순서대로 돌려주는지 확인
 - 이유: 컨트롤러 테스트와 서비스 테스트를 나눠 두면 실패했을 때 화면 문제인지 처리 문제인지 바로 알 수 있다
 - 결과: 테스트 9개 통과
+
+### 010-01 상세, 데이터가 없을 때 쓰는 DataNotFoundException 추가
+- 작업: `global.exception.DataNotFoundException`(`RuntimeException` 상속, `@ResponseStatus(NOT_FOUND)`, 메시지를 생성자로 받음)
+- 이유: 없는 데이터를 요청하면 서버 오류(500)가 아니라 "없음"(404)으로 응답해야 한다 (책 2-10). 책의 고정 문구 대신 무엇이 없는지 메시지를 받는다(강사식)
+- 결과: 테스트 통과. 실제 사용은 010-02
