@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 // 007-03: 새 파일. 질문 화면을 담당하는 컨트롤러 (책 2-07)
 //         @RequiredArgsConstructor → final 필드를 받는 생성자를 Lombok이 만들고, 스프링이 그 생성자로 빈을 주입한다
@@ -31,13 +32,16 @@ public class QuestionController {
     //         Model 에 담은 값은 템플릿에서 ${questionList} 로 꺼내 쓴다
     // 011-01: "/question/list" → "/list" (앞부분은 클래스의 @RequestMapping 이 붙인다)
     // 011-02: GET /questions → 질문 목록 (/list 같은 동사·명사 꼬리를 붙이지 않는다)
+    // 018-03: 주소의 ?page=N 값을 받는다. 없으면 1페이지
+    //         강사식: 사용자에게 보이는 페이지 번호는 1부터 (책은 0부터). 서비스(PageRequest)는 0부터이므로 1을 뺀다
+    //         1보다 작은 값(0, 음수)이 들어오면 1페이지로 본다
     @GetMapping
-    public String list(Model model) {
+    public String list(@RequestParam(defaultValue = "1") int page, Model model) {
         // 009-02: questionRepository.findAll() → questionService.getList()
-        // 018-01: 서비스가 Page 를 돌려준다. 우선 첫 페이지(0)만 보여 준다 (page 값 받기는 018-03)
-        //         Page 도 반복할 수 있어서 템플릿의 th:each 는 그대로 동작한다
-        Page<Question> questionList = questionService.getList(0);
-        model.addAttribute("questionList", questionList);
+        // 018-01: 서비스가 Page 를 돌려준다. Page 도 반복할 수 있어서 템플릿의 th:each 는 그대로 동작한다
+        // 018-03: getList(0) → getList(page - 1). 모델 이름도 Page 객체라는 뜻으로 questionList → paging
+        Page<Question> paging = questionService.getList(Math.max(page, 1) - 1);
+        model.addAttribute("paging", paging);
         return "question_list";
     }
 

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -79,6 +80,27 @@ class QuestionControllerTests {
                 .andExpect(content().string(containsString("href=\"/resource/global.css\"")))
                 // 010-04: 목록의 제목이 상세 링크인지 확인
                 .andExpect(content().string(containsString("href=\"/questions/" + q1.getId() + "\"")));
+    }
+
+    // 018-03: ?page 값으로 페이지 고르기
+    @Test
+    @DisplayName("?page=2 는 두 번째 페이지(11번째 이후 질문)를 보여 준다")
+    void listPage() throws Exception {
+        // setUp 의 q1 이 가장 먼저 저장됐으므로, 11개를 더 저장하면 최신순에서 12번째 → 2페이지로 밀려난다
+        for (int i = 1; i <= 11; i++) {
+            Question q = new Question();
+            q.setSubject("페이지질문" + i);
+            q.setContent("내용");
+            questionRepository.save(q);
+        }
+
+        mvc.perform(get("/questions").param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("sbb가 무엇인가요?")));
+
+        mvc.perform(get("/questions").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("sbb가 무엇인가요?"))));
     }
 
     // 016-02: 등록 폼 화면
