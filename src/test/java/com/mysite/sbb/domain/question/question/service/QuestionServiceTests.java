@@ -87,6 +87,22 @@ class QuestionServiceTests {
         assertThat(found.getModifyDate()).isAfter(found.getCreateDate());
     }
 
+    // 026-02: 질문 추천
+    @Test
+    @DisplayName("vote 는 추천자를 추가하고, 같은 회원이 두 번 추천해도 1표다")
+    void vote() {
+        Question q = saveQuestion("추천할 질문");
+        Member m1 = memberService.join("voter1", "voter1@test.com", "1234");
+        Member m2 = memberService.join("voter2", "voter2@test.com", "1234");
+
+        questionService.vote(q, m1);
+        questionService.vote(q, m1);
+        questionService.vote(q, m2);
+        questionRepository.flush();
+
+        assertThat(questionRepository.findById(q.getId()).get().getVoter()).hasSize(2);
+    }
+
     // 010-02: 단건 조회 성공과 실패
     @Test
     @DisplayName("getQuestion은 id로 질문을 찾고, 없으면 DataNotFoundException을 던진다")

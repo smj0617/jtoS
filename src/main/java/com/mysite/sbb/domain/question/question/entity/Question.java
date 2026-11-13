@@ -5,6 +5,7 @@ import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.global.jpa.entity.BaseEntity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.CascadeType;
@@ -15,7 +16,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // 004-01: 새 파일. 책 2-04 그대로의 질문 엔티티
 //         @Entity → JPA가 이 클래스를 question 테이블과 연결한다 (ddl-auto: update 라서 테이블이 자동으로 생긴다)
@@ -38,6 +41,12 @@ public class Question extends BaseEntity {
     //         024 이전에 저장된 질문(샘플 데이터)은 글쓴이가 없으므로 비어 있을 수 있다(null 허용)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member author;
+
+    // 026-02: 이 질문을 추천한 회원들 (책 3-10)
+    //         회원 여러 명이 질문 여러 개를 추천 → @ManyToMany. question_voter 연결 테이블(question_id, voter_id)이 생긴다
+    //         Set → 같은 회원이 두 번 들어가지 않는다(026-01 equals/hashCode). 추천 수는 voter.size()
+    @ManyToMany
+    private Set<Member> voter = new HashSet<>();
 
     // 004-01: 이 질문에 달린 답변 목록. 테이블에 컬럼이 생기지 않는다
     //         mappedBy = "question" → 관계의 주인은 Answer.question (FK는 answer 테이블에 있다)

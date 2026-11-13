@@ -62,6 +62,13 @@ public class QuestionService {
         questionRepository.delete(question);
     }
 
+    // 026-02: 질문 추천 (책 3-10). 추천자 Set 에 회원을 넣는다. 이미 추천했으면 Set 이라 그대로(중복 추천 안 됨)
+    //         변경 감지로 question_voter 테이블에 한 줄이 추가된다
+    @Transactional
+    public void vote(Question question, Member member) {
+        question.getVoter().add(member);
+    }
+
     // 010-02: id로 질문 하나 조회. findById 는 Optional 을 돌려주므로, 비어 있으면 DataNotFoundException(404)을 던진다
     public Question getQuestion(Integer id) {
         return questionRepository.findById(id)

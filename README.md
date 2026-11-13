@@ -691,3 +691,9 @@
 - 이유: 026-02부터 추천한 회원을 `Set<Member>`에 담는다. Set은 `equals`/`hashCode`로 중복을 거른다. 기본 `equals`는 "메모리상 같은 객체"만 같다고 봐서, DB에서 따로 읽어 온 같은 회원을 다른 사람으로 볼 수 있다 (강사식)
 - 결과: 회원을 저장하고 영속성 컨텍스트를 비운 뒤 다시 읽으면 메모리상 다른 객체(`isNotSameAs`)지만 `equals`는 true이고, 둘을 `HashSet`에 넣으면 1개만 남는다. 저장 전 `new Member()` 두 개는 서로 다르다. 기존 테스트도 모두 통과(`gradlew test` 58개)
 - 메모: `hashCode`를 id로 계산하면 저장 전(null)과 저장 후 값이 달라져, Set에 넣은 뒤 저장하면 찾지 못하게 된다. 그래서 클래스 기준으로 고정했다
+
+### 026-02 추천, 질문 추천자 voter 와 QuestionService.vote
+- 작업: `Question`에 `@ManyToMany private Set<Member> voter = new HashSet<>();`, `QuestionService.vote(question, member)`(`voter.add(member)`, `@Transactional`). 테스트 추가
+- 이유: 질문 추천 (책 3-10). 회원 여러 명이 질문 여러 개를 추천하므로 `@ManyToMany`. `Set`과 026-01 `equals`로 같은 회원이 두 번 추천해도 한 표만 남는다
+- 결과: 테스트 시작 로그에 `create table question_voter (question_id integer not null, voter_id integer not null, primary key (question_id, voter_id))` 연결 테이블이 생긴다. `voter1`이 두 번, `voter2`가 한 번 추천한 뒤 다시 읽으면 추천자 2명. `gradlew test` 59개 통과
+- 메모: 연결 테이블의 기본키가 (질문, 회원) 두 칸이라 DB도 같은 회원의 중복 추천을 막는다
