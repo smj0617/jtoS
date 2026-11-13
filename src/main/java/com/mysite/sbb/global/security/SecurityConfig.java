@@ -37,7 +37,14 @@ public class SecurityConfig {
                 //         성공 → defaultSuccessUrl("/") 로 이동, 실패 → /members/login?error 로 돌려보낸다(기본값)
                 .formLogin(form -> form
                         .loginPage("/members/login")
-                        .defaultSuccessUrl("/"));
+                        .defaultSuccessUrl("/"))
+                // 023-04: 로그아웃. POST /members/logout 을 시큐리티가 처리한다 (책 3-07은 GET 주소로 로그아웃)
+                //         POST + CSRF 토큰이 필요하므로, 다른 사이트가 링크·이미지 하나로 사용자를 몰래 로그아웃시킬 수 없다
+                //         세션을 없애(invalidateHttpSession) 로그인 정보를 지우고 첫 화면으로 보낸다
+                .logout(logout -> logout
+                        .logoutUrl("/members/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true));
         return http.build();
     }
 

@@ -572,3 +572,9 @@
 - 이유: 아이디·비밀번호 확인을 스프링 시큐리티에 맡긴다 (책 3-07). `loginPage`를 주면 시큐리티 자동 로그인 화면 대신 023-02 화면을 쓰고, 같은 주소로 오는 POST를 시큐리티가 로그인 처리한다(023-01 `MemberSecurityService`로 회원을 찾고 022-03 `PasswordEncoder`로 비교)
 - 결과: dev 서버에서 로그인 폼 토큰과 함께 `devuser`/`1234`를 보내면 302로 `/` 이동(로그인 성공), `devuser`/`wrong`이면 302로 `/members/login?error`(023-02 안내 문구가 나오는 주소). 테스트에서 성공 시 `authenticated().withUsername("user1")`, 실패 시 `unauthenticated()` 확인. `gradlew test` 40개 통과
 - 메모: 로그인 성공 상태는 서버 세션에 저장되고 브라우저는 세션 쿠키(`JSESSIONID`)로 자신을 알린다
+
+### 023-04 로그아웃, POST /members/logout 로그아웃 설정
+- 작업: `SecurityConfig`에 `.logout(logout -> logout.logoutUrl("/members/logout").logoutSuccessUrl("/").invalidateHttpSession(true))`. 로그아웃 테스트 2개
+- 이유: 로그아웃 (책 3-07). 책은 `GET /user/logout`으로 로그아웃하도록 설정을 바꾸지만, 시큐리티 기본대로 POST + CSRF 토큰으로만 받는다. GET이면 다른 사이트가 `<img src=".../logout">` 하나로 사용자를 몰래 로그아웃시킬 수 있다
+- 결과: 테스트에서 실제로 로그인해 받은 세션으로 `POST /members/logout`을 보내면 로그아웃(`unauthenticated()`)되고 302로 `/` 이동. 같은 주소를 GET으로 열면 404(로그아웃 처리 대상이 아님). 화면의 로그아웃 버튼은 023-05에서 POST 폼으로 만든다. `gradlew test` 42개 통과
+- 메모: `invalidateHttpSession(true)`는 서버 세션 자체를 없앤다. 세션에 담긴 로그인 정보도 함께 사라진다

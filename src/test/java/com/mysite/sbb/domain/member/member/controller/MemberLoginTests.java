@@ -7,11 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -48,5 +54,26 @@ class MemberLoginTests {
         mvc.perform(formLogin("/members/login").user("user1").password("9999"))
                 .andExpect(unauthenticated())
                 .andExpect(redirectedUrl("/members/login?error"));
+    }
+
+    // 023-04: 로그아웃
+    @Test
+    @DisplayName("로그인 후 POST /members/logout 하면 같은 세션이 로그아웃되고 첫 화면으로 이동한다")
+    void logoutSuccess() throws Exception {
+        // 023-04: 실제로 로그인해서 세션을 받은 뒤, 그 세션으로 로그아웃한다
+        MockHttpSession session = (MockHttpSession) mvc.perform(formLogin("/members/login").user("user1").password("1234"))
+                .andExpect(authenticated())
+                .andReturn().getRequest().getSession();
+
+        mvc.perform(post("/members/logout").session(session).with(csrf()))
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    @DisplayName("GET /members/logout 으로는 로그아웃되지 않는다")
+    void logoutByGetIsNotAllowed() throws Exception {
+        mvc.perform(get("/members/logout").with(user("user1")))
+                .andExpect(status().isNotFound());
     }
 }
