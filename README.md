@@ -89,3 +89,10 @@
 - 이유: 책과 강의(14163 2강) 모두 `SbbApplication`을 쓰므로, 이름을 맞춰 두면 코드를 비교할 때 헷갈리지 않는다
 - 결과: `SbbApplicationTests` 통과, 실행 로그에 `Started SbbApplication`, `[sbb]` 표시
 - 메모: IntelliJ Rename의 "텍스트 속 이름도 바꾸기" 옵션 때문에 README의 001-01 메모까지 바뀌어서 원래대로 되돌림
+
+### 002-01 컨트롤러, MainController와 액션 메서드 2개 추가 (@ResponseBody 없이)
+- 작업: `@Controller` `MainController`에 `@GetMapping("/")`, `@GetMapping("/hello")` 액션 메서드 추가
+- 이유: `@ResponseBody`가 없으면 리턴한 문자열이 어떻게 처리되는지 직접 보기 위해 (14163 3강)
+- 결과: `/`, `/hello`, `/not-exist` 모두 404. 하지만 원인이 다르다
+  - `/not-exist`: 매핑된 액션 메서드가 없음 → 정적 파일에서 찾다가 실패 (`No static resource not-exist`)
+  - `/hello`: 액션 메서드는 실행됨 → 리턴값 `Hello SBB`를 **화면(뷰) 이름**으로 해석 → `/Hello SBB`로 forward → 그런 파일이 없어서 404 (`No static resource Hello SBB`, 스택에 `InternalResourceView.forward`)
