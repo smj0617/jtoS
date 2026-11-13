@@ -195,6 +195,21 @@ class QuestionControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // 029-02: ?kw 로 검색
+    @Test
+    @DisplayName("GET /questions?kw=검색어 는 검색어가 들어간 질문만 보여 준다")
+    void searchByKw() throws Exception {
+        Question other = new Question();
+        other.setSubject("전혀 다른 글");
+        other.setContent("내용");
+        questionRepository.save(other);
+
+        mvc.perform(get("/questions").param("kw", "sbb"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                .andExpect(content().string(not(containsString("전혀 다른 글"))));
+    }
+
     // 028-02: 상세 화면 내용 마크다운
     @Test
     @DisplayName("상세 화면은 내용을 마크다운으로 보여 주고, 직접 쓴 script 태그는 글자로 바꾼다")

@@ -26,13 +26,14 @@ public class QuestionService {
     //         page 는 0부터 시작하는 페이지 번호. PageRequest.of(page, 10) → "page 번째 페이지, 한 페이지에 10개"
     //         findAll(Pageable) 은 JpaRepository 에 이미 있다. limit/offset 쿼리와 전체 개수(count) 쿼리를 함께 실행한다
     //         Page 에는 이 페이지의 질문 목록 + 전체 개수·전체 페이지 수·이전/다음 페이지 여부가 들어 있다
-    public Page<Question> getList(int page) {
+    // 029-02: 검색어 kw 를 받아 029-01 search 쿼리로 찾는다. kw 가 빈 문자열이면 like '%%' 라 전체가 나온다
+    public Page<Question> getList(int page, String kw) {
         // 018-02: 최신 글이 먼저 오도록 정렬 조건 추가 (책 3-02)
         //         Sort.by(Sort.Order.desc("createDate")) → 작성일시 내림차순. "createDate" 는 엔티티의 필드 이름이다
         //         정렬은 DB 쿼리의 order by 로 실행된다 (페이지를 자르기 전에 정렬해야 1페이지가 최신 10개가 된다)
         // 018-06: 작성일시가 같으면 id 가 큰(나중에 저장된) 질문이 먼저 → 같은 시각에 저장된 질문도 순서가 항상 같다
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate"), Sort.Order.desc("id")));
-        return questionRepository.findAll(pageable);
+        return questionRepository.search(kw, pageable);
     }
 
     // 016-01: 질문 등록. 생성일시·수정일시는 BaseEntity 의 Auditing 이 채운다 (책은 setCreateDate 를 직접 호출)

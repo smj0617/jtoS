@@ -47,12 +47,14 @@ public class QuestionController {
     //         강사식: 사용자에게 보이는 페이지 번호는 1부터 (책은 0부터). 서비스(PageRequest)는 0부터이므로 1을 뺀다
     //         1보다 작은 값(0, 음수)이 들어오면 1페이지로 본다
     @GetMapping
-    public String list(@RequestParam(defaultValue = "1") int page, Model model) {
+    // 029-02: ?kw=검색어 도 받는다. 없으면 빈 문자열(전체 목록). 화면의 검색창·페이지 링크가 쓰도록 모델에 kw 도 담는다
+    public String list(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String kw, Model model) {
         // 009-02: questionRepository.findAll() → questionService.getList()
         // 018-01: 서비스가 Page 를 돌려준다. Page 도 반복할 수 있어서 템플릿의 th:each 는 그대로 동작한다
         // 018-03: getList(0) → getList(page - 1). 모델 이름도 Page 객체라는 뜻으로 questionList → paging
-        Page<Question> paging = questionService.getList(Math.max(page, 1) - 1);
+        Page<Question> paging = questionService.getList(Math.max(page, 1) - 1, kw);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return "question_list";
     }
 
