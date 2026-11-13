@@ -674,3 +674,8 @@
 - 작업: `AnswerController`에 수정 화면 `GET /questions/{questionId}/answers/{id}/edit`와 수정 처리 `PUT /questions/{questionId}/answers/{id}`(둘 다 로그인 필요, 답변 글쓴이 `checkAuthor`), 새 템플릿 `answer_modify.html`(기존 내용, `_method=put`), 상세의 답변 카드에 글쓴이 전용 "수정" 버튼
 - 이유: 답변 수정 (책 3-09의 `/answer/modify/{id}`). 025-03~05 질문 수정과 같은 흐름을 답변 주소(질문의 하위 자원) 아래에 둔다
 - 결과: 답변 글쓴이 `user1`이 수정 화면을 열면 textarea에 "처음 답변"이 채워져 있고, `POST` + `_method=put`으로 "고친 답변"을 보내면 302로 질문 상세 이동, 답변 내용이 바뀐다. 다른 회원 `other`가 수정 화면을 열면 403. `gradlew test` 55개 통과
+
+### 025-10 수정·삭제, 답변 삭제 DELETE 처리와 삭제 버튼
+- 작업: `AnswerController.delete()`(`@PreAuthorize("isAuthenticated()")`, `@DeleteMapping("/{id}")`, 답변 글쓴이 확인 후 `answerService.delete`(025-08), 질문 상세로 리다이렉트). 상세의 답변 카드에 `<a href="/questions/{qid}/answers/{id}" method="DELETE" data-confirm="정말로 삭제하시겠습니까?">삭제</a>`
+- 이유: 답변 삭제 (책 3-09의 `GET /answer/delete/{id}`). 025-06, 025-07 질문 삭제와 같은 방식으로, `global.js`가 이미 `method` 링크를 처리하므로 링크만 달면 된다
+- 결과: 답변 글쓴이 `user1`이 상세를 열면 그 답변의 삭제 링크(`method="DELETE"`)가 있다. 다른 회원 `other`의 DELETE는 403이고 답변이 남는다. `user1`의 DELETE는 302로 질문 상세 이동, 질문의 답변 목록이 빈다. `gradlew test` 56개 통과

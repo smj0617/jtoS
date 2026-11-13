@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,6 +92,32 @@ class AnswerControllerTests {
         memberService.join("other", "other@test.com", "1234");
         mvc.perform(get("/questions/%d/answers/%d/edit".formatted(q.getId(), a.getId())).with(user("other")))
                 .andExpect(status().isForbidden());
+    }
+
+    // 025-10: 답변 삭제
+    @Test
+    @DisplayName("다른 회원의 답변 DELETE 는 403, 글쓴이는 삭제하고 상세로 이동. 상세에는 삭제 링크가 있다")
+    void delete() throws Exception {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+        Answer a = q.addAnswer("지울 답변");
+        a.setAuthor(memberService.getMember("user1"));
+        questionRepository.flush();
+
+        mvc.perform(get("/questions/" + q.getId()).with(user("user1")))
+                .andExpect(content().string(containsString("href=\"/questions/%d/answers/%d\" method=\"DELETE\"".formatted(q.getId(), a.getId()))));
+
+        memberService.join("other", "other@test.com", "1234");
+        mvc.perform(MockMvcRequestBuilders.delete("/questions/%d/answers/%d".formatted(q.getId(), a.getId())).with(csrf()).with(user("other")))
+                .andExpect(status().isForbidden());
+        assertThat(q.getAnswerList()).hasSize(1);
+
+        mvc.perform(MockMvcRequestBuilders.delete("/questions/%d/answers/%d".formatted(q.getId(), a.getId())).with(csrf()).with(user("user1")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions/" + q.getId()));
+        assertThat(q.getAnswerList()).isEmpty();
     }
 
     // 024-06: 로그인하지 않으면 답변 등록이 로그인 화면으로 보내진다
