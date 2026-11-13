@@ -590,3 +590,8 @@
 - 이유: 누가 쓴 질문인지 저장한다 (책 3-08). 회원 한 명이 질문 여러 개를 쓰므로 `@ManyToOne`. 강사식으로 LAZY(004-03과 같은 이유: 질문만 볼 때는 회원을 읽지 않는다)
 - 결과: `question` 테이블에 `author_id` 외래키 컬럼이 생긴다. 회원 `writer1`을 글쓴이로 넣어 저장하고 다시 읽으면 `getAuthor().getUsername()`이 `writer1`. dev DB의 기존 질문은 `author_id`가 비어 있다(null 허용). `gradlew test` 44개 통과
 - 메모: dev 서버의 `ddl-auto: update`가 기존 `question` 테이블에 `author_id` 컬럼만 추가하고 데이터는 그대로 둔다
+
+### 024-02 글쓴이, 답변에 글쓴이 author 필드
+- 작업: `Answer`에 `@ManyToOne(fetch = FetchType.LAZY) private Member author;`. 024-01 테스트에 답변 글쓴이 확인 추가
+- 이유: 누가 쓴 답변인지 저장한다 (책 3-08). 024-01 질문과 같은 관계·같은 LAZY
+- 결과: `answer` 테이블에 `author_id` 외래키 컬럼이 생긴다. `addAnswer`로 만든 답변에 글쓴이 `writer1`을 넣고 저장한 뒤 다시 읽으면 글쓴이 아이디가 `writer1`. `gradlew test` 44개 통과

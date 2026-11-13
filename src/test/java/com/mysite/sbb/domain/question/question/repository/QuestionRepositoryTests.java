@@ -60,6 +60,12 @@ class QuestionRepositoryTests {
         questionRepository.saveAndFlush(q);
 
         assertThat(questionRepository.findById(q.getId()).get().getAuthor().getUsername()).isEqualTo("writer1");
+
+        // 024-02: 답변에도 글쓴이를 넣을 수 있다
+        Answer a = q.addAnswer("글쓴이 있는 답변");
+        a.setAuthor(member);
+        questionRepository.flush();
+        assertThat(answerRepository.findById(a.getId()).get().getAuthor().getUsername()).isEqualTo("writer1");
     }
 
     @Test

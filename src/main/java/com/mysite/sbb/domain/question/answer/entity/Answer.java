@@ -2,6 +2,7 @@
 package com.mysite.sbb.domain.question.answer.entity;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.global.jpa.entity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -28,4 +29,8 @@ public class Answer extends BaseEntity {
     //         EAGER는 쓰지도 않는 연관 데이터까지 매번 읽어서 쿼리가 불필요하게 늘어난다 (N+1 문제의 원인)
     @ManyToOne(fetch = FetchType.LAZY)
     private Question question;
+
+    // 024-02: 답변 글쓴이 (책 3-08). 024-01 질문과 같은 방식 → answer 테이블에 author_id 외래키
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member author;
 }
