@@ -726,3 +726,8 @@
 - 이유: 답변을 고치거나 추천한 뒤에도 그 답변을 계속 보고 있어야 한다 (책 3-11). 027-01에서 붙인 카드 id를 그대로 쓴다
 - 결과: 답변 수정 후 리다이렉트 주소가 `/questions/{qid}#answer_{답변 id}`, 답변 추천 후에도 같은 형태. `gradlew test` 62개 통과
 - 메모: 질문 추천·수정은 질문이 페이지 맨 위에 있으므로 앵커 없이 상세로 돌아간다
+
+### 028-01 마크다운, commonmark 와 MarkdownService
+- 작업: `org.commonmark:commonmark:0.24.0` 의존성(부트가 버전을 관리하지 않아 직접 지정). `global.markdown.MarkdownService.markdown(String)`이 commonmark `Parser`로 읽고 `HtmlRenderer`(`escapeHtml(true)`, `sanitizeUrls(true)`)로 HTML을 만든다. 테스트 `MarkdownServiceTests`(스프링 없이)
+- 이유: 질문·답변에 굵게, 목록, 코드 같은 서식을 쓰게 한다 (책 3-12의 `CommonUtil`). 강사식으로 서비스로 분리해 여러 도메인이 같이 쓴다. 책 방식 그대로면 내용에 `<script>`를 쓰면 다른 사람 브라우저에서 실행되므로(XSS), 직접 쓴 HTML은 글자로 바꾸고 `javascript:` 같은 위험한 링크 주소도 막았다
+- 결과: `**굵게**`는 `<strong>굵게</strong>`, `- 하나`는 `<li>하나</li>`, `` `code` ``는 `<code>code</code>`. `<script>alert('x')</script>`는 `<script>` 태그가 없어지고 `&lt;script&gt;` 글자로 바뀐다. `gradlew test` 64개 통과

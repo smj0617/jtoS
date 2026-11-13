@@ -36,6 +36,8 @@ dependencies {
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     // 023-05: 타임리프에서 로그인 상태를 읽는 sec: 문법 (sec:authorize, sec:authentication)
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    // 028-01: 마크다운 → HTML 변환 라이브러리 (책 3-12). 스프링 부트가 버전을 관리하지 않아 직접 적는다
+    implementation("org.commonmark:commonmark:0.24.0")
     runtimeOnly("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
