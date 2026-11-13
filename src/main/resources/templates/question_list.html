@@ -1,0 +1,26 @@
+<!-- 007-03: 새 파일. 질문 목록 템플릿 (책 2-07) -->
+<!--         th:each → questionList 를 하나씩 꺼내 <tr>을 반복해서 그린다 -->
+<!--         th:text → 태그 안의 글자를 그 값으로 바꾼다 (HTML 특수문자는 자동으로 이스케이프) -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>질문 목록</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>제목</th>
+        <th>작성일시</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="question : ${questionList}">
+        <td th:text="${question.subject}"></td>
+        <td th:text="${question.createDate}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

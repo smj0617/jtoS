@@ -206,3 +206,10 @@
 - 작업: `application-dev.yaml`에 `spring.thymeleaf.cache: false`
 - 이유: 타임리프는 기본으로 템플릿을 캐시해서 HTML을 고쳐도 서버를 다시 켜야 반영된다. 개발 중에만 끄고 운영(기본값 true)은 그대로 둔다 (강사식, 책에는 없는 설정)
 - 결과: dev 서버에서 HTML을 고치면 새로고침만으로 반영된다. test 프로파일과 운영 설정에는 영향이 없다. 테스트 6개 통과
+
+### 007-03 질문 목록, QuestionController와 question_list.html
+- 작업: `domain.question.question.controller.QuestionController`의 `GET /question/list`가 `questionRepository.findAll()` 결과를 `Model`에 `questionList`로 담고 `question_list`를 반환. `templates/question_list.html`은 `th:each`로 제목·작성일시 표를 그린다. MockMvc 테스트 `QuestionControllerTests` 추가
+- 이유: 질문 목록 화면 (책 2-07). 서버와 브라우저 없이 화면 결과를 빠르게 확인하려고 MockMvc 테스트를 함께 둔다
+- 결과: `GET /question/list` → 200, 뷰 이름 `question_list`, 응답 HTML에 질문 제목 "sbb가 무엇인가요?"가 들어 있다. 테스트 7개 통과
+- 메모: `@ResponseBody`가 없으면 반환한 문자열은 템플릿 이름이다(002-01에서 404가 났던 이유와 같다). 이번에는 템플릿이 있어서 화면이 그려진다
+
