@@ -373,3 +373,8 @@
 - 작업: 목록 표 아래 `/questions/new`로 가는 `btn btn-primary` 링크
 - 이유: 목록 → 등록 화면 이동 (책 2-16)
 - 결과: 테스트 18개 통과
+
+### 016-05 질문 등록, record 폼 QuestionForm과 서버 검증
+- 작업: `spring-boot-starter-validation` 추가. `QuestionForm` record(`@NotBlank`, `@Size(max = 200)`)를 `@Valid`로 받고 `BindingResult`에 오류가 있으면 폼을 다시 보여 준다
+- 이유: 빈 값과 너무 긴 제목을 서버에서 막는다 (책 2-16). 강사식으로 폼은 record
+- 결과: 테스트 19개 통과 (공백 제목 → 200 + `question_form`, 저장 개수 변화 없음)

@@ -101,6 +101,21 @@ class QuestionControllerTests {
         assertThat(questionRepository.findBySubject("새 질문")).isPresent();
     }
 
+    // 016-05: 서버 검증 실패
+    @Test
+    @DisplayName("제목이 비어 있으면 저장하지 않고 등록 폼을 다시 보여 준다")
+    void createInvalid() throws Exception {
+        long before = questionRepository.count();
+
+        mvc.perform(post("/questions")
+                        .param("subject", " ")
+                        .param("content", "내용"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("question_form"));
+
+        assertThat(questionRepository.count()).isEqualTo(before);
+    }
+
     // 010-03: 상세 화면과 없는 질문의 404
     @Test
     @DisplayName("질문 상세 화면에 제목과 내용이 보이고, 없는 질문은 404")

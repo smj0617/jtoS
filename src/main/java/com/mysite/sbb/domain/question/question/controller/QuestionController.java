@@ -1,15 +1,17 @@
 package com.mysite.sbb.domain.question.question.controller;
 
+import com.mysite.sbb.domain.question.question.dto.QuestionForm;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -49,9 +51,16 @@ public class QuestionController {
     //         REST 규칙: 같은 자원 주소에 POST → POST /questions = 질문 하나 생성
     //         폼의 name="subject", name="content" 값을 @RequestParam 으로 받는다 (016-05 에서 폼 객체로 바꾼다)
     //         저장 후 목록으로 redirect → 새로고침해도 다시 저장되지 않는다 (012-02 PRG 와 같다)
+    // 016-05: @RequestParam 두 개 → 폼 객체(QuestionForm record) 하나로 받는다
+    //         @Valid → QuestionForm 의 @NotBlank, @Size 규칙으로 검사한다
+    //         BindingResult → 검사 결과. 반드시 @Valid 객체 바로 뒤에 둬야 한다 (없으면 검증 실패 시 400 오류로 끝난다)
+    //         오류가 있으면 저장하지 않고 등록 폼을 다시 보여 준다 (오류 메시지 표시는 016-06)
     @PostMapping
-    public String create(@RequestParam String subject, @RequestParam String content) {
-        questionService.create(subject, content);
+    public String create(@Valid QuestionForm questionForm, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "question_form";
+        }
+        questionService.create(questionForm.subject(), questionForm.content());
         return "redirect:/questions";
     }
 
