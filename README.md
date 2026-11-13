@@ -595,3 +595,8 @@
 - 작업: `Answer`에 `@ManyToOne(fetch = FetchType.LAZY) private Member author;`. 024-01 테스트에 답변 글쓴이 확인 추가
 - 이유: 누가 쓴 답변인지 저장한다 (책 3-08). 024-01 질문과 같은 관계·같은 LAZY
 - 결과: `answer` 테이블에 `author_id` 외래키 컬럼이 생긴다. `addAnswer`로 만든 답변에 글쓴이 `writer1`을 넣고 저장한 뒤 다시 읽으면 글쓴이 아이디가 `writer1`. `gradlew test` 44개 통과
+
+### 024-03 글쓴이, MemberService.getMember 아이디로 회원 찾기
+- 작업: `MemberService.getMember(username)`이 `findByUsername`으로 회원을 찾고, 없으면 `DataNotFoundException("아이디 회원이 없습니다.")`(010-01, 404). 테스트 추가
+- 이유: 로그인한 사용자 정보(`Principal`)에는 아이디 글자만 들어 있다. 질문·답변의 글쓴이(024-01, 024-02)로 저장하려면 `Member` 엔티티가 필요해서 아이디로 찾는다 (책 3-08의 `getUser`)
+- 결과: `user1` 가입 후 `getMember("user1")`의 이메일이 `user1@test.com`. 없는 `nobody`는 `DataNotFoundException`과 메시지 "nobody 회원이 없습니다." `gradlew test` 45개 통과
