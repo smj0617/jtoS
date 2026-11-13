@@ -239,3 +239,8 @@
 - 작업: `global.exception.DataNotFoundException`(`RuntimeException` 상속, `@ResponseStatus(NOT_FOUND)`, 메시지를 생성자로 받음)
 - 이유: 없는 데이터를 요청하면 서버 오류(500)가 아니라 "없음"(404)으로 응답해야 한다 (책 2-10). 책의 고정 문구 대신 무엇이 없는지 메시지를 받는다(강사식)
 - 결과: 테스트 통과. 실제 사용은 010-02
+
+### 010-02 상세, QuestionService.getQuestion 단건 조회
+- 작업: `getQuestion(id)`가 `findById(id).orElseThrow(...)`로 질문을 찾고, 없으면 `DataNotFoundException("N번 질문이 없습니다.")`
+- 이유: 상세 화면에 쓸 질문 하나 조회 (책 2-10). `Optional`을 꺼낼 때 `get()` 대신 `orElseThrow`로 없는 경우를 명확히 처리
+- 결과: 테스트 10개 통과 (성공 조회, 없는 id 999999 → 예외와 메시지)

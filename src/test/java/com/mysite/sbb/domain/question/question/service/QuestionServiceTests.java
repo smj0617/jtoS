@@ -2,6 +2,7 @@ package com.mysite.sbb.domain.question.question.service;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.global.exception.DataNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 // 009-03: 새 파일. 서비스 메서드를 직접 호출해 결과를 확인하는 테스트
 //         컨트롤러 테스트(화면)와 따로 두면, 실패했을 때 문제가 화면 쪽인지 처리 쪽인지 바로 구분된다
@@ -40,5 +42,17 @@ class QuestionServiceTests {
         assertThat(questionService.getList())
                 .extracting(Question::getSubject)
                 .containsExactly("질문1", "질문2");
+    }
+
+    // 010-02: 단건 조회 성공과 실패
+    @Test
+    @DisplayName("getQuestion은 id로 질문을 찾고, 없으면 DataNotFoundException을 던진다")
+    void getQuestion() {
+        Question q = saveQuestion("질문1");
+
+        assertThat(questionService.getQuestion(q.getId()).getSubject()).isEqualTo("질문1");
+        assertThatThrownBy(() -> questionService.getQuestion(999999))
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage("999999번 질문이 없습니다.");
     }
 }

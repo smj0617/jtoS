@@ -2,6 +2,7 @@ package com.mysite.sbb.domain.question.question.service;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +20,11 @@ public class QuestionService {
     // 009-01: 질문 목록 조회. 지금은 findAll() 그대로지만, 018 페이징·029 검색 같은 규칙이 이 메서드 안에 쌓인다
     public List<Question> getList() {
         return questionRepository.findAll();
+    }
+
+    // 010-02: id로 질문 하나 조회. findById 는 Optional 을 돌려주므로, 비어 있으면 DataNotFoundException(404)을 던진다
+    public Question getQuestion(Integer id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("%d번 질문이 없습니다.".formatted(id)));
     }
 }
