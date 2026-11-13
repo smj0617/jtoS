@@ -542,3 +542,9 @@
 - 이유: 회원가입 입력 화면 (책 3-06). REST 규칙으로 입력 화면은 `/members/new`, 처리는 `POST /members`(책은 `/user/signup` 하나로 GET·POST). 016 질문 폼에서 쓴 방식을 그대로 적용
 - 결과: `GET /members/new` → 200, 탭 제목 `회원가입 | SBB`, 폼 `action="/members"`, 비밀번호 칸(`name="password1"`, 입력이 ●로 가려짐), CSRF 숨은 입력칸이 들어 있다. 아직 `POST /members`를 받는 곳이 없어 가입은 안 된다. `gradlew test` 32개 통과
 - 메모: 글로벌 오류는 특정 칸이 아닌 오류(비밀번호 불일치, 이미 있는 아이디 등)다. 022-07에서 이 자리에 보여 준다
+
+### 022-07 회원가입, 가입 처리 POST /members (불일치·중복 처리)
+- 작업: `MemberController.join()`이 `@Valid MemberJoinForm` + `BindingResult`로 받는다. ① 검증 실패면 폼 다시 표시 ② `password1`과 `password2`가 다르면 `bindingResult.rejectValue("password2", ...)`로 비밀번호 확인 칸 오류 ③ `memberService.join`에서 `DataIntegrityViolationException`(022-01 유니크 제약 위반)이 나면 `bindingResult.reject(...)`로 글로벌 오류 ④ 성공하면 `redirect:/`
+- 이유: 회원가입 처리 (책 3-06). 사용자가 무엇이 틀렸는지 알 수 있게, 특정 칸 문제는 그 칸 아래(rejectValue), 칸과 상관없는 문제는 폼 위(reject)에 보여 준다
+- 결과: 정상 입력이면 302로 `/` 이동, `findByUsername("user1")`로 저장 확인. 비밀번호를 1234/9999로 다르게 보내면 200 + 가입 폼, "2개의 비밀번호가 일치하지 않습니다."가 나오고 저장되지 않는다. 이미 있는 `user1`로 가입하면 폼 위 빨간 상자(`alert alert-danger`)에 "이미 등록된 아이디 또는 이메일입니다."가 나온다. `gradlew test` 35개 통과
+- 메모: 중복 검사를 미리 `findByUsername`으로 하지 않고 DB 유니크 제약 예외로 잡는 것은 책 방식이다. 동시에 두 명이 같은 아이디로 가입해도 DB가 하나만 받아 준다
