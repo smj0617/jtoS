@@ -31,7 +31,11 @@ public class BaseInitData {
     // 005-02: ApplicationRunner → 스프링 준비가 끝난 직후 한 번 실행된다
     @Bean
     public ApplicationRunner baseInitDataRunner() {
-        return args -> self.work();
+        return args -> {
+            self.work();
+            // 018-05: 페이징 확인용 질문을 이어서 넣는다
+            self.work2();
+        };
     }
 
     // 005-02: 이미 데이터가 있으면 넣지 않는다 (db_dev 는 파일 DB라 재시작해도 데이터가 남는다)
@@ -50,5 +54,21 @@ public class BaseInitData {
         q2.setContent("id는 자동으로 생성되나요?");
         q2.addAnswer("네 자동으로 생성됩니다.");
         questionRepository.save(q2);
+    }
+
+    // 018-05: 페이징 확인용 샘플 질문 300개 (책 3-02는 테스트 코드로 300개를 넣는다, 강사식은 BaseInitData)
+    //         한 페이지 10개 → 30페이지 이상이 되어 018-04 의 "앞뒤 5개만 보이기"까지 확인할 수 있다
+    //         이미 넣었으면(질문이 100개 이상) 다시 넣지 않는다 → 서버를 다시 켜도 300개씩 쌓이지 않는다
+    //         work() 와 나눈 이유: 이미 db_dev 에 샘플 2개가 있어 work() 는 건너뛰지만, 이 데이터는 새로 필요하다
+    @Transactional
+    public void work2() {
+        if (questionRepository.count() >= 100) return;
+
+        for (int i = 1; i <= 300; i++) {
+            Question q = new Question();
+            q.setSubject("테스트 데이터입니다:[%03d]".formatted(i));
+            q.setContent("내용무");
+            questionRepository.save(q);
+        }
     }
 }
