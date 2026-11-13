@@ -7,11 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 // 007-03: 새 파일. 질문 화면을 담당하는 컨트롤러 (책 2-07)
 //         @RequiredArgsConstructor → final 필드를 받는 생성자를 Lombok이 만들고, 스프링이 그 생성자로 빈을 주입한다
+// 011-01: 클래스에 공통 주소 /question 을 붙였다 (책 2-11)
+//         → 메서드의 주소는 이 뒤에 이어진다. 주소가 바뀌어도 이 한 줄만 고치면 된다
+@RequestMapping("/question")
 @Controller
 @RequiredArgsConstructor
 public class QuestionController {
@@ -20,7 +24,8 @@ public class QuestionController {
 
     // 007-03: @ResponseBody 가 없으므로 반환한 문자열은 템플릿 이름 → templates/question_list.html 을 그린다
     //         Model 에 담은 값은 템플릿에서 ${questionList} 로 꺼내 쓴다
-    @GetMapping("/question/list")
+    // 011-01: "/question/list" → "/list" (앞부분은 클래스의 @RequestMapping 이 붙인다)
+    @GetMapping("/list")
     public String list(Model model) {
         // 009-02: questionRepository.findAll() → questionService.getList()
         List<Question> questionList = questionService.getList();
@@ -31,7 +36,8 @@ public class QuestionController {
     // 010-03: 질문 상세 화면 (책 2-10)
     //         {id} → 주소의 그 자리 값을 @PathVariable 로 받는다. /question/detail/3 이면 id = 3
     //         없는 id면 getQuestion 이 DataNotFoundException 을 던져 404 가 된다
-    @GetMapping("/question/detail/{id}")
+    // 011-01: "/question/detail/{id}" → "/detail/{id}"
+    @GetMapping("/detail/{id}")
     public String detail(@PathVariable Integer id, Model model) {
         Question question = questionService.getQuestion(id);
         model.addAttribute("question", question);
