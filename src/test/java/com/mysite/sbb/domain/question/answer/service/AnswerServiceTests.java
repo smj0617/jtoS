@@ -1,5 +1,7 @@
 package com.mysite.sbb.domain.question.answer.service;
 
+import com.mysite.sbb.domain.member.member.entity.Member;
+import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
@@ -23,6 +25,10 @@ class AnswerServiceTests {
     @Autowired
     private QuestionRepository questionRepository;
 
+    // 024-05: 글쓴이 회원을 만들기 위해
+    @Autowired
+    private MemberService memberService;
+
     @Test
     @DisplayName("create는 답변을 저장하고 질문의 답변 목록에도 넣는다")
     void create() {
@@ -31,11 +37,14 @@ class AnswerServiceTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        Answer a = answerService.create(q, "답변입니다.");
+        // 024-05: 글쓴이와 함께 저장
+        Member author = memberService.join("writer1", "writer1@test.com", "1234");
+        Answer a = answerService.create(q, "답변입니다.", author);
 
         assertThat(a.getId()).isNotNull();
         assertThat(a.getCreateDate()).isNotNull();
         assertThat(a.getQuestion()).isSameAs(q);
+        assertThat(a.getAuthor().getUsername()).isEqualTo("writer1");
         assertThat(q.getAnswerList()).containsExactly(a);
     }
 }

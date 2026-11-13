@@ -606,3 +606,8 @@
 - 이유: 024-01에서 만든 질문 글쓴이를 실제로 채운다 (책 3-08). `Principal`은 스프링 시큐리티가 컨트롤러에 넣어 주는 "지금 로그인한 사용자" 정보
 - 결과: 로그인한 `user1`이 `POST /questions`로 등록하면 302로 목록 이동, 저장된 질문의 `getAuthor().getUsername()`이 `user1`. 서비스 테스트에서도 글쓴이 `writer1`이 저장됨. `gradlew test` 45개 통과
 - 메모: 아직 로그인하지 않은 상태로 등록하면 `principal`이 없어 오류(500)가 난다. 024-06에서 로그인한 사용자만 등록할 수 있게 막는다
+
+### 024-05 글쓴이, 답변 저장 때 로그인 회원을 글쓴이로 기록
+- 작업: `AnswerService.create(question, content, author)`가 `addAnswer` 후 `answer.setAuthor(author)`. `AnswerController.create`가 `Principal`을 받아 `memberService.getMember(principal.getName())`로 글쓴이를 넘긴다. 답변 테스트도 `user1`로 로그인한 상태로 등록
+- 이유: 024-02에서 만든 답변 글쓴이를 실제로 채운다 (책 3-08). 024-04 질문과 같은 방식
+- 결과: 로그인한 `user1`이 `POST /questions/{id}/answers`로 등록하면 302로 상세 이동, 질문의 첫 답변 글쓴이가 `user1`. 서비스 테스트에서 글쓴이 `writer1` 확인. `gradlew test` 45개 통과

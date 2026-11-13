@@ -1,7 +1,9 @@
 package com.mysite.sbb.domain.question.answer.controller;
 
+import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 // 021-01: 시큐리티가 켜지면 POST 에 CSRF 토큰이 필요하다. 테스트 요청에는 csrf() 로 토큰을 붙인다
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +36,15 @@ class AnswerControllerTests {
     @Autowired
     private QuestionRepository questionRepository;
 
+    // 024-05: 답변 등록에 쓸 로그인 회원
+    @Autowired
+    private MemberService memberService;
+
+    @BeforeEach
+    void setUp() {
+        memberService.join("user1", "user1@test.com", "1234");
+    }
+
     @Test
     @DisplayName("POST /questions/{id}/answers 는 답변을 저장하고 상세로 리다이렉트한다")
     void create() throws Exception {
@@ -41,12 +53,14 @@ class AnswerControllerTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf())
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf()).with(user("user1"))
                         .param("content", "답변입니다."))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/questions/%d".formatted(q.getId())));
 
         assertThat(q.getAnswerList()).extracting("content").containsExactly("답변입니다.");
+        // 024-05: 로그인한 user1 이 답변 글쓴이로 저장된다
+        assertThat(q.getAnswerList().get(0).getAuthor().getUsername()).isEqualTo("user1");
     }
 
     // 016-09: 답변 서버 검증 실패
@@ -58,7 +72,7 @@ class AnswerControllerTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf())
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf()).with(user("user1"))
                         .param("content", " "))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
