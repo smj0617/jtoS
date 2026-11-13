@@ -70,7 +70,9 @@ class QuestionControllerTests {
         mvc.perform(get("/questions/" + q1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
-                .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")));
+                .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")))
+                // 012-03: 답변 폼이 답변 등록 주소로 POST 하는지 확인
+                .andExpect(content().string(containsString("action=\"/questions/" + q1.getId() + "/answers\"")));
 
         mvc.perform(get("/questions/999999"))
                 .andExpect(status().isNotFound());

@@ -277,3 +277,8 @@
 - 이유: 답변 폼이 보낼 요청 처리 (책 2-12). 답변은 질문에 속한 자원이라 질문 주소 아래에 둔다(강사식, 책은 `/answer/create/{id}`)
 - 결과: 테스트 13개 통과 (302 → 상세 주소, 질문의 답변 목록에 내용 추가)
 - 메모: 저장 후 화면을 바로 그리지 않고 리다이렉트하는 것을 PRG(Post-Redirect-Get)라 한다. 새로고침해도 POST가 다시 가지 않는다
+
+### 012-03 답변, 상세 화면에 답변 입력 폼
+- 작업: `question_detail.html`에 `POST /questions/{id}/answers`로 보내는 폼(`textarea name="content"`, 답변등록 버튼)
+- 이유: 상세 화면에서 답변 입력 (책 2-12). 입력칸의 `name`이 컨트롤러 `@RequestParam` 이름과 같아야 값이 들어간다
+- 결과: 테스트 13개 통과 (상세 HTML에 `action="/questions/{id}/answers"`)

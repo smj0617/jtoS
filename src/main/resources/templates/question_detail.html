@@ -8,5 +8,13 @@
 <body>
 <h1 th:text="${question.subject}"></h1>
 <div th:text="${question.content}"></div>
+
+<!-- 012-03: 답변 입력 폼 (책 2-12) -->
+<!--         th:action → 012-02 의 POST /questions/{id}/answers 로 보낸다 -->
+<!--         textarea 의 name="content" 가 컨트롤러의 @RequestParam content 로 들어간다 -->
+<form th:action="@{|/questions/${question.id}/answers|}" method="post">
+    <textarea name="content" id="content" rows="15"></textarea>
+    <input type="submit" value="답변등록">
+</form>
 </body>
 </html>
