@@ -96,3 +96,8 @@
 - 결과: `/`, `/hello`, `/not-exist` 모두 404. 하지만 원인이 다르다
   - `/not-exist`: 매핑된 액션 메서드가 없음 → 정적 파일에서 찾다가 실패 (`No static resource not-exist`)
   - `/hello`: 액션 메서드는 실행됨 → 리턴값 `Hello SBB`를 **화면(뷰) 이름**으로 해석 → `/Hello SBB`로 forward → 그런 파일이 없어서 404 (`No static resource Hello SBB`, 스택에 `InternalResourceView.forward`)
+
+### 002-02 컨트롤러, 액션 메서드에 @ResponseBody 추가
+- 작업: `index()`, `hello()`에 `@ResponseBody` 추가
+- 이유: 액션 메서드의 리턴값을 화면 이름이 아니라 **응답 본문 그대로** 브라우저에 보내기 위해 (14163 4강)
+- 결과: `/` → `안녕하세요, SBB입니다.`, `/hello` → `Hello SBB` (200). `/not-exist`는 여전히 404
