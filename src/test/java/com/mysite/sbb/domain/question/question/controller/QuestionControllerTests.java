@@ -77,6 +77,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
                 .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")))
+                // 015-04: 상세 화면도 레이아웃을 통해 부트스트랩 링크를 받는지 확인
+                .andExpect(content().string(containsString("bootstrap/5.3.3/css/bootstrap.min.css")))
                 // 014-04: 질문·답변이 부트스트랩 카드로 그려지는지 확인
                 .andExpect(content().string(containsString("class=\"card my-3\"")))
                 .andExpect(content().string(containsString("class=\"btn btn-primary my-2\"")))
