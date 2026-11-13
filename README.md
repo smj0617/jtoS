@@ -249,3 +249,9 @@
 - 작업: `GET /question/detail/{id}`가 `@PathVariable`로 id를 받아 `getQuestion(id)`를 `question_detail.html`로 그린다. 템플릿은 제목과 내용
 - 이유: 질문 하나를 보는 화면 (책 2-10)
 - 결과: 테스트 11개 통과. 상세 200 + 내용 포함, 없는 id 999999는 404 (010-01 예외의 `@ResponseStatus` 동작 확인)
+
+### 010-04 상세, 목록의 제목을 상세 화면 링크로
+- 작업: `question_list.html`의 제목을 `th:href="@{|/question/detail/${question.id}|}"` 링크로 변경
+- 이유: 목록에서 제목을 눌러 상세로 이동 (책 2-10)
+- 결과: 테스트 통과. 목록 HTML에 `href="/question/detail/{id}"` 포함
+- 메모: `@{}`는 앱 기준 주소를 만들고, `|...|`는 글자와 `${}` 값을 이어 붙이는 문법이다

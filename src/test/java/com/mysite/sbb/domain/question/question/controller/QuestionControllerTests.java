@@ -57,7 +57,9 @@ class QuestionControllerTests {
         mvc.perform(get("/question/list"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
-                .andExpect(content().string(containsString("sbb가 무엇인가요?")));
+                .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 010-04: 목록의 제목이 상세 링크인지 확인
+                .andExpect(content().string(containsString("href=\"/question/detail/" + q1.getId() + "\"")));
     }
 
     // 010-03: 상세 화면과 없는 질문의 404
