@@ -45,7 +45,9 @@ class MemberControllerTests {
                 .andExpect(content().string(containsString("<title>회원가입 | SBB</title>")))
                 .andExpect(content().string(containsString("action=\"/members\"")))
                 .andExpect(content().string(containsString("name=\"password1\"")))
-                .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")));
+                .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")))
+                // 022-08: 내비게이션 바에 회원가입 메뉴
+                .andExpect(content().string(containsString("href=\"/members/new\">회원가입</a>")));
     }
 
     // 022-07: 가입 처리
