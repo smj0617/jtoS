@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.question.service;
 
+import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import com.mysite.sbb.global.exception.DataNotFoundException;
@@ -37,10 +38,12 @@ public class QuestionService {
     // 016-01: 질문 등록. 생성일시·수정일시는 BaseEntity 의 Auditing 이 채운다 (책은 setCreateDate 를 직접 호출)
     //         @Transactional → 저장 중 예외가 나면 되돌린다
     @Transactional
-    public Question create(String subject, String content) {
+    // 024-04: 글쓴이(author)도 받아서 함께 저장한다
+    public Question create(String subject, String content, Member author) {
         Question question = new Question();
         question.setSubject(subject);
         question.setContent(content);
+        question.setAuthor(author);
         return questionRepository.save(question);
     }
 

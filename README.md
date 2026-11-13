@@ -600,3 +600,9 @@
 - 작업: `MemberService.getMember(username)`이 `findByUsername`으로 회원을 찾고, 없으면 `DataNotFoundException("아이디 회원이 없습니다.")`(010-01, 404). 테스트 추가
 - 이유: 로그인한 사용자 정보(`Principal`)에는 아이디 글자만 들어 있다. 질문·답변의 글쓴이(024-01, 024-02)로 저장하려면 `Member` 엔티티가 필요해서 아이디로 찾는다 (책 3-08의 `getUser`)
 - 결과: `user1` 가입 후 `getMember("user1")`의 이메일이 `user1@test.com`. 없는 `nobody`는 `DataNotFoundException`과 메시지 "nobody 회원이 없습니다." `gradlew test` 45개 통과
+
+### 024-04 글쓴이, 질문 저장 때 로그인 회원을 글쓴이로 기록
+- 작업: `QuestionService.create(subject, content, author)`가 `question.setAuthor(author)`까지 저장. `QuestionController.create`가 `Principal principal`을 받아 `memberService.getMember(principal.getName())`(024-03)로 회원을 찾아 넘긴다. 테스트는 회원 `user1`을 만들고 `.with(user("user1"))`로 로그인한 상태에서 등록
+- 이유: 024-01에서 만든 질문 글쓴이를 실제로 채운다 (책 3-08). `Principal`은 스프링 시큐리티가 컨트롤러에 넣어 주는 "지금 로그인한 사용자" 정보
+- 결과: 로그인한 `user1`이 `POST /questions`로 등록하면 302로 목록 이동, 저장된 질문의 `getAuthor().getUsername()`이 `user1`. 서비스 테스트에서도 글쓴이 `writer1`이 저장됨. `gradlew test` 45개 통과
+- 메모: 아직 로그인하지 않은 상태로 등록하면 `principal`이 없어 오류(500)가 난다. 024-06에서 로그인한 사용자만 등록할 수 있게 막는다

@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.question.controller;
 
+import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 // 021-01: 시큐리티가 켜지면 POST 에 CSRF 토큰이 필요하다. 테스트 요청에는 csrf() 로 토큰을 붙인다
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,8 +41,13 @@ class QuestionControllerTests {
 
     private Question q1;
 
+    // 024-04: 질문 등록에 쓸 로그인 회원
+    @Autowired
+    private MemberService memberService;
+
     @BeforeEach
     void setUp() {
+        memberService.join("user1", "user1@test.com", "1234");
         q1 = new Question();
         q1.setSubject("sbb가 무엇인가요?");
         q1.setContent("sbb에 대해서 알고 싶습니다.");
@@ -135,13 +142,15 @@ class QuestionControllerTests {
     @Test
     @DisplayName("POST /questions 는 질문을 저장하고 목록으로 리다이렉트한다")
     void create() throws Exception {
-        mvc.perform(post("/questions").with(csrf())
+        mvc.perform(post("/questions").with(csrf()).with(user("user1"))
                         .param("subject", "새 질문")
                         .param("content", "새 내용"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/questions"));
 
         assertThat(questionRepository.findBySubject("새 질문")).isPresent();
+        // 024-04: 로그인한 user1 이 글쓴이로 저장된다
+        assertThat(questionRepository.findBySubject("새 질문").get().getAuthor().getUsername()).isEqualTo("user1");
     }
 
     // 021-03: th:action 을 쓴 폼에는 타임리프가 CSRF 토큰 숨은 입력칸을 자동으로 넣는다
@@ -180,7 +189,7 @@ class QuestionControllerTests {
     void createInvalid() throws Exception {
         long before = questionRepository.count();
 
-        mvc.perform(post("/questions").with(csrf())
+        mvc.perform(post("/questions").with(csrf()).with(user("user1"))
                         .param("subject", " ")
                         .param("content", "내용"))
                 .andExpect(status().isOk())

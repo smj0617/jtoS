@@ -1,5 +1,7 @@
 package com.mysite.sbb.domain.question.question.service;
 
+import com.mysite.sbb.domain.member.member.entity.Member;
+import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import com.mysite.sbb.global.exception.DataNotFoundException;
@@ -25,6 +27,10 @@ class QuestionServiceTests {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    // 024-04: 글쓴이 회원을 만들기 위해
+    @Autowired
+    private MemberService memberService;
 
     // 009-03: 테스트용 질문 저장 도우미
     private Question saveQuestion(String subject) {
@@ -54,10 +60,13 @@ class QuestionServiceTests {
     @Test
     @DisplayName("create는 질문을 저장하고 생성일시를 채운다")
     void create() {
-        Question q = questionService.create("새 질문", "새 내용");
+        // 024-04: 글쓴이와 함께 저장한다
+        Member author = memberService.join("writer1", "writer1@test.com", "1234");
+        Question q = questionService.create("새 질문", "새 내용", author);
 
         assertThat(q.getId()).isNotNull();
         assertThat(q.getCreateDate()).isNotNull();
+        assertThat(q.getAuthor().getUsername()).isEqualTo("writer1");
         assertThat(questionService.getQuestion(q.getId()).getSubject()).isEqualTo("새 질문");
     }
 
