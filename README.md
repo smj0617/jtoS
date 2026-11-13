@@ -394,3 +394,8 @@
 - 작업: `global.js`에 `onReady(() => document.querySelector(".is-invalid")?.focus())` 동작 추가
 - 이유: 검증 실패 후 고칠 칸으로 바로 커서 이동 (강사식). 공통 JS라 모든 폼에 적용
 - 결과: 테스트 19개 통과
+
+### 016-09 질문 등록, 답변 AnswerForm과 서버 검증
+- 작업: `AnswerForm` record(`@NotBlank content`), `AnswerController`가 `@Valid AnswerForm` + `BindingResult`로 받고 오류면 상세 화면을 다시 그림
+- 이유: 빈 답변 방지 (책 2-16). 질문과 같은 방식
+- 결과: 테스트 20개 통과

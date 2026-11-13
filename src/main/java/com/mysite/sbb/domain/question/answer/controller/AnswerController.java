@@ -1,14 +1,17 @@
 package com.mysite.sbb.domain.question.answer.controller;
 
+import com.mysite.sbb.domain.question.answer.dto.AnswerForm;
 import com.mysite.sbb.domain.question.answer.service.AnswerService;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 // 012-02: 새 파일. 답변 요청을 받는 컨트롤러 (책 2-12)
 //         강사식 REST 주소: 답변은 질문에 속한 자원이라 /questions/{questionId}/answers 아래에 둔다
@@ -21,12 +24,18 @@ public class AnswerController {
     private final AnswerService answerService;
 
     // 012-02: POST /questions/{questionId}/answers → 답변 생성
-    //         @RequestParam content → 폼의 name="content" 입력값을 받는다
     //         저장 후 화면을 그리지 않고 상세 주소로 redirect → 새로고침해도 같은 답변이 두 번 등록되지 않는다 (PRG 패턴)
+    // 016-09: @RequestParam String content → @Valid AnswerForm + BindingResult (016-05 질문과 같은 방식)
+    //         오류가 있으면 저장하지 않고 상세 화면을 다시 그린다. 상세 화면은 question 이 필요하므로 모델에 담는다
     @PostMapping
-    public String create(@PathVariable Integer questionId, @RequestParam String content) {
+    public String create(@PathVariable Integer questionId, @Valid AnswerForm answerForm,
+                         BindingResult bindingResult, Model model) {
         Question question = questionService.getQuestion(questionId);
-        answerService.create(question, content);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("question", question);
+            return "question_detail";
+        }
+        answerService.create(question, answerForm.content());
         return "redirect:/questions/%d".formatted(questionId);
     }
 }

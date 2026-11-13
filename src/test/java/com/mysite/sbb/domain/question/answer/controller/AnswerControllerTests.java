@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 // 012-02: 새 파일. 답변 등록 요청 테스트
 @ActiveProfiles("test")
@@ -42,5 +43,22 @@ class AnswerControllerTests {
                 .andExpect(redirectedUrl("/questions/%d".formatted(q.getId())));
 
         assertThat(q.getAnswerList()).extracting("content").containsExactly("답변입니다.");
+    }
+
+    // 016-09: 답변 서버 검증 실패
+    @Test
+    @DisplayName("답변 내용이 비어 있으면 저장하지 않고 상세 화면을 다시 보여 준다")
+    void createInvalid() throws Exception {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId()))
+                        .param("content", " "))
+                .andExpect(status().isOk())
+                .andExpect(view().name("question_detail"));
+
+        assertThat(q.getAnswerList()).isEmpty();
     }
 }
