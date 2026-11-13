@@ -30,7 +30,14 @@ public class SecurityConfig {
                 //         시큐리티 기본값 X-Frame-Options: DENY 는 모든 프레임을 막아 콘솔이 빈 화면이 된다
                 //         → 같은 사이트 안의 프레임만 허용(SAMEORIGIN). 다른 사이트가 우리 화면을 프레임에 넣는 공격(클릭재킹)은 계속 막힌다
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin()));
+                        .frameOptions(frame -> frame.sameOrigin()))
+                // 023-03: 폼 로그인 (책 3-07)
+                //         loginPage → 시큐리티 자동 로그인 화면 대신 023-02 화면을 쓴다. 같은 주소로 오는 POST 를 시큐리티가 로그인 처리한다
+                //         처리: MemberSecurityService(023-01)로 회원을 찾고 PasswordEncoder(022-03)로 비밀번호 비교
+                //         성공 → defaultSuccessUrl("/") 로 이동, 실패 → /members/login?error 로 돌려보낸다(기본값)
+                .formLogin(form -> form
+                        .loginPage("/members/login")
+                        .defaultSuccessUrl("/"));
         return http.build();
     }
 

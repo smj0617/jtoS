@@ -566,3 +566,9 @@
 - 이유: 로그인 화면 (책 3-07의 `/user/login`). 아이디·비밀번호 확인(POST)은 스프링 시큐리티가 처리하므로(023-03) 컨트롤러에는 화면 메서드만 둔다. 입력칸 이름 `username`, `password`는 시큐리티 기본값
 - 결과: `GET /members/login` → 200, `action="/members/login"` 폼과 비밀번호 칸. 평소에는 안내 문구가 없고, `?error`로 열면 빨간 상자에 안내가 나온다. 아직 로그인 처리 설정이 없어 실제 로그인은 023-03부터. `gradlew test` 38개 통과
 - 메모: 실패 안내는 아이디가 틀렸는지 비밀번호가 틀렸는지 나누지 않는다. 나누면 어떤 아이디가 가입돼 있는지 알려 주는 셈이 된다
+
+### 023-03 로그인, 시큐리티 폼 로그인 설정
+- 작업: `SecurityConfig`에 `.formLogin(form -> form.loginPage("/members/login").defaultSuccessUrl("/"))`. 테스트 `MemberLoginTests`(`SecurityMockMvcRequestBuilders.formLogin`)
+- 이유: 아이디·비밀번호 확인을 스프링 시큐리티에 맡긴다 (책 3-07). `loginPage`를 주면 시큐리티 자동 로그인 화면 대신 023-02 화면을 쓰고, 같은 주소로 오는 POST를 시큐리티가 로그인 처리한다(023-01 `MemberSecurityService`로 회원을 찾고 022-03 `PasswordEncoder`로 비교)
+- 결과: dev 서버에서 로그인 폼 토큰과 함께 `devuser`/`1234`를 보내면 302로 `/` 이동(로그인 성공), `devuser`/`wrong`이면 302로 `/members/login?error`(023-02 안내 문구가 나오는 주소). 테스트에서 성공 시 `authenticated().withUsername("user1")`, 실패 시 `unauthenticated()` 확인. `gradlew test` 40개 통과
+- 메모: 로그인 성공 상태는 서버 세션에 저장되고 브라우저는 세션 쿠키(`JSESSIONID`)로 자신을 알린다
