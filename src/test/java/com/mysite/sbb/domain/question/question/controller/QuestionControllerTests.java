@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+// 021-01: 시큐리티가 켜지면 POST 에 CSRF 토큰이 필요하다. 테스트 요청에는 csrf() 로 토큰을 붙인다
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -132,7 +134,7 @@ class QuestionControllerTests {
     @Test
     @DisplayName("POST /questions 는 질문을 저장하고 목록으로 리다이렉트한다")
     void create() throws Exception {
-        mvc.perform(post("/questions")
+        mvc.perform(post("/questions").with(csrf())
                         .param("subject", "새 질문")
                         .param("content", "새 내용"))
                 .andExpect(status().is3xxRedirection())
@@ -141,13 +143,25 @@ class QuestionControllerTests {
         assertThat(questionRepository.findBySubject("새 질문")).isPresent();
     }
 
+    // 021-01: CSRF 토큰 없이 보낸 POST 는 시큐리티가 막는다
+    @Test
+    @DisplayName("CSRF 토큰이 없는 POST /questions 는 403 으로 거부된다")
+    void createWithoutCsrf() throws Exception {
+        mvc.perform(post("/questions")
+                        .param("subject", "새 질문")
+                        .param("content", "새 내용"))
+                .andExpect(status().isForbidden());
+
+        assertThat(questionRepository.findBySubject("새 질문")).isEmpty();
+    }
+
     // 016-05: 서버 검증 실패
     @Test
     @DisplayName("제목이 비어 있으면 저장하지 않고 등록 폼을 다시 보여 준다")
     void createInvalid() throws Exception {
         long before = questionRepository.count();
 
-        mvc.perform(post("/questions")
+        mvc.perform(post("/questions").with(csrf())
                         .param("subject", " ")
                         .param("content", "내용"))
                 .andExpect(status().isOk())

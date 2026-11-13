@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+// 021-01: 시큐리티가 켜지면 POST 에 CSRF 토큰이 필요하다. 테스트 요청에는 csrf() 로 토큰을 붙인다
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,7 +41,7 @@ class AnswerControllerTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        mvc.perform(post("/questions/%d/answers".formatted(q.getId()))
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf())
                         .param("content", "답변입니다."))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/questions/%d".formatted(q.getId())));
@@ -56,7 +58,7 @@ class AnswerControllerTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        mvc.perform(post("/questions/%d/answers".formatted(q.getId()))
+        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf())
                         .param("content", " "))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
