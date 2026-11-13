@@ -669,3 +669,8 @@
 - 작업: `AnswerService`에 `getAnswer(id)`(없으면 `DataNotFoundException`), `modify(answer, content)`(값만 바꿔 변경 감지), `delete(answer)`(질문의 `answerList`에서 빼서 `orphanRemoval`로 삭제) 추가. 테스트 추가
 - 이유: 답변 수정·삭제 처리 (책 3-09). 삭제는 리포지터리로 직접 지우지 않고 질문의 목록에서 빼는 방식으로 했다. 004-03에서 답변은 질문을 통해서만 관리하기로 했고, 그래야 같은 요청 안에서 질문의 답변 목록과 DB가 어긋나지 않는다
 - 결과: 답변 "처음 답변"을 `modify`로 "고친 답변"으로 바꾸고 DB에 반영한 뒤 다시 읽으면 "고친 답변". `delete` 후 질문의 답변 목록이 비고, 같은 id로 `getAnswer`하면 `DataNotFoundException`. `gradlew test` 54개 통과
+
+### 025-09 수정·삭제, 답변 수정 화면·PUT 처리·수정 버튼
+- 작업: `AnswerController`에 수정 화면 `GET /questions/{questionId}/answers/{id}/edit`와 수정 처리 `PUT /questions/{questionId}/answers/{id}`(둘 다 로그인 필요, 답변 글쓴이 `checkAuthor`), 새 템플릿 `answer_modify.html`(기존 내용, `_method=put`), 상세의 답변 카드에 글쓴이 전용 "수정" 버튼
+- 이유: 답변 수정 (책 3-09의 `/answer/modify/{id}`). 025-03~05 질문 수정과 같은 흐름을 답변 주소(질문의 하위 자원) 아래에 둔다
+- 결과: 답변 글쓴이 `user1`이 수정 화면을 열면 textarea에 "처음 답변"이 채워져 있고, `POST` + `_method=put`으로 "고친 답변"을 보내면 302로 질문 상세 이동, 답변 내용이 바뀐다. 다른 회원 `other`가 수정 화면을 열면 403. `gradlew test` 55개 통과

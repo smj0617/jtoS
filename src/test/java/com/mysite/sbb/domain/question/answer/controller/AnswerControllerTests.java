@@ -1,6 +1,7 @@
 package com.mysite.sbb.domain.question.answer.controller;
 
 import com.mysite.sbb.domain.member.member.service.MemberService;
+import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,6 +63,34 @@ class AnswerControllerTests {
         assertThat(q.getAnswerList()).extracting("content").containsExactly("답변입니다.");
         // 024-05: 로그인한 user1 이 답변 글쓴이로 저장된다
         assertThat(q.getAnswerList().get(0).getAuthor().getUsername()).isEqualTo("user1");
+    }
+
+    // 025-09: 답변 수정 화면과 수정 처리
+    @Test
+    @DisplayName("답변 글쓴이는 수정 화면을 열고 POST + _method=put 으로 수정한다. 다른 회원은 403")
+    void modify() throws Exception {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+        Answer a = q.addAnswer("처음 답변");
+        a.setAuthor(memberService.getMember("user1"));
+        questionRepository.flush();
+
+        mvc.perform(get("/questions/%d/answers/%d/edit".formatted(q.getId(), a.getId())).with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("answer_modify"))
+                .andExpect(content().string(containsString(">처음 답변</textarea>")));
+
+        mvc.perform(post("/questions/%d/answers/%d".formatted(q.getId(), a.getId())).with(csrf()).with(user("user1"))
+                        .param("_method", "put").param("content", "고친 답변"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions/" + q.getId()));
+        assertThat(a.getContent()).isEqualTo("고친 답변");
+
+        memberService.join("other", "other@test.com", "1234");
+        mvc.perform(get("/questions/%d/answers/%d/edit".formatted(q.getId(), a.getId())).with(user("other")))
+                .andExpect(status().isForbidden());
     }
 
     // 024-06: 로그인하지 않으면 답변 등록이 로그인 화면으로 보내진다
