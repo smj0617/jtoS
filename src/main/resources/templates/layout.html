@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/resource/global.css}">
+    <!-- 017-03: 부트스트랩 자바스크립트(bundle = Popper 포함). 햄버거 버튼의 메뉴 펼치기(collapse) 같은 동작을 한다 -->
+    <!--         CSS(014-01)만으로는 모양만 생기고, 누르면 움직이는 동작은 이 JS 가 있어야 한다. 버전은 CSS 와 같은 5.3.3 -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <!-- 015-06: 공통 자바스크립트. defer → HTML 을 다 읽은 뒤 실행해서 화면 표시가 늦어지지 않는다 -->
     <script defer th:src="@{/resource/global.js}"></script>
     <!-- 015-05: 제목 패턴 (강사식). $LAYOUT_TITLE = 이 틀의 제목(SBB), $CONTENT_TITLE = 화면의 <title> -->

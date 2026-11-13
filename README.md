@@ -414,3 +414,8 @@
 - 작업: `layout.html`의 `<body>` 맨 위에 `<nav th:replace="~{navbar :: navbar}">`
 - 이유: 레이아웃에 한 번 붙이면 모든 화면에 메뉴가 나온다 (책 3-01)
 - 결과: 테스트 20개 통과
+
+### 017-03 내비게이션 바, 부트스트랩 JS로 햄버거 메뉴 동작
+- 작업: `layout.html`에 `bootstrap.bundle.min.js`(5.3.3, cdnjs, `defer`)
+- 이유: CSS는 모양만, 펼치기 같은 동작은 JS가 한다 (책 3-01)
+- 결과: 테스트 20개 통과
