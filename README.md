@@ -368,3 +368,8 @@
 - 작업: `POST /questions`가 `subject`, `content`를 받아 저장하고 `redirect:/questions`
 - 이유: 등록 폼의 질문 저장 (책 2-16). 같은 자원 주소에 POST = 생성(REST)
 - 결과: 테스트 18개 통과
+
+### 016-04 질문 등록, 목록에 질문 등록하기 버튼
+- 작업: 목록 표 아래 `/questions/new`로 가는 `btn btn-primary` 링크
+- 이유: 목록 → 등록 화면 이동 (책 2-16)
+- 결과: 테스트 18개 통과

@@ -61,6 +61,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 016-04: 목록에 질문 등록 버튼이 있는지 확인
+                .andExpect(content().string(containsString("href=\"/questions/new\"")))
                 // 015-06: 레이아웃이 공통 자바스크립트를 불러오는지 확인
                 .andExpect(content().string(containsString("src=\"/resource/global.js\"")))
                 // 015-05: 화면 제목과 사이트 제목이 패턴대로 합쳐지는지 확인
