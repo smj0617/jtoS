@@ -133,3 +133,10 @@
 - 결과: 임시 테스트(`select 1 + ?`, 값 41)로 확인. 로그에 `/* dynamic native SQL query */` 주석, 줄바꿈된 SQL, 색이 입혀진 키워드, `binding parameter (1:INTEGER) <- [41]`가 찍혔다. 임시 테스트는 확인 후 지웠다. `gradlew test` 통과, `bootRun` 정상 시작
 - 메모 1: `show_sql: true`는 `System.out`으로 찍혀 로그 형식(시간·레벨)이 빠진다. 그래서 `org.hibernate.SQL` 로거를 DEBUG로 켰다
 - 메모 2: 책에 나오는 `org.hibernate.type.descriptor.sql.BasicBinder`는 Hibernate 5 시절 이름이다. Hibernate 6 이상은 `org.hibernate.orm.jdbc.bind`
+### 004-01 엔티티, 책 그대로 Question·Answer 엔티티 작성
+- 작업: `com.mysite.sbb`에 `Question`(id, subject, content, createDate, answerList)과 `Answer`(id, content, createDate, question) 엔티티 추가. 책 2-04 코드 그대로(`@Setter`, `@ManyToOne` 기본 EAGER, `cascade = REMOVE`)
+- 이유: 강사식 개선(004-02 BaseEntity, 004-03 LAZY)을 하기 전에 책의 기본 모양을 먼저 남겨 두고, 무엇이 왜 바뀌는지 커밋으로 비교하려고
+- 결과: 테스트와 `bootRun` 로그에 `create table question`(subject `varchar(200)`, content `TEXT`, `create_date timestamp(6)`), `create table answer`(`question_id`), `alter table answer add constraint FK... foreign key (question_id) references question`. H2 콘솔 `jdbc:h2:./db_dev`에 `QUESTION`, `ANSWER` 테이블이 보인다
+- 메모 1: 자바 필드 `createDate`는 컬럼 `create_date`가 된다 (Spring Boot 기본 이름 규칙: 카멜 표기 → 밑줄 표기)
+- 메모 2: `answerList`(`@OneToMany(mappedBy)`)는 컬럼을 만들지 않는다. 외래키는 관계의 주인인 `Answer.question` 쪽 테이블에만 생긴다
+- 메모 3: 패키지는 006에서 도메인별로 옮긴다. 지금은 책 순서대로 `com.mysite.sbb`에 둔다
