@@ -629,3 +629,9 @@
 - 이유: HTML 폼은 `method`에 GET, POST만 쓸 수 있다. 강사식 REST는 수정을 `PUT /questions/{id}`, 삭제를 `DELETE /questions/{id}`로 받는다(책은 `POST /question/modify/{id}`, `GET /question/delete/{id}`). 이 필터를 켜면 폼에 `<input type="hidden" name="_method" value="PUT">`을 넣은 POST를 PUT으로 바꿔 컨트롤러에 넘긴다
 - 결과: 앱에 `HiddenHttpMethodFilter` 빈이 등록된다(테스트로 확인). 실제로 쓰는 곳은 025-04(PUT), 025-06(DELETE). `gradlew test` 48개 통과
 - 메모: 스프링 부트는 이 필터를 기본으로 꺼 둔다. 설정 한 줄로 켠다
+
+### 025-02 수정·삭제, QuestionService.modify 질문 수정
+- 작업: `QuestionService.modify(question, subject, content)`가 `setSubject`, `setContent`만 하고 `save`는 부르지 않는다. `@Transactional`. 테스트 추가
+- 이유: 질문 수정 처리 (책 3-09). JPA는 트랜잭션 안에서 읽은 엔티티의 값이 바뀌면 끝날 때 알아서 `update`를 보낸다(변경 감지). 수정일시는 004-02 `@LastModifiedDate`가 자동으로 갱신한다(책은 `setModifyDate` 직접 호출)
+- 결과: "수정 전" 질문을 "수정 후"/"바뀐 내용"으로 바꾸고 DB에 반영(`flush`)한 뒤 다시 읽으면 제목·내용이 바뀌어 있고, `modifyDate`가 `createDate`보다 늦다. `gradlew test` 49개 통과
+- 메모: 테스트에서 생성 직후 바로 수정하면 두 시각이 같을 수 있어 5ms 기다렸다

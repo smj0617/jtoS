@@ -70,6 +70,23 @@ class QuestionServiceTests {
         assertThat(questionService.getQuestion(q.getId()).getSubject()).isEqualTo("새 질문");
     }
 
+    // 025-02: 질문 수정
+    @Test
+    @DisplayName("modify 는 제목·내용을 바꾸고, DB 반영 후 수정일시가 생성일시보다 늦다")
+    void modify() throws InterruptedException {
+        Question q = saveQuestion("수정 전");
+        questionRepository.flush();
+        Thread.sleep(5); // 수정일시가 생성일시와 달라지도록 아주 잠깐 기다린다
+
+        questionService.modify(q, "수정 후", "바뀐 내용");
+        questionRepository.flush();
+
+        Question found = questionRepository.findById(q.getId()).get();
+        assertThat(found.getSubject()).isEqualTo("수정 후");
+        assertThat(found.getContent()).isEqualTo("바뀐 내용");
+        assertThat(found.getModifyDate()).isAfter(found.getCreateDate());
+    }
+
     // 010-02: 단건 조회 성공과 실패
     @Test
     @DisplayName("getQuestion은 id로 질문을 찾고, 없으면 DataNotFoundException을 던진다")

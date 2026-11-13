@@ -47,6 +47,15 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
+    // 025-02: 질문 수정 (책 3-09)
+    //         엔티티 값을 바꾸기만 하고 save 를 부르지 않는다 → 트랜잭션이 끝날 때 JPA 가 바뀐 필드를 찾아 update 를 보낸다(변경 감지)
+    //         수정일시(modifyDate)는 BaseEntity 의 @LastModifiedDate 가 자동으로 갱신한다 (책은 setModifyDate 직접 호출)
+    @Transactional
+    public void modify(Question question, String subject, String content) {
+        question.setSubject(subject);
+        question.setContent(content);
+    }
+
     // 010-02: id로 질문 하나 조회. findById 는 Optional 을 돌려주므로, 비어 있으면 DataNotFoundException(404)을 던진다
     public Question getQuestion(Integer id) {
         return questionRepository.findById(id)
