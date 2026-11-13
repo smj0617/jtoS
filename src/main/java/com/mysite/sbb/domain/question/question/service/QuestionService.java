@@ -29,7 +29,8 @@ public class QuestionService {
         // 018-02: 최신 글이 먼저 오도록 정렬 조건 추가 (책 3-02)
         //         Sort.by(Sort.Order.desc("createDate")) → 작성일시 내림차순. "createDate" 는 엔티티의 필드 이름이다
         //         정렬은 DB 쿼리의 order by 로 실행된다 (페이지를 자르기 전에 정렬해야 1페이지가 최신 10개가 된다)
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+        // 018-06: 작성일시가 같으면 id 가 큰(나중에 저장된) 질문이 먼저 → 같은 시각에 저장된 질문도 순서가 항상 같다
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate"), Sort.Order.desc("id")));
         return questionRepository.findAll(pageable);
     }
 
