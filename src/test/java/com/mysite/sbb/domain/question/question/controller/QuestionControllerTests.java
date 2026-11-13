@@ -59,6 +59,8 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 013-02: 공통 CSS 를 불러오는지 확인
+                .andExpect(content().string(containsString("href=\"/resource/global.css\"")))
                 // 010-04: 목록의 제목이 상세 링크인지 확인
                 .andExpect(content().string(containsString("href=\"/questions/" + q1.getId() + "\"")));
     }
