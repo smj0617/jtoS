@@ -1,5 +1,8 @@
 package com.mysite.sbb;
 
+// 006-01: BaseEntity 가 global.jpa.entity 로 옮겨져 import 추가
+import com.mysite.sbb.global.jpa.entity.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

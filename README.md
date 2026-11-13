@@ -167,3 +167,9 @@
 - 결과: `bootRun` 로그에 insert SQL 8줄과 `binding parameter ... <- [sbb가 무엇인가요?]`, 생성·수정 일시 값이 찍혔다
 - 메모 1: `work()`는 `self.work()`로 부른다. `this.work()`로 부르면 스프링 프록시를 거치지 않아 `@Transactional`이 적용되지 않는다. 자기 자신을 주입받으면 순환 참조가 되므로 `@Lazy`를 붙였다
 - 메모 2: 004에서 테이블 구조가 바뀌어 기존 `db_dev.mv.db`를 지우고 새로 만들었다 (`ddl-auto: update`는 컬럼 추가는 하지만 지운 컬럼·바뀐 제약은 정리하지 않는다)
+
+### 006-01 도메인별 분류, 공통 엔티티 BaseEntity를 global.jpa.entity로
+- 작업: `BaseEntity`를 `com.mysite.sbb`에서 `com.mysite.sbb.global.jpa.entity`로 옮겼다. 아직 옮기지 않은 `Question`, `Answer`(같은 패키지라 import가 없던 파일)에 새 위치의 `BaseEntity` import를 추가했다
+- 이유: 책 2-06처럼 파일을 기능별로 나누기 시작한다. 강사식 구조에서 여러 도메인이 함께 쓰는 코드는 `global` 아래에 둔다. 다른 클래스가 상속·의존하는 것부터 옮겨야 각 단계에서 컴파일이 깨지지 않는다
+- 결과: `global/jpa/entity/BaseEntity.java`로 이동. 질문·답변을 저장하면 생성·수정 일시가 그대로 채워진다(`QuestionRepositoryTests`의 Auditing 테스트 포함 테스트 6개 통과)
+- 메모: 같은 패키지 안의 클래스는 import 없이 쓸 수 있지만, 패키지가 달라지면 import가 필요하다. 그래서 옮긴 파일뿐 아니라 그 파일을 쓰는 쪽도 함께 고쳐야 한다

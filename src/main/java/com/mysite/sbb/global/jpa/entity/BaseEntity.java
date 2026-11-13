@@ -1,4 +1,5 @@
-package com.mysite.sbb;
+// 006-01: 여러 도메인이 함께 쓰는 공통 엔티티라 global.jpa.entity 로 이동 (강사식 패키지 구조)
+package com.mysite.sbb.global.jpa.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
