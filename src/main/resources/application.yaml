@@ -11,3 +11,24 @@ spring:
       path: /h2-console
   # 003-02: datasource 설정은 프로파일마다 다르므로
   #         application-dev.yaml(파일 DB), application-test.yaml(메모리 DB)로 옮겼다
+  # 003-04: 로그에 색을 입힌다. IntelliJ 콘솔이 색을 지원하는지 알아서 판단하지 못할 때가 있어 always 로 고정
+  output:
+    ansi:
+      enabled: always
+  # 003-04: SQL 로그를 읽기 좋게 만드는 Hibernate 설정 (dev, test 모두 쓰므로 공통 파일에 둔다)
+  jpa:
+    properties:
+      hibernate:
+        # 003-04: 한 줄로 나오는 SQL을 줄바꿈·들여쓰기해서 출력
+        format_sql: true
+        # 003-04: SQL 키워드(select, from 등)에 색을 입힌다
+        highlight_sql: true
+        # 003-04: 이 SQL이 어떤 JPA 동작에서 나왔는지 /* ... */ 주석으로 함께 출력
+        use_sql_comments: true
+# 003-04: 어떤 로그를 얼마나 자세히 볼지 정한다
+logging:
+  level:
+    # 003-04: 실행되는 SQL을 로그로 출력 (show_sql 은 System.out 으로 찍혀서 로그 형식이 깨지므로 이 방식을 쓴다)
+    org.hibernate.SQL: DEBUG
+    # 003-04: SQL의 ? 자리에 실제로 들어간 값을 출력 (Hibernate 6 이상은 이 이름. 책의 BasicBinder 는 예전 이름)
+    org.hibernate.orm.jdbc.bind: TRACE

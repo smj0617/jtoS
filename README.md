@@ -127,3 +127,9 @@
 - 메모 1: JPA 스타터에 JDBC·HikariCP가 들어 있어 003-01의 `starter-jdbc`는 지웠다. DB 연결과 `db_dev.mv.db` 생성은 그대로 된다
 - 메모 2: 책의 `hibernate.dialect: H2Dialect` 설정은 넣지 않았다. Hibernate 7은 DB 종류를 스스로 알아낸다
 - 메모 3: 시작 로그에 `spring.jpa.open-in-view is enabled by default` 경고가 뜬다. 지금은 그대로 두고, 화면(템플릿)을 만드는 단계에서 다룬다
+### 003-04 JPA, SQL 로그 보기 좋게 설정
+- 작업: `application.yaml`에 `spring.output.ansi.enabled: always`, Hibernate `format_sql`·`highlight_sql`·`use_sql_comments: true`, 로그 레벨 `org.hibernate.SQL: DEBUG`, `org.hibernate.orm.jdbc.bind: TRACE`
+- 이유: 004부터 JPA가 만든 SQL과 그 SQL에 들어간 값을 로그로 읽으며 공부하려고 (강사 강의 14158 JPA 기초의 SQL 로그 설정). dev와 test 모두 쓰므로 공통 파일에 넣었다
+- 결과: 임시 테스트(`select 1 + ?`, 값 41)로 확인. 로그에 `/* dynamic native SQL query */` 주석, 줄바꿈된 SQL, 색이 입혀진 키워드, `binding parameter (1:INTEGER) <- [41]`가 찍혔다. 임시 테스트는 확인 후 지웠다. `gradlew test` 통과, `bootRun` 정상 시작
+- 메모 1: `show_sql: true`는 `System.out`으로 찍혀 로그 형식(시간·레벨)이 빠진다. 그래서 `org.hibernate.SQL` 로거를 DEBUG로 켰다
+- 메모 2: 책에 나오는 `org.hibernate.type.descriptor.sql.BasicBinder`는 Hibernate 5 시절 이름이다. Hibernate 6 이상은 `org.hibernate.orm.jdbc.bind`
