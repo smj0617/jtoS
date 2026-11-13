@@ -22,6 +22,13 @@
             <div class="d-flex justify-content-end" th:if="${question.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${question.author.username}"></span>
             </div>
+            <!-- 025-11: 작성일시, 그리고 수정된 적이 있으면(수정일시가 작성일시보다 늦으면) 수정일시도 (책 3-09) -->
+            <!--         #temporals.format → LocalDateTime 을 원하는 모양의 글자로. 004-02 Auditing 이 두 값을 채운다 -->
+            <div class="d-flex justify-content-end gap-2 small text-muted">
+                <span th:if="${question.modifyDate != null and question.modifyDate.isAfter(question.createDate)}"
+                      th:text="|수정 ${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}|"></span>
+                <span th:text="|작성 ${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}|"></span>
+            </div>
             <!-- 025-05: 글쓴이 본인에게만 보이는 수정 버튼 (책 3-09) -->
             <!--         sec:authorize 로 로그인한 경우만, #authentication.name(로그인 아이디)과 글쓴이가 같을 때만 그린다 -->
             <div class="my-2" sec:authorize="isAuthenticated()"
@@ -45,6 +52,13 @@
             <!-- 024-07: 답변 글쓴이 -->
             <div class="d-flex justify-content-end" th:if="${answer.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${answer.author.username}"></span>
+            </div>
+            <!-- 025-11: 작성일시, 그리고 수정된 적이 있으면(수정일시가 작성일시보다 늦으면) 수정일시도 (책 3-09) -->
+            <!--         #temporals.format → LocalDateTime 을 원하는 모양의 글자로. 004-02 Auditing 이 두 값을 채운다 -->
+            <div class="d-flex justify-content-end gap-2 small text-muted">
+                <span th:if="${answer.modifyDate != null and answer.modifyDate.isAfter(answer.createDate)}"
+                      th:text="|수정 ${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}|"></span>
+                <span th:text="|작성 ${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}|"></span>
             </div>
             <!-- 025-09: 답변 글쓴이 본인에게만 보이는 답변 수정 버튼 (025-05 질문과 같은 조건) -->
             <div class="my-2" sec:authorize="isAuthenticated()"

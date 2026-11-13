@@ -679,3 +679,9 @@
 - 작업: `AnswerController.delete()`(`@PreAuthorize("isAuthenticated()")`, `@DeleteMapping("/{id}")`, 답변 글쓴이 확인 후 `answerService.delete`(025-08), 질문 상세로 리다이렉트). 상세의 답변 카드에 `<a href="/questions/{qid}/answers/{id}" method="DELETE" data-confirm="정말로 삭제하시겠습니까?">삭제</a>`
 - 이유: 답변 삭제 (책 3-09의 `GET /answer/delete/{id}`). 025-06, 025-07 질문 삭제와 같은 방식으로, `global.js`가 이미 `method` 링크를 처리하므로 링크만 달면 된다
 - 결과: 답변 글쓴이 `user1`이 상세를 열면 그 답변의 삭제 링크(`method="DELETE"`)가 있다. 다른 회원 `other`의 DELETE는 403이고 답변이 남는다. `user1`의 DELETE는 302로 질문 상세 이동, 질문의 답변 목록이 빈다. `gradlew test` 56개 통과
+
+### 025-11 수정·삭제, 상세 카드에 작성·수정 일시 표시
+- 작업: 상세의 질문·답변 카드 오른쪽 아래에 `작성 yyyy-MM-dd HH:mm`(`#temporals.format`)을 항상, `수정 yyyy-MM-dd HH:mm`은 `modifyDate.isAfter(createDate)`일 때만 표시
+- 이유: 언제 쓰고 언제 고쳤는지 보여 준다 (책 3-09). 004-02 Auditing은 처음 저장할 때도 수정일시를 생성일시와 같은 값으로 채우므로, "수정됨" 표시는 수정일시가 더 늦을 때만 보여 준다(책은 수정일시가 null인지로 판단)
+- 결과: dev 서버 `/questions/1`의 질문·답변 카드에 "작성 2026-11-13 14:20"이 나오고, 수정한 적이 없어 수정 표시는 없다. 테스트에서 질문을 수정한 뒤 상세에 "작성 20…"과 "수정 20…"이 함께 나오는 것을 확인. `gradlew test` 56개 통과
+- 메모: 처음 테스트는 "수정 " 글자만 찾아서 HTML 주석의 "수정 버튼"에도 걸렸다. 날짜 앞의 `>수정 20`으로 좁혀 검사했다

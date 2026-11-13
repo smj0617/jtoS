@@ -237,6 +237,12 @@ class QuestionControllerTests {
                 .andExpect(redirectedUrl("/questions/" + q1.getId()));
         assertThat(questionRepository.findById(q1.getId()).get().getSubject()).isEqualTo("수정된 제목");
 
+        // 025-11: 수정된 질문의 상세에는 "작성"과 "수정" 일시가 함께 나온다
+        questionRepository.flush();
+        mvc.perform(get("/questions/" + q1.getId()))
+                .andExpect(content().string(containsString(">작성 20")))
+                .andExpect(content().string(containsString(">수정 20")));
+
         memberService.join("other", "other@test.com", "1234");
         mvc.perform(put("/questions/%d".formatted(q1.getId())).with(csrf()).with(user("other"))
                         .param("subject", "남의 글 수정").param("content", "x"))
