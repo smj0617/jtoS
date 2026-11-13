@@ -100,7 +100,11 @@ class QuestionControllerTests {
 
         mvc.perform(get("/questions").param("page", "1"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(not(containsString("sbb가 무엇인가요?"))));
+                .andExpect(content().string(not(containsString("sbb가 무엇인가요?"))))
+                // 018-04: 페이지 버튼 확인 (2페이지 링크, 현재 페이지 active, 1페이지라 이전은 disabled)
+                .andExpect(content().string(containsString("href=\"/questions?page=2\"")))
+                .andExpect(content().string(containsString("page-item active")))
+                .andExpect(content().string(containsString("page-item disabled")));
     }
 
     // 016-02: 등록 폼 화면

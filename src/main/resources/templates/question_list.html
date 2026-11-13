@@ -35,6 +35,29 @@
     </tr>
     </tbody>
 </table>
+<!-- 018-04: 페이지 이동 버튼 (책 3-02, 부트스트랩 pagination) -->
+<!--         paging.number 는 0부터 시작하는 현재 페이지 → 화면 번호는 number + 1 (018-03 과 같은 1부터 규칙) -->
+<!--         질문이 하나도 없으면 버튼 줄을 그리지 않는다 -->
+<div th:if="${!paging.isEmpty()}">
+    <ul class="pagination justify-content-center">
+        <!-- 018-04: 이전. 첫 페이지면 disabled(회색, 눌리지 않음). 이전 페이지의 화면 번호 = number -->
+        <!--         @{/questions(page=...)} → /questions?page=값 형태의 주소를 만든다 -->
+        <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
+            <a class="page-link" th:href="@{/questions(page=${paging.number})}">이전</a>
+        </li>
+        <!-- 018-04: 페이지 번호. 1부터 전체 페이지 수까지 만들되, 현재 페이지 앞뒤 5개만 보인다 -->
+        <!--         현재 페이지는 active(파란 배경) -->
+        <li th:each="p : ${#numbers.sequence(1, paging.totalPages)}"
+            th:if="${p >= paging.number + 1 - 5 and p <= paging.number + 1 + 5}"
+            th:classappend="${p == paging.number + 1} ? 'active'" class="page-item">
+            <a th:text="${p}" class="page-link" th:href="@{/questions(page=${p})}"></a>
+        </li>
+        <!-- 018-04: 다음. 마지막 페이지면 disabled. 다음 페이지의 화면 번호 = number + 2 -->
+        <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
+            <a class="page-link" th:href="@{/questions(page=${paging.number + 2})}">다음</a>
+        </li>
+    </ul>
+</div>
 <!-- 016-04: 질문 등록 화면(016-02 GET /questions/new)으로 가는 버튼 (책 2-16) -->
 <!--         <a> 링크에 btn 클래스를 붙이면 버튼 모양이 된다 -->
 <a th:href="@{/questions/new}" class="btn btn-primary">질문 등록하기</a>

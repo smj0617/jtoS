@@ -221,216 +221,238 @@
 
 
 ### 009-01 서비스, QuestionService 생성과 목록 조회
-- 작업: `domain.question.question.service.QuestionService` 추가(`@Service`, `@RequiredArgsConstructor` + `final QuestionRepository`). 목록 조회 메서드 `getList()`
-- 이유: 컨트롤러(요청·응답), 서비스(업무 처리), 리포지터리(DB 접근)로 역할을 나누려고 (책 2-09). 생성자 주입은 강사식
-- 결과: 컴파일과 기존 테스트 8개 통과. 아직 컨트롤러는 리포지터리를 직접 쓴다(009-02에서 교체)
+- 작업: `domain.question.question.service.QuestionService` 추가. `@Service`, `@RequiredArgsConstructor` + `private final QuestionRepository`로 생성자 주입. 질문 전체를 돌려주는 `getList()`(`findAll()` 호출)
+- 이유: 컨트롤러(요청·응답), 서비스(업무 처리), 리포지터리(DB 접근)로 역할을 나누려고 (책 2-09). 페이징·검색 같은 조회 규칙이 생기면 컨트롤러가 아니라 서비스에 쌓인다. 필드 `@Autowired` 대신 `final` + 생성자 주입은 강사식(값이 바뀌지 않고 테스트에서 직접 넣기 쉽다)
+- 결과: 서비스 빈이 만들어져 앱이 정상 시작. 아직 컨트롤러는 리포지터리를 직접 쓰고 있어 화면 결과는 그대로. 기존 테스트 8개 통과
+- 메모: 이 단계는 서비스 "추가"만 했다. 컨트롤러를 서비스로 바꾸는 것은 009-02로 나눴다
 
 ### 009-02 서비스, 컨트롤러가 리포지터리 대신 서비스 사용
-- 작업: `QuestionController`가 `QuestionRepository` 대신 `QuestionService`를 주입받고, `list()`에서 `getList()`를 호출
-- 이유: 컨트롤러는 DB를 직접 다루지 않고 서비스에 처리를 맡긴다 (책 2-09)
-- 결과: 테스트 통과. 목록 화면 결과는 그대로
+- 작업: `QuestionController`의 주입 대상을 `QuestionRepository` → `QuestionService`로 바꾸고, `list()`에서 `questionRepository.findAll()` 대신 `questionService.getList()` 호출
+- 이유: 컨트롤러가 DB를 직접 알지 않고 처리를 서비스에 맡기게 하려고 (책 2-09)
+- 결과: `GET /question/list` 응답 HTML에 질문 제목이 그대로 나온다(MockMvc 목록 테스트가 고치지 않고 통과). 사용자가 보는 화면은 바뀌지 않고 내부 구조만 바뀌었다
+- 메모: 겉으로 결과가 같아야 하는 구조 변경은 기존 테스트가 그대로 통과하는지로 확인한다
 
 ### 009-03 서비스, QuestionService 테스트 추가
-- 작업: `QuestionServiceTests`에서 질문 2개를 저장한 뒤 `getList()`가 두 제목을 순서대로 돌려주는지 확인
-- 이유: 컨트롤러 테스트와 서비스 테스트를 나눠 두면 실패했을 때 화면 문제인지 처리 문제인지 바로 알 수 있다
-- 결과: 테스트 9개 통과
+- 작업: `QuestionServiceTests` 추가. 질문 2개("질문1", "질문2")를 저장하고 `getList()`가 두 제목을 그 순서로 돌려주는지 검사. 클래스에 `@Transactional`(테스트마다 롤백)
+- 이유: 화면(컨트롤러) 테스트와 처리(서비스) 테스트를 나눠 두면, 실패했을 때 어느 층의 문제인지 바로 알 수 있다
+- 결과: `getList()`가 저장한 질문 2개를 순서대로 돌려준다. 전체 테스트 9개 통과
 
 ### 010-01 상세, 데이터가 없을 때 쓰는 DataNotFoundException 추가
-- 작업: `global.exception.DataNotFoundException`(`RuntimeException` 상속, `@ResponseStatus(NOT_FOUND)`, 메시지를 생성자로 받음)
-- 이유: 없는 데이터를 요청하면 서버 오류(500)가 아니라 "없음"(404)으로 응답해야 한다 (책 2-10). 책의 고정 문구 대신 무엇이 없는지 메시지를 받는다(강사식)
-- 결과: 테스트 통과. 실제 사용은 010-02
+- 작업: `global.exception.DataNotFoundException` 추가. `RuntimeException` 상속, 클래스에 `@ResponseStatus(HttpStatus.NOT_FOUND)`, 생성자로 메시지를 받는다
+- 이유: 없는 번호의 질문을 요청하면 서버 오류(500)가 아니라 "없음"(404)으로 응답해야 한다 (책 2-10). 책은 고정 문구 `"entity not found"`, 강사식은 무엇이 없는지 메시지를 직접 받는다. 여러 도메인이 같이 쓰므로 `global`에 둔다
+- 결과: 예외 클래스만 추가. 실제로 던지는 곳은 010-02, 404가 나는 것은 010-03에서 확인. 테스트 9개 통과
+- 메모: `RuntimeException`(언체크 예외)이라 메서드마다 `throws`를 적지 않아도 된다
 
 ### 010-02 상세, QuestionService.getQuestion 단건 조회
-- 작업: `getQuestion(id)`가 `findById(id).orElseThrow(...)`로 질문을 찾고, 없으면 `DataNotFoundException("N번 질문이 없습니다.")`
-- 이유: 상세 화면에 쓸 질문 하나 조회 (책 2-10). `Optional`을 꺼낼 때 `get()` 대신 `orElseThrow`로 없는 경우를 명확히 처리
-- 결과: 테스트 10개 통과 (성공 조회, 없는 id 999999 → 예외와 메시지)
+- 작업: `QuestionService.getQuestion(id)` 추가. `findById(id).orElseThrow(() -> new DataNotFoundException("%d번 질문이 없습니다."))`. 서비스 테스트에 성공·실패 경우 추가
+- 이유: 상세 화면에 보여 줄 질문 하나를 찾기 위해 (책 2-10). `findById`는 `Optional`을 돌려주므로, 비어 있을 때 `get()`으로 꺼내다 터지지 않게 `orElseThrow`로 명확히 처리
+- 결과: 있는 id는 그 질문을 돌려주고, 없는 id 999999는 `DataNotFoundException`과 메시지 `999999번 질문이 없습니다.`가 난다. 테스트 10개 통과
 
 ### 010-03 상세, 질문 상세 화면
-- 작업: `GET /question/detail/{id}`가 `@PathVariable`로 id를 받아 `getQuestion(id)`를 `question_detail.html`로 그린다. 템플릿은 제목과 내용
-- 이유: 질문 하나를 보는 화면 (책 2-10)
-- 결과: 테스트 11개 통과. 상세 200 + 내용 포함, 없는 id 999999는 404 (010-01 예외의 `@ResponseStatus` 동작 확인)
+- 작업: `QuestionController.detail()` 추가. `GET /question/detail/{id}`, `@PathVariable Integer id`로 주소의 번호를 받아 `getQuestion(id)` 결과를 모델 `question`에 담고 `question_detail.html`(제목 `h1`, 내용 `div`)을 그린다
+- 이유: 질문 하나의 내용을 보는 화면 (책 2-10)
+- 결과: `GET /question/detail/{id}` → 200, 응답에 질문 내용 "sbb에 대해서 알고 싶습니다."가 나온다. `GET /question/detail/999999` → 404 (010-01 `@ResponseStatus`가 동작). 테스트 11개 통과
 
 ### 010-04 상세, 목록의 제목을 상세 화면 링크로
-- 작업: `question_list.html`의 제목을 `th:href="@{|/question/detail/${question.id}|}"` 링크로 변경
-- 이유: 목록에서 제목을 눌러 상세로 이동 (책 2-10)
-- 결과: 테스트 통과. 목록 HTML에 `href="/question/detail/{id}"` 포함
-- 메모: `@{}`는 앱 기준 주소를 만들고, `|...|`는 글자와 `${}` 값을 이어 붙이는 문법이다
+- 작업: `question_list.html`의 제목 칸을 `<a th:href="@{|/question/detail/${question.id}|}">`로 감쌈
+- 이유: 목록에서 제목을 눌러 상세로 이동하게 (책 2-10)
+- 결과: 목록 응답 HTML에 `href="/question/detail/{질문 id}"` 링크가 생겼다. 목록 → 상세 이동이 가능해졌다
+- 메모: `@{}`는 앱 기준 주소를 만들고, `|...|` 안에서는 글자와 `${}` 값을 이어 붙일 수 있다
 
 ### 011-01 URL 프리픽스, 컨트롤러에 공통 주소 /question 적용
-- 작업: `QuestionController` 클래스에 `@RequestMapping("/question")`, 메서드는 `/list`, `/detail/{id}`
-- 이유: 주소 앞부분을 한곳에서 관리 (책 2-11)
-- 결과: 실제 주소는 바뀌지 않아 기존 테스트 11개 그대로 통과
+- 작업: `QuestionController` 클래스에 `@RequestMapping("/question")`을 붙이고 메서드 주소를 `/list`, `/detail/{id}`로 줄였다
+- 이유: 같은 컨트롤러의 주소 앞부분을 한곳에서 관리하려고 (책 2-11)
+- 결과: 실제 주소는 `/question/list`, `/question/detail/{id}` 그대로. 기존 목록·상세·404 테스트가 고치지 않고 통과(11개)
 
 ### 011-02 URL 프리픽스, REST 주소 /questions, /questions/{id}로 변경
-- 작업: 목록 `GET /questions`, 상세 `GET /questions/{id}`. 목록 링크, 루트 리다이렉트, 테스트 주소 변경
-- 이유: 강사식 REST 규칙. 자원은 복수형 명사로 쓰고 `list`, `detail` 같은 동작은 주소에 넣지 않는다. 동작은 HTTP 메서드(GET 조회, POST 생성, PUT 수정, DELETE 삭제)로 구분한다
-- 결과: 테스트 11개 통과
-- 메모: 책은 `/question/list`, `/question/detail/{id}`를 계속 쓴다. 이후 단계의 주소는 모두 REST 규칙으로 바꿔 적용한다
+- 작업: 공통 주소를 `@RequestMapping("/questions")`로, 목록은 `@GetMapping`(= `GET /questions`), 상세는 `@GetMapping("/{id}")`(= `GET /questions/{id}`). 목록 링크, 루트 리다이렉트(`redirect:/questions`), 테스트 주소도 바꿨다
+- 이유: 강사식 REST 규칙. 자원 이름은 복수형 명사로 쓰고 `list`, `detail` 같은 동작은 주소에 넣지 않는다. 동작은 HTTP 메서드(GET 조회, POST 생성, PUT 수정, DELETE 삭제)로 구분한다
+- 결과: `/` → `/questions`로 302 리다이렉트, `/questions`에서 목록, `/questions/{id}`에서 상세, 목록의 링크도 `href="/questions/{id}"`. 테스트 11개 통과
+- 메모: 책은 끝까지 `/question/list`, `/question/detail/{id}`를 쓴다. 이후 주소는 모두 이 REST 규칙으로 바꿔 적용한다 (답변 `POST /questions/{id}/answers`, 수정·삭제 `PUT`/`DELETE`)
 
 ### 012-01 답변, AnswerService.create 답변 저장
-- 작업: `domain.question.answer.service.AnswerService.create(question, content)`가 `question.addAnswer(content)`로 답변을 만들고 저장. `@Transactional`
-- 이유: 답변 저장 처리 (책 2-12). 책처럼 `setQuestion`, `setCreateDate`를 직접 하지 않고 004-03의 `addAnswer`와 004-02 Auditing을 쓴다
-- 결과: 테스트 12개 통과 (id·생성일시가 채워지고, 답변↔질문 양쪽 관계가 맞음)
+- 작업: `domain.question.answer.service.AnswerService` 추가. `create(question, content)`가 `question.addAnswer(content)`로 답변을 만들고 `answerRepository.save()`. `@Transactional`. `AnswerServiceTests` 추가
+- 이유: 답변 저장 처리 (책 2-12). 책처럼 `new Answer()` 후 `setQuestion`, `setCreateDate`를 직접 하지 않고, 004-03의 `addAnswer`(양쪽 관계를 한 번에 맞춤)와 004-02 Auditing(생성일시 자동)을 쓴다
+- 결과: 저장된 답변에 id와 생성일시가 채워지고, `answer.getQuestion()`은 그 질문, `question.getAnswerList()`에는 그 답변이 들어 있다. 테스트 12개 통과
 
 ### 012-02 답변, AnswerController 답변 등록 요청 처리
-- 작업: `POST /questions/{questionId}/answers`가 `content`를 받아 저장하고 `redirect:/questions/{questionId}`
-- 이유: 답변 폼이 보낼 요청 처리 (책 2-12). 답변은 질문에 속한 자원이라 질문 주소 아래에 둔다(강사식, 책은 `/answer/create/{id}`)
-- 결과: 테스트 13개 통과 (302 → 상세 주소, 질문의 답변 목록에 내용 추가)
-- 메모: 저장 후 화면을 바로 그리지 않고 리다이렉트하는 것을 PRG(Post-Redirect-Get)라 한다. 새로고침해도 POST가 다시 가지 않는다
+- 작업: `domain.question.answer.controller.AnswerController` 추가. `@RequestMapping("/questions/{questionId}/answers")` + `@PostMapping`. `@PathVariable questionId`, `@RequestParam content`를 받아 질문을 찾고 `answerService.create` 후 `redirect:/questions/{questionId}`
+- 이유: 상세 화면의 답변 폼이 보낼 요청을 받기 위해 (책 2-12). 답변은 질문에 속한 자원이라 질문 주소 아래에 둔다(강사식, 책은 `POST /answer/create/{id}`)
+- 결과: `POST /questions/{id}/answers` (content=답변입니다.) → 302로 `/questions/{id}` 이동, 질문의 답변 목록에 "답변입니다."가 저장됐다. 테스트 13개 통과
+- 메모: 저장 후 화면을 바로 그리지 않고 리다이렉트하는 것을 PRG(Post-Redirect-Get)라 한다. 새로고침해도 POST가 다시 가지 않아 중복 등록이 없다
 
 ### 012-03 답변, 상세 화면에 답변 입력 폼
-- 작업: `question_detail.html`에 `POST /questions/{id}/answers`로 보내는 폼(`textarea name="content"`, 답변등록 버튼)
-- 이유: 상세 화면에서 답변 입력 (책 2-12). 입력칸의 `name`이 컨트롤러 `@RequestParam` 이름과 같아야 값이 들어간다
-- 결과: 테스트 13개 통과 (상세 HTML에 `action="/questions/{id}/answers"`)
+- 작업: `question_detail.html`에 `<form th:action="@{|/questions/${question.id}/answers|}" method="post">`, `<textarea name="content">`, 답변등록 버튼
+- 이유: 상세 화면에서 답변을 입력해 012-02로 보내기 위해 (책 2-12)
+- 결과: 상세 응답 HTML에 `action="/questions/{id}/answers"` 폼이 생겼다. 화면에서 답변을 입력하고 등록할 수 있다
+- 메모: 입력칸의 `name="content"`가 컨트롤러의 `@RequestParam String content`와 이름이 같아야 값이 들어간다. `th:action`을 쓰면 021 시큐리티에서 CSRF 토큰이 자동으로 들어간다
 
 ### 012-04 답변, 상세 화면에 답변 개수와 목록 표시
-- 작업: `question_detail.html`에 `${#lists.size(question.answerList)}개의 답변이 있습니다.`와 `th:each` 답변 목록
-- 이유: 등록된 답변 보기 (책 2-12)
-- 결과: 테스트 13개 통과 (답변 1개 → "1개의 답변이 있습니다.", 답변 내용 표시)
-- 메모: `answerList`는 LAZY라 템플릿에서 처음 쓸 때 조회된다. 화면을 그리는 동안에도 DB 연결이 열려 있는 것은 `open-in-view`(003-03 경고) 기본값 덕분이다
+- 작업: `question_detail.html`에 `${#lists.size(question.answerList)}개의 답변이 있습니다.`와 `th:each`로 답변 내용 목록(`<ul><li>`)
+- 이유: 등록된 답변을 상세 화면에서 보기 위해 (책 2-12)
+- 결과: 답변 1개 달린 질문의 상세 화면에 "1개의 답변이 있습니다."와 답변 내용 "스프링부트 게시판입니다."가 나온다. 등록 → 리다이렉트 → 새 답변이 보이는 흐름 완성. 테스트 13개 통과
+- 메모: `answerList`는 004-03에서 LAZY로 정해 템플릿에서 처음 쓸 때 조회된다. 화면을 그리는 동안 DB 연결이 열려 있는 것은 `open-in-view` 기본값(003-03 경고) 덕분이다
 
 ### 013-01 웹 디자인, 공통 CSS 파일 static/resource/global.css
-- 작업: `src/main/resources/static/resource/global.css`(textarea 가로 100%, 제출 버튼 위 여백) 추가. `/resource/global.css` 제공 테스트
-- 이유: 스타일을 한 파일에 모은다 (책 2-13의 `style.css`). 정적 파일은 `static/resource`에 둔다(강사식)
-- 결과: 테스트 14개 통과
-- 메모: `static` 폴더의 파일은 컨트롤러 없이 그 경로 그대로 주소가 된다
+- 작업: `src/main/resources/static/resource/global.css` 추가(`textarea { width: 100%; }`, `input[type=submit] { margin-top: 10px; }`). `/resource/global.css` 제공을 확인하는 `StaticResourceTests` 추가
+- 이유: 화면 스타일을 한 파일에 모으려고 (책 2-13의 `style.css`). 강사식으로 정적 파일은 `static/resource` 폴더에 모아 컨트롤러 주소와 섞이지 않게 한다
+- 결과: `GET /resource/global.css` → 200, 응답에 `textarea` 규칙이 들어 있다. 아직 어느 화면도 불러오지 않아 모양 변화는 없다. 테스트 14개 통과
+- 메모: `static` 폴더 파일은 컨트롤러 없이 폴더 경로 그대로 주소가 된다
 
 ### 013-02 웹 디자인, 목록·상세 템플릿에 공통 CSS 연결
-- 작업: 두 템플릿의 `<head>`에 `<link rel="stylesheet" th:href="@{/resource/global.css}">`
-- 이유: 013-01 스타일을 화면에 적용 (책 2-13)
-- 결과: 테스트 14개 통과 (목록 HTML에 `href="/resource/global.css"`)
-- 메모: 같은 `<head>`를 템플릿마다 반복하고 있다. 015 레이아웃에서 한곳으로 모은다
+- 작업: `question_list.html`, `question_detail.html`의 `<head>`에 `<link rel="stylesheet" th:href="@{/resource/global.css}">`
+- 이유: 013-01 스타일을 실제 화면에 적용 (책 2-13)
+- 결과: 두 화면 HTML에 `href="/resource/global.css"`가 들어가, 답변 입력칸이 가로로 꽉 차고 버튼 위에 여백이 생긴다. 테스트 14개 통과
+- 메모: 같은 `<head>` 내용을 템플릿마다 반복하고 있다. 015 레이아웃에서 한곳으로 모은다
 
 ### 014-01 부트스트랩, 부트스트랩 CSS를 cdnjs CDN으로 연결
-- 작업: 두 템플릿에 `https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css` 링크. `global.css`보다 먼저 불러온다
-- 이유: 부트스트랩 클래스를 쓰기 위해 (책 2-14). 책은 파일을 내려받아 `static`에 넣지만 강사식은 CDN, 버전은 5.3.3으로 고정
-- 결과: 테스트 14개 통과
-- 메모: CSS는 나중에 불러온 것이 이긴다. 우리 스타일이 부트스트랩을 덮어쓸 수 있게 순서를 정했다
+- 작업: 두 템플릿 `<head>`에 `https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css` 링크를 `global.css`보다 먼저 추가
+- 이유: 미리 만들어진 스타일 클래스(`table`, `btn`, `card` 등)를 쓰려고 (책 2-14). 책은 파일을 내려받아 `static`에 넣지만 강사식은 CDN, 버전은 5.3.3으로 고정
+- 결과: 화면에 부트스트랩 기본 글꼴·여백이 적용된다. 목록 HTML에 부트스트랩 링크 포함 확인. 테스트 14개 통과
+- 메모: CSS는 나중에 불러온 것이 앞의 규칙을 덮어쓴다. 우리 `global.css`가 부트스트랩을 고칠 수 있게 순서를 정했다
 
 ### 014-02 부트스트랩, Pretendard 한글 폰트 적용
-- 작업: 두 템플릿에 Pretendard v1.3.9 CDN 링크, `global.css`의 `body`에 `font-family: "Pretendard", ... sans-serif`
-- 이유: 읽기 좋은 한글 웹폰트 (강사식)
-- 결과: 테스트 14개 통과
-- 메모: 폰트 파일을 불러오는 것(link)과 실제로 쓰는 것(font-family)은 별개다. 뒤쪽 글꼴들은 폰트를 못 받았을 때의 대체 글꼴
+- 작업: 두 템플릿에 Pretendard v1.3.9 CSS(jsDelivr CDN) 링크, `global.css`에 `body { font-family: "Pretendard", -apple-system, ..., sans-serif; }`
+- 이유: 기본 글꼴보다 읽기 좋은 한글 웹폰트 (강사식)
+- 결과: 화면 전체 글꼴이 Pretendard로 바뀐다. `global.css` 응답에 `Pretendard` 지정 확인. 테스트 14개 통과
+- 메모: 폰트 파일을 불러오는 것(`link`)과 실제로 쓰는 것(`font-family`)은 따로다. 뒤쪽 글꼴은 폰트를 못 받았을 때의 대체 글꼴
 
 ### 014-03 부트스트랩, 목록 화면에 부트스트랩 클래스 적용
-- 작업: 목록을 `container my-3`으로 감싸고, 표에 `table`, 머리줄에 `table-dark`
-- 이유: 목록 화면 모양 정리 (책 2-14)
-- 결과: 테스트 14개 통과
+- 작업: 목록을 `<div class="container my-3">`로 감싸고, 표에 `class="table"`, 머리줄에 `class="table-dark"`
+- 이유: 목록 화면을 부트스트랩 표 모양으로 정리 (책 2-14)
+- 결과: 목록이 화면 가운데 고정 폭으로 놓이고, 줄마다 구분선이 생기며 머리줄(제목, 작성일시)이 어두운 배경이 된다. 목록 HTML에 `<table class="table">` 확인. 테스트 14개 통과
 
 ### 014-04 부트스트랩, 상세 화면에 부트스트랩 카드 적용
-- 작업: 상세 화면을 `container my-3`으로 감싸고, 질문 내용과 답변을 각각 `card`로, 입력칸 `form-control`, 버튼 `btn btn-primary`. 내용 줄바꿈은 `white-space: pre-line`
-- 이유: 상세 화면 모양 정리 (책 2-14)
-- 결과: 테스트 14개 통과
-- 메모: 답변 표시는 `<ul><li>`에서 카드로 바뀌었다. 012-04 테스트는 글자만 확인하므로 그대로 통과한다
+- 작업: 상세를 `container my-3`으로 감싸고, 제목 `h2.border-bottom`, 질문 내용과 각 답변을 `card`로, 답변 목록 `<ul><li>`를 답변마다 카드로 변경, 입력칸 `form-control`, 버튼 `btn btn-primary`, 내용에 `white-space: pre-line`
+- 이유: 상세 화면을 부트스트랩 카드 모양으로 정리 (책 2-14)
+- 결과: 질문 내용과 답변이 테두리 있는 상자로 나뉘어 보이고, 입력한 줄바꿈이 화면에서도 줄바꿈으로 나온다. 답변등록 버튼이 파란 버튼이 됐다. 상세 HTML에 `card my-3`, `btn btn-primary` 확인. 테스트 14개 통과
 
 ### 015-01 레이아웃, 타임리프 레이아웃 다이얼렉트 의존성 추가
-- 작업: `thymeleaf-layout-dialect` 의존성 추가 (버전은 Spring Boot가 관리)
-- 이유: 화면마다 반복되는 `<head>`와 바깥 틀을 하나로 모으기 위해 (강사식, 책 2-15는 `th:replace`)
-- 결과: 테스트 14개 통과
+- 작업: `build.gradle.kts`에 `nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect` 추가 (버전은 Spring Boot 의존성 관리)
+- 이유: 화면마다 반복되는 `<head>`와 바깥 틀을 공통 틀 하나에 모으려고 (강사식). 책 2-15는 `th:replace`로 `<head>` 조각만 나눈다
+- 결과: 라이브러리가 들어와 타임리프에서 `layout:` 문법을 쓸 수 있게 됐다(스프링이 자동 등록). 아직 쓰는 화면은 없다. 테스트 14개 통과
 
 ### 015-02 레이아웃, 공통 틀 layout.html 추가
-- 작업: `templates/layout.html`에 공통 `<head>`(부트스트랩, Pretendard, `global.css`)와 내용 자리 `<div layout:fragment="content">`
-- 이유: 반복되는 `<head>`를 한 파일에 모은다 (강사식)
-- 결과: 테스트 14개 통과. 화면 적용은 015-03, 015-04
+- 작업: `templates/layout.html` 추가. `<head>`에 부트스트랩·Pretendard·`global.css` 링크와 기본 제목 `SBB`, `<body>`에 각 화면 내용이 들어갈 `<div layout:fragment="content">`
+- 이유: 화면마다 반복되던 `<head>` 3줄을 한 파일로 모으려고 (강사식)
+- 결과: 공통 틀 파일 생성. 화면 적용은 015-03, 015-04. 테스트 14개 통과
 
 ### 015-03 레이아웃, 목록 화면이 layout.html 사용
-- 작업: `question_list.html`에 `layout:decorate="~{layout}"`, 내용 `div`에 `layout:fragment="content"`. 링크 3줄 삭제
-- 이유: 공통 부분을 레이아웃에 맡긴다 (강사식)
-- 결과: 테스트 14개 통과. 013-02, 014-01 테스트(목록 HTML에 CSS 링크 존재)가 그대로 통과 → 레이아웃이 합쳐져 나온다
+- 작업: `question_list.html`의 `<html>`에 `layout:decorate="~{layout}"`, `<head>`에는 제목만 남기고 링크 3줄 삭제, 내용 `div`에 `layout:fragment="content"`
+- 이유: 목록 화면의 공통 부분을 레이아웃에 맡기려고 (강사식)
+- 결과: 목록 화면 파일에서 링크를 지웠는데도 응답 HTML에는 부트스트랩·공통 CSS 링크가 그대로 들어 있다(013-02, 014-01 테스트가 고치지 않고 통과). 레이아웃과 화면이 합쳐져 나온다는 뜻이다. 테스트 14개 통과
 
 ### 015-04 레이아웃, 상세 화면이 layout.html 사용
-- 작업: `question_detail.html`에 `layout:decorate="~{layout}"`, 바깥 `div`에 `layout:fragment="content"`. 링크 3줄 삭제
-- 이유: 이제 공통 `<head>`는 `layout.html` 한 곳에서만 관리한다
-- 결과: 테스트 14개 통과 (상세 HTML에도 레이아웃의 부트스트랩 링크 포함)
+- 작업: `question_detail.html`도 `layout:decorate="~{layout}"`, 제목만 남기고 링크 3줄 삭제, 바깥 `container` `div`에 `layout:fragment="content"`
+- 이유: 이제 공통 `<head>`는 `layout.html` 한 곳에서만 관리하려고
+- 결과: 상세 응답 HTML에도 레이아웃에서 온 부트스트랩 링크가 들어 있다(테스트 추가). 화면 모양은 전과 같다. 테스트 14개 통과
 
 ### 015-05 레이아웃, 화면 제목 패턴 layout:title-pattern
 - 작업: `layout.html`의 `<title>`에 `layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE"`
-- 이유: 탭 제목을 "화면 이름 | SBB"로 통일 (강사식)
-- 결과: 테스트 14개 통과 (목록 `<title>질문 목록 | SBB</title>`)
+- 이유: 브라우저 탭 제목을 "화면 이름 | SBB"로 통일하려고 (강사식). 화면은 자기 이름만 적으면 된다
+- 결과: 목록 화면 탭 제목이 `질문 목록 | SBB`, 상세는 `질문 상세 | SBB`가 된다. 목록 응답에 `<title>질문 목록 | SBB</title>` 확인. 테스트 14개 통과
 
 ### 015-06 레이아웃, 공통 자바스크립트 global.js
-- 작업: `static/resource/global.js`(`onReady` 도우미) 추가, `layout.html`에서 `<script defer>`로 불러옴
-- 이유: 여러 화면이 함께 쓸 JS를 한 곳에 모은다 (강사식). 016, 025에서 함수를 더한다
-- 결과: 테스트 15개 통과
+- 작업: `static/resource/global.js` 추가(화면이 준비되면 함수를 실행하는 `onReady(fn)` 도우미), `layout.html`에 `<script defer th:src="@{/resource/global.js}">`
+- 이유: 여러 화면이 함께 쓸 JS를 한 곳에 모으려고 (강사식). 016 첫 오류 칸 focus, 025 DELETE 링크 처리가 이 파일에 들어간다
+- 결과: `GET /resource/global.js` → 200, 모든 화면 HTML에 `src="/resource/global.js"` 스크립트가 들어간다. 테스트 15개 통과
+- 메모: `defer`는 HTML을 다 읽은 뒤 실행해 화면 표시를 늦추지 않는다
 
 ### 016-01 질문 등록, QuestionService.create 질문 저장
-- 작업: `QuestionService.create(subject, content)`(`@Transactional`) 추가와 테스트
-- 이유: 질문 등록 처리 (책 2-16). 생성일시는 004-02 Auditing이 채운다
-- 결과: 테스트 16개 통과
+- 작업: `QuestionService.create(subject, content)` 추가. 새 `Question`에 제목·내용을 넣고 `save`, 저장된 질문을 돌려준다. `@Transactional`
+- 이유: 질문 등록 화면이 쓸 저장 처리 (책 2-16). 생성일시는 004-02 Auditing이 채운다(책은 `setCreateDate` 직접 호출)
+- 결과: `create("새 질문", "새 내용")` 후 id·생성일시가 채워지고 `getQuestion`으로 다시 조회하면 제목이 같다. 테스트 16개 통과
 
 ### 016-02 질문 등록, 등록 폼 화면 GET /questions/new
-- 작업: `GET /questions/new` → `question_form.html`(제목, 내용, `POST /questions`로 보내는 폼)
-- 이유: 질문 입력 화면 (책 2-16). REST 규칙으로 `/questions/new` (책은 `/question/create`)
-- 결과: 테스트 17개 통과
+- 작업: `QuestionController.showCreate()` (`GET /questions/new`) → 새 템플릿 `question_form.html`(레이아웃 사용, 제목 `input name="subject"`, 내용 `textarea name="content"`, `POST /questions`로 보내는 폼)
+- 이유: 질문 입력 화면 (책 2-16). REST 규칙으로 생성 입력 화면은 `/questions/new`, 저장은 `POST /questions` (책은 `/question/create` 하나로 GET·POST)
+- 결과: `GET /questions/new` → 200, 탭 제목 `질문 등록 | SBB`, 폼 `action="/questions"`. 아직 POST를 받는 곳이 없어 저장은 안 된다. 테스트 17개 통과
+- 메모: `/new`와 `/{id}`가 겹쳐 보여도 스프링은 글자 그대로인 경로를 변수 경로보다 먼저 맞춘다
 
 ### 016-03 질문 등록, 저장 요청 POST /questions
-- 작업: `POST /questions`가 `subject`, `content`를 받아 저장하고 `redirect:/questions`
-- 이유: 등록 폼의 질문 저장 (책 2-16). 같은 자원 주소에 POST = 생성(REST)
-- 결과: 테스트 18개 통과
+- 작업: `QuestionController.create()` (`@PostMapping` = `POST /questions`), `@RequestParam subject`, `content`를 받아 `questionService.create` 후 `redirect:/questions`
+- 이유: 등록 폼이 보낸 질문을 저장 (책 2-16). 목록과 같은 자원 주소에 POST = 생성(REST)
+- 결과: `POST /questions` (subject=새 질문, content=새 내용) → 302로 `/questions` 이동, DB에서 `findBySubject("새 질문")`으로 저장 확인. 테스트 18개 통과
+- 메모: 이때는 제목이 비어도 저장된다. 016-05에서 검증을 넣는다
 
 ### 016-04 질문 등록, 목록에 질문 등록하기 버튼
-- 작업: 목록 표 아래 `/questions/new`로 가는 `btn btn-primary` 링크
-- 이유: 목록 → 등록 화면 이동 (책 2-16)
-- 결과: 테스트 18개 통과
+- 작업: 목록 표 아래에 `<a th:href="@{/questions/new}" class="btn btn-primary">질문 등록하기</a>`
+- 이유: 목록에서 등록 화면으로 가는 길 (책 2-16)
+- 결과: 목록 화면에 파란 "질문 등록하기" 버튼이 생겼다(HTML에 `href="/questions/new"`). 목록 → 등록 폼 → 저장 → 목록에 새 질문, 흐름이 이어진다. 테스트 18개 통과
 
 ### 016-05 질문 등록, record 폼 QuestionForm과 서버 검증
-- 작업: `spring-boot-starter-validation` 추가. `QuestionForm` record(`@NotBlank`, `@Size(max = 200)`)를 `@Valid`로 받고 `BindingResult`에 오류가 있으면 폼을 다시 보여 준다
-- 이유: 빈 값과 너무 긴 제목을 서버에서 막는다 (책 2-16). 강사식으로 폼은 record
-- 결과: 테스트 19개 통과 (공백 제목 → 200 + `question_form`, 저장 개수 변화 없음)
+- 작업: `spring-boot-starter-validation` 추가. `domain.question.question.dto.QuestionForm` record(제목 `@NotBlank` + `@Size(max = 200)`, 내용 `@NotBlank`, 각각 한글 메시지). `create()`가 `@RequestParam` 두 개 대신 `@Valid QuestionForm` + `BindingResult`로 받고, 오류가 있으면 저장하지 않고 `question_form`을 다시 보여 준다
+- 이유: 빈 제목·내용, 200자 넘는 제목을 서버에서 막으려고 (책 2-16). 강사식으로 폼은 `@Getter/@Setter` 클래스 대신 `record`
+- 결과: 제목에 공백(" ")을 보내면 200 + 등록 폼이 다시 나오고 질문 개수가 늘지 않는다. 정상 입력은 그대로 저장된다. 테스트 19개 통과
+- 메모: `BindingResult`는 반드시 `@Valid` 객체 바로 뒤에 둬야 한다. 없으면 검증 실패가 400 오류로 끝난다
 
 ### 016-06 질문 등록, th:object·th:field와 필드별 오류 메시지
-- 작업: 등록 폼에 `th:object="${questionForm}"`, 입력칸 `th:field`, `th:errorclass="is-invalid"`, 칸 아래 `th:errors`. GET 폼 화면에 빈 `QuestionForm` 제공
-- 이유: 틀린 칸을 바로 아래에 표시하고 입력값을 유지 (책 2-16은 오류를 폼 위에 한꺼번에 표시, 강사식은 칸마다)
-- 결과: 테스트 19개 통과 (메시지 "제목은 필수항목입니다.", `is-invalid`, 입력한 내용 유지)
+- 작업: 등록 폼에 `th:object="${questionForm}"`, 입력칸 `th:field="*{subject}"`/`"*{content}"`, `th:errorclass="is-invalid"`, 칸 아래 `<div class="invalid-feedback" th:errors="*{...}">`. 폼 화면 GET이 빈 `QuestionForm`을 인자로 받아 모델에 담는다
+- 이유: 어느 칸이 왜 틀렸는지 칸 바로 아래 보여 주고, 다시 열린 폼에 입력값을 남기려고 (책 2-16은 오류를 폼 위에 한꺼번에, 강사식은 칸마다)
+- 결과: 제목을 비우고 저장하면 제목 칸이 빨간 테두리가 되고 아래에 "제목은 필수항목입니다."가 나오며, 입력했던 내용은 textarea에 그대로 남아 있다. 테스트 19개 통과
+- 메모: `record`에도 `th:field`가 정상 동작함을 테스트로 확인했다
 
 ### 016-07 질문 등록, 브라우저 검증 required·maxlength
-- 작업: 제목에 `required maxlength="200"`, 내용에 `required`
-- 이유: 서버에 가기 전에 브라우저에서 먼저 막는다. 서버 검증과 같은 규칙으로 양쪽에서 검증(강사식)
-- 결과: 테스트 19개 통과
-- 메모: 브라우저 검증은 개발자 도구나 직접 요청으로 우회할 수 있다. 그래서 서버 검증(016-05)이 진짜 방어선이다
+- 작업: 제목 입력칸에 `required maxlength="200"`, 내용 textarea에 `required`
+- 이유: 서버에 보내기 전에 브라우저에서 먼저 막아 빠르게 알려 주려고. 서버 검증과 같은 규칙으로 양쪽에서 검증(강사식)
+- 결과: 칸을 비우고 저장을 누르면 브라우저가 전송을 막고 "이 입력란을 작성하세요" 말풍선을 띄운다. 제목은 200자 넘게 입력되지 않는다. 폼 HTML에 `required`, `maxlength="200"` 확인. 테스트 19개 통과
+- 메모: 브라우저 검증은 개발자 도구나 직접 요청으로 우회된다. 공백만 있는 값도 `required`로는 못 막는다. 진짜 방어선은 서버 검증(016-05)
 
 ### 016-08 질문 등록, 첫 오류 입력칸에 자동 focus
-- 작업: `global.js`에 `onReady(() => document.querySelector(".is-invalid")?.focus())` 동작 추가
-- 이유: 검증 실패 후 고칠 칸으로 바로 커서 이동 (강사식). 공통 JS라 모든 폼에 적용
-- 결과: 테스트 19개 통과
+- 작업: `global.js`에 화면 준비 후 `document.querySelector(".is-invalid")`로 첫 오류 칸을 찾아 `focus()`하는 코드
+- 이유: 검증 실패로 폼이 다시 열리면 고칠 칸으로 바로 커서를 옮기려고 (강사식). 공통 JS라 앞으로 만들 모든 폼에 적용된다
+- 결과: 서버 검증 실패로 다시 열린 폼에서 첫 번째 빨간 칸에 커서가 가 있다. `global.js` 응답에 해당 코드 포함 확인. 테스트 19개 통과
+- 메모: MockMvc는 JS를 실행하지 않아 실제 커서 이동은 브라우저에서 확인할 부분이다
 
 ### 016-09 질문 등록, 답변 AnswerForm과 서버 검증
-- 작업: `AnswerForm` record(`@NotBlank content`), `AnswerController`가 `@Valid AnswerForm` + `BindingResult`로 받고 오류면 상세 화면을 다시 그림
-- 이유: 빈 답변 방지 (책 2-16). 질문과 같은 방식
-- 결과: 테스트 20개 통과
+- 작업: `domain.question.answer.dto.AnswerForm` record(내용 `@NotBlank`). `AnswerController.create()`가 `@Valid AnswerForm` + `BindingResult`로 받고, 오류면 질문을 모델에 담아 `question_detail`을 다시 그린다
+- 이유: 빈 답변 저장을 서버에서 막으려고 (책 2-16). 질문과 같은 방식으로 통일
+- 결과: 공백 답변을 보내면 200 + 상세 화면이 다시 나오고 답변이 저장되지 않는다. 정상 답변 등록(012-02)은 그대로 동작. 테스트 20개 통과
+- 메모: 상세 화면은 `${question}`이 있어야 그릴 수 있어 오류일 때 직접 모델에 담는다. 질문 조회를 먼저 해서 없는 질문이면 404가 먼저 난다
 
 ### 016-10 질문 등록, 답변 폼에 th:object·오류 표시·required
-- 작업: 상세 화면 답변 폼에 `th:object="${answerForm}"`, `th:field`, `is-invalid`, `th:errors`, `required`. 상세 GET이 빈 `AnswerForm` 제공
-- 이유: 답변 폼도 질문 폼과 같은 방식으로 오류 표시 (책 2-16)
-- 결과: 테스트 20개 통과
+- 작업: 상세 화면 답변 폼에 `th:object="${answerForm}"`, `th:field="*{content}"`, `th:errorclass="is-invalid"`, `th:errors`, `required`. 상세 GET이 빈 `AnswerForm`을 받아 모델에 담는다
+- 이유: 답변 폼도 질문 폼과 같이 칸 아래 오류 표시, 입력값 유지, 브라우저 검증 (책 2-16)
+- 결과: 공백 답변을 보내면 상세 화면 답변 칸이 빨간 테두리가 되고 "내용은 필수항목입니다."가 나온다. 016-08 덕분에 그 칸에 커서가 간다. 테스트 20개 통과
 
 ### 017-01 내비게이션 바, navbar.html 프래그먼트 파일
-- 작업: `templates/navbar.html`에 `th:fragment="navbar"` 내비게이션 바(로고, 햄버거 버튼, 질문 목록 메뉴)
-- 이유: 공통 메뉴 (책 3-01). 레이아웃과 분리된 조각 파일로 관리(강사식)
-- 결과: 테스트 20개 통과. 연결은 017-02
+- 작업: `templates/navbar.html` 추가. `th:fragment="navbar"`인 부트스트랩 `navbar`(로고 `SBB` → `/`, 좁은 화면용 햄버거 버튼, "질문 목록" 메뉴)
+- 이유: 모든 화면 위에 공통 메뉴를 두려고 (책 3-01). 강사식으로 레이아웃에 직접 쓰지 않고 조각 파일로 분리
+- 결과: 조각 파일 생성. 아직 붙인 곳이 없어 화면 변화는 없다. 테스트 20개 통과
+- 메모: 로그인·회원가입 메뉴는 021~023에서 그 기능을 만든 뒤 넣는다
 
 ### 017-02 내비게이션 바, 레이아웃에 navbar 붙이기
-- 작업: `layout.html`의 `<body>` 맨 위에 `<nav th:replace="~{navbar :: navbar}">`
-- 이유: 레이아웃에 한 번 붙이면 모든 화면에 메뉴가 나온다 (책 3-01)
-- 결과: 테스트 20개 통과
+- 작업: `layout.html`의 `<body>` 맨 위에 `<nav th:replace="~{navbar :: navbar}"></nav>`
+- 이유: 레이아웃에 한 번 붙이면 레이아웃을 쓰는 모든 화면에 메뉴가 나온다 (책 3-01)
+- 결과: 목록·상세·등록 폼 맨 위에 "SBB" 로고와 "질문 목록" 메뉴가 있는 바가 생겼다. 목록 HTML에 `navbar-brand` 확인. 테스트 20개 통과
+- 메모: `th:insert`는 태그 안에 넣어 `<nav>` 안에 `<nav>`가 생기므로 `th:replace`를 쓴다
 
 ### 017-03 내비게이션 바, 부트스트랩 JS로 햄버거 메뉴 동작
 - 작업: `layout.html`에 `bootstrap.bundle.min.js`(5.3.3, cdnjs, `defer`)
-- 이유: CSS는 모양만, 펼치기 같은 동작은 JS가 한다 (책 3-01)
-- 결과: 테스트 20개 통과
+- 이유: 부트스트랩 CSS는 모양만 만들고, 버튼을 누르면 메뉴가 펼쳐지는 동작은 JS가 한다 (책 3-01)
+- 결과: 좁은 화면에서 햄버거 버튼을 누르면 메뉴가 펼쳐지고 접힌다. 모든 화면 HTML에 부트스트랩 JS 포함 확인. 테스트 20개 통과
+- 메모: `bundle`은 Popper까지 합친 파일. CSS와 같은 버전(5.3.3)으로 맞췄다
 
 ### 018-01 페이징, 서비스가 한 페이지(10개)씩 조회
-- 작업: `getList()` → `getList(int page)`가 `PageRequest.of(page, 10)`으로 `Page<Question>` 반환. 컨트롤러는 우선 0페이지
-- 이유: 전체 조회 대신 페이지 단위 조회 (책 3-02)
-- 결과: 테스트 20개 통과 (12개 → 10개 + 2개, 전체 12개, 2페이지)
+- 작업: `QuestionService.getList()` → `getList(int page)`가 `PageRequest.of(page, 10)`과 `findAll(Pageable)`로 `Page<Question>`을 돌려준다. 컨트롤러는 우선 `getList(0)`
+- 이유: 질문이 많아지면 전체를 한 번에 읽는 것이 느리고 화면도 길어진다 (책 3-02)
+- 결과: 질문 12개일 때 0페이지 10개, 1페이지 2개, 전체 개수 12, 전체 페이지 2. 목록 화면에는 처음 10개만 나온다. SQL 로그에 `offset`/`limit` 쿼리와 `count` 쿼리가 함께 나간다. 테스트 20개 통과
+- 메모: `Page`에는 목록(`getContent()`) 외에 전체 개수, 전체 페이지 수, 이전/다음 여부가 들어 있다
 
 ### 018-02 페이징, 최신 글이 먼저 오도록 작성일시 내림차순 정렬
 - 작업: `PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")))`
-- 이유: 최신 글이 1페이지 맨 위에 오게 (책 3-02)
-- 결과: 테스트 20개 통과 (질문12 → 첫 페이지 첫 줄, 질문1 → 마지막 페이지 마지막 줄)
+- 이유: 게시판은 최신 글을 먼저 보여 줘야 한다 (책 3-02)
+- 결과: 질문1~질문12를 순서대로 저장했을 때 첫 페이지 맨 위가 질문12, 마지막 페이지 맨 아래가 질문1. 목록 화면 맨 위에 가장 최근 질문이 온다. 테스트 20개 통과
+- 메모: 정렬은 DB의 `order by`로 해야 한다. 10개를 자른 뒤 자바에서 정렬하면 그 10개 안에서만 순서가 바뀐다
 
 ### 018-03 페이징, 주소의 ?page 값으로 페이지 선택 (1부터)
-- 작업: `GET /questions?page=N`(기본 1) → `getList(N - 1)`, 모델 이름 `paging`. 0 이하는 1페이지로
-- 이유: 주소로 페이지 선택 (책 3-02). 사용자에게는 1부터 보이게(강사식, 책은 0부터)
-- 결과: 테스트 21개 통과
+- 작업: `list(@RequestParam(defaultValue = "1") int page, ...)`가 `getList(Math.max(page, 1) - 1)` 호출. 모델 이름 `questionList` → `paging`, 템플릿 `th:each`도 `${paging}`
+- 이유: 주소로 원하는 페이지를 보려고 (책 3-02). 강사식으로 사용자에게 보이는 번호는 1부터(책은 0부터). 0 이하 값은 1페이지로
+- 결과: `/questions`와 `/questions?page=1`은 최신 10개, `/questions?page=2`는 11번째부터 보여 준다. 가장 오래된 질문이 page=2에는 있고 page=1에는 없음을 확인. 테스트 21개 통과
+
+### 018-04 페이징, 목록 아래 페이지 이동 버튼
+- 작업: `question_list.html`에 부트스트랩 `pagination`. "이전"(첫 페이지면 `disabled`), 현재 페이지 앞뒤 5개 번호(현재는 `active`), "다음"(마지막이면 `disabled`). 링크는 `@{/questions(page=...)}`, 질문이 없으면 버튼 줄을 그리지 않는다
+- 이유: 화면에서 페이지를 이동하려고 (책 3-02)
+- 결과: 목록 아래 가운데에 `이전 1 2 다음` 버튼이 생기고, 현재 페이지 번호가 파란 배경, 1페이지에서는 "이전"이 회색으로 눌리지 않는다. HTML에 `href="/questions?page=2"`, `page-item active`, `page-item disabled` 확인. 테스트 21개 통과
+- 메모: `paging.number`는 0부터라 화면 번호는 `number + 1`, 이전은 `number`, 다음은 `number + 2`
+
