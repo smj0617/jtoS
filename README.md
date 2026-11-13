@@ -333,3 +333,8 @@
 - 작업: `templates/layout.html`에 공통 `<head>`(부트스트랩, Pretendard, `global.css`)와 내용 자리 `<div layout:fragment="content">`
 - 이유: 반복되는 `<head>`를 한 파일에 모은다 (강사식)
 - 결과: 테스트 14개 통과. 화면 적용은 015-03, 015-04
+
+### 015-03 레이아웃, 목록 화면이 layout.html 사용
+- 작업: `question_list.html`에 `layout:decorate="~{layout}"`, 내용 `div`에 `layout:fragment="content"`. 링크 3줄 삭제
+- 이유: 공통 부분을 레이아웃에 맡긴다 (강사식)
+- 결과: 테스트 14개 통과. 013-02, 014-01 테스트(목록 HTML에 CSS 링크 존재)가 그대로 통과 → 레이아웃이 합쳐져 나온다
