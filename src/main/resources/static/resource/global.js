@@ -13,3 +13,13 @@ function onReady(fn) {
         fn();
     }
 }
+
+// 016-08: 서버 검증에 실패해 폼이 다시 열렸을 때, 첫 번째 오류 입력칸에 커서를 둔다 (강사식)
+//         016-06 의 th:errorclass 가 오류 칸에 is-invalid 클래스를 붙이므로 그 클래스로 찾는다
+//         querySelector 는 화면 위에서부터 처음 만나는 하나를 돌려준다 → 첫 오류 칸
+onReady(() => {
+    const firstInvalid = document.querySelector(".is-invalid");
+    if (firstInvalid) {
+        firstInvalid.focus();
+    }
+});

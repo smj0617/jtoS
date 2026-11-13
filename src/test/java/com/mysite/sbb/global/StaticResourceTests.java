@@ -37,6 +37,8 @@ class StaticResourceTests {
     void globalJs() throws Exception {
         mvc.perform(get("/resource/global.js"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("function onReady")));
+                .andExpect(content().string(containsString("function onReady")))
+                // 016-08: 첫 오류 칸 focus 코드가 들어 있는지 확인
+                .andExpect(content().string(containsString("querySelector(\".is-invalid\")")));
     }
 }
