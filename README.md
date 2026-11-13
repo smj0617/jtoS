@@ -703,3 +703,8 @@
 - 이유: 질문 추천 (책 3-10의 `GET /question/vote/{id}`). REST 규칙으로 "추천 하나를 만든다" → 질문의 하위 자원 `votes`에 POST. 버튼은 025-07 `global.js`가 `method` 링크를 처리하므로 링크로 쓴다
 - 결과: `user1`이 `POST /questions/{id}/votes`를 보내면 302로 상세 이동, 추천자에 `user1`이 들어가고 상세의 추천 배지가 `1`. 로그인 전에 보내면 `/members/login`으로 이동. `gradlew test` 60개 통과
 - 메모: `_method=POST`는 필터가 바꿀 대상(PUT, DELETE, PATCH)이 아니라서 그대로 POST로 들어온다
+
+### 026-04 추천, 답변 추천자 voter 와 AnswerService.vote
+- 작업: `Answer`에 `@ManyToMany private Set<Member> voter = new HashSet<>();`, `AnswerService.vote(answer, member)`. 테스트 추가
+- 이유: 답변 추천 (책 3-10). 026-02 질문 추천과 같은 관계·같은 방식
+- 결과: `answer_voter(answer_id, voter_id)` 연결 테이블이 생긴다. 같은 회원 `voter1`이 두 번 추천해도 다시 읽은 답변의 추천자는 1명. `gradlew test` 61개 통과

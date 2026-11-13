@@ -50,6 +50,24 @@ class AnswerServiceTests {
         assertThat(q.getAnswerList()).containsExactly(a);
     }
 
+    // 026-04: 답변 추천
+    @Test
+    @DisplayName("답변 vote 는 추천자를 추가하고 같은 회원은 한 번만 센다")
+    void vote() {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+        Answer a = answerService.create(q, "추천할 답변", null);
+        Member m = memberService.join("voter1", "voter1@test.com", "1234");
+
+        answerService.vote(a, m);
+        answerService.vote(a, m);
+        questionRepository.flush();
+
+        assertThat(answerService.getAnswer(a.getId()).getVoter()).hasSize(1);
+    }
+
     // 025-08: 답변 조회·수정·삭제
     @Test
     @DisplayName("getAnswer 로 찾고, modify 로 내용을 바꾸고, delete 로 지운다")

@@ -45,4 +45,10 @@ public class AnswerService {
     public void delete(Answer answer) {
         answer.getQuestion().getAnswerList().remove(answer);
     }
+
+    // 026-04: 답변 추천. 026-02 질문 추천과 같다
+    @Transactional
+    public void vote(Answer answer, Member member) {
+        answer.getVoter().add(member);
+    }
 }

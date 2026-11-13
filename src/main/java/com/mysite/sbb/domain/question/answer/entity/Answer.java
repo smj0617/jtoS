@@ -8,9 +8,13 @@ import com.mysite.sbb.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 // 004-01: 새 파일. 책 2-04 그대로의 답변 엔티티 → answer 테이블
 // 004-02: BaseEntity 상속 → id, createDate, modifyDate 를 물려받는다 (여기 있던 id, createDate 필드는 삭제)
@@ -33,4 +37,8 @@ public class Answer extends BaseEntity {
     // 024-02: 답변 글쓴이 (책 3-08). 024-01 질문과 같은 방식 → answer 테이블에 author_id 외래키
     @ManyToOne(fetch = FetchType.LAZY)
     private Member author;
+
+    // 026-04: 이 답변을 추천한 회원들 (책 3-10). 026-02 질문과 같은 방식 → answer_voter 연결 테이블
+    @ManyToMany
+    private Set<Member> voter = new HashSet<>();
 }
