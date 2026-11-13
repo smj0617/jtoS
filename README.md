@@ -106,3 +106,11 @@
 - 작업: README 목표와 작업 계획에서 2단계를 "시간이 되면 하는 선택 과정"으로 변경
 - 이유: 1단계(책 + 강의 개선, 001~029)를 끝까지 제대로 마치는 데 집중하기 위해
 - 결과: 1단계가 필수 범위, 2단계(030~)는 선택 범위
+
+### 003-01 JPA, H2 데이터베이스와 H2 콘솔 추가
+- 작업: 의존성 `h2`, `spring-boot-h2console`, `spring-boot-starter-jdbc` 추가. `application.yaml`에 H2 콘솔(`/h2-console`)과 파일 모드 DB(`jdbc:h2:./db_dev`) 설정
+- 이유: 004에서 만들 엔티티를 저장할 DB를 준비하기 위해 (책 2-03, 14163 5강)
+- 결과: 시작 로그에 `HikariPool-1 - Start completed`, `H2 console available at '/h2-console'`. 프로젝트 폴더에 `db_dev.mv.db` 생성. `/h2-console`에서 `jdbc:h2:./db_dev`로 로그인 성공
+- 메모 1: Boot 4는 H2 콘솔 자동 설정이 별도 모듈이라 `spring-boot-h2console` 의존성이 필요하다 (책 Boot 3에는 없음)
+- 메모 2: 처음에는 JDBC 없이 시도했더니 콘솔에서 `Database ... db_dev not found` 오류. H2는 콘솔(원격)에서 DB 파일을 새로 만들지 않는데, JDBC가 없으면 앱이 `datasource` 설정을 쓰지 않아 파일이 만들어지지 않았다. `starter-jdbc`를 추가하자 앱이 시작하면서 DB에 연결해 파일을 만들었다. 003-03에서 JPA 스타터(JDBC 포함)를 넣으면 이 줄은 지운다
+- 메모 3: `db_dev.mv.db`는 커밋하지 않는다. 003-02에서 `.gitignore`에 추가
