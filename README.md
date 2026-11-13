@@ -1,0 +1,79 @@
+# jtoS - 점프 투 스프링부트 복습
+
+## 목표
+- **1단계**: 『점프 투 스프링부트』(SBB)의 기능을 책 순서대로 구현하면서, 장희성 강사의 수업 내용으로 개선할 수 있는 부분을 적용한다.
+- **2단계**: 책의 [3-14 SBB 추가 기능 구현하기](https://wikidocs.net/162814) 도전과제를 하나씩 구현한다.
+
+## 진행 규칙
+- AI는 나의 이해 속도보다 앞서 나가지 않는다.
+- 단계마다 할 일과 이유를 먼저 설명받고, 내가 승인한 뒤에 실행한다.
+- 한 번에 작은 작업 하나만 진행하고, 결과는 직접 실행해서 눈으로 확인한다.
+- 커밋은 작게, 자주 한다.
+  - 제목: `기능번호-세부번호 기능명, 세부작업` (예: `004-02 엔티티, BaseEntity 도입`)
+  - 본문: 작업 내용 / 작업 이유 / 검증
+- 모든 커밋마다 아래 `## 작업내역`에 기록을 누적한다.
+
+## 기술 스택
+- Java 25
+- Spring Boot 4.1.2
+- Gradle (Kotlin DSL)
+- Spring Data JPA, H2
+- Thymeleaf
+- Spring Security
+
+## 참고 자료
+- 점프 투 스프링부트: [교재](https://wikidocs.net/book/7601) / [GitHub](https://github.com/pahkey/sbb3)
+- 장희성 강사 수업 (2026-11-13 수업까지 진행한 범위)
+  - 14158 스프링부트, JPA 기초: 1~56강
+  - 14163 스프링부트, JSB: 1~39강 / [강의](https://www.slog.gg/p/14163) / [GitHub](https://github.com/jhs512/p-14163-2)
+  - 14164 스프링부트, 컨트롤러, 빈, AOP: 1~37강
+  - 14168 스프링부트, SpringWeb, 타임리프, 벨리데이션: 1~46강 / [강의](https://www.slog.gg/p/14168) / [GitHub](https://github.com/jhs512/p-14168-2)
+
+## 작업 계획
+
+### 2장 기본기 다지기
+| 번호 | 책 | 적용할 개선점 |
+|---|---|---|
+| 001 | 2-01 프로젝트 구조 | Boot 4.1.2 / Java 25 / `build.gradle.kts` |
+| 002 | 2-02 컨트롤러 | 404가 나오는 과정 확인 |
+| 003 | 2-03 JPA | H2 파일 모드(dev) + 메모리 모드(test) 프로파일 분리, SQL 로그 상세 출력 |
+| 004 | 2-04 엔티티 | `BaseEntity`, `@CreatedDate`/`@LastModifiedDate`, `@ManyToOne(fetch = LAZY)`, cascade/orphanRemoval |
+| 005 | 2-05 리포지터리 | `BaseInitData` 샘플 데이터, 테스트 `@Transactional` 롤백 |
+| 006 | 2-06 도메인별 분류 | `domain.question.question.{controller,service,repository,entity}` 구조 |
+| 007 | 2-07 질문 목록 | 타임리프 캐시는 dev에서만 끔 |
+| 008 | 2-08 루트 URL | - |
+| 009 | 2-09 서비스 | `@RequiredArgsConstructor` + `final` 생성자 주입 |
+| 010 | 2-10 상세 | 친절한 메시지의 커스텀 예외 + 404 |
+| 011 | 2-11 URL 프리픽스 | 복수형 리소스 URL `/questions` |
+| 012 | 2-12 답변 | `question.addAnswer()` + cascade, `POST /questions/{id}/answers` |
+| 013 | 2-13 웹 디자인 | 정적 파일은 `static/resource` 폴더 |
+| 014 | 2-14 부트스트랩 | cdnjs CDN, Pretendard 폰트 |
+| 015 | 2-15 표준 HTML | Layout Dialect `layout.html`, `layout:title-pattern`, `global.js` |
+| 016 | 2-16 질문 등록 | `record` 폼, `BindingResult`, `th:object`/`th:field`, 첫 오류 필드 focus, 클라이언트·서버 양쪽 검증 |
+
+### 3장 SBB 서비스 개발
+| 번호 | 책 | 적용할 개선점 |
+|---|---|---|
+| 017 | 3-01 내비게이션 바 | 프래그먼트로 분리 |
+| 018 | 3-02 페이징 | - |
+| 019 | 3-03 게시물 번호 | - |
+| 020 | 3-04 답변 개수 | `@OneToMany` 컬렉션 활용 |
+| 021 | 3-05 스프링 시큐리티 | 처음엔 모든 요청 허용, `th:action`으로 CSRF 처리 |
+| 022 | 3-06 회원가입 | `record` 폼 + 검증, `BaseEntity` 상속 |
+| 023 | 3-07 로그인/로그아웃 | - |
+| 024 | 3-08 글쓴이 | `@ManyToOne(fetch = LAZY) author` |
+| 025 | 3-09 수정·삭제 | `_method` → `@PutMapping`/`@DeleteMapping`, `<a method="DELETE">` |
+| 026 | 3-10 추천 | `equals`/`hashCode` |
+| 027 | 3-11 앵커 | - |
+| 028 | 3-12 마크다운 | `MarkdownService`로 분리 |
+| 029 | 3-13 검색 | 검색 옵션 `select` 기본값 JS |
+
+### 2단계 도전과제
+- 030번부터 하나씩 진행
+
+## 작업내역
+
+### 000-01 프로젝트 준비, README와 진행 계획 작성
+- 작업: git 저장소 생성, README에 목표·진행 규칙·기술 스택·참고 자료·작업 계획 작성
+- 이유: 코드를 쓰기 전에 무엇을 어떤 순서로, 어떤 규칙으로 할지 정해 두기 위해
+- 결과: GitHub 공개 저장소 `smj0617/jtoS`에 push
