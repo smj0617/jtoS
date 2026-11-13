@@ -481,3 +481,9 @@
 - 이유: 목록에서 답변이 달린 질문을 바로 알아보게 (책 3-04). 004의 `@OneToMany answerList` 컬렉션 크기를 그대로 쓴다
 - 결과: dev 서버 `/questions?page=31`에서 답변이 하나씩 달린 샘플 질문 2개 제목 옆에 빨간 `1`이 나온다. 답변이 없는 1페이지 테스트 데이터에는 아무것도 붙지 않는다. 테스트에서 `<span class="text-danger small ms-2">1</span>` 확인, `gradlew test` 21개 통과
 - 메모: 목록 10개 질문마다 `answerList`를 처음 쓸 때 답변 조회 쿼리가 하나씩 더 나간다(LAZY라서). 이 N+1 문제는 020-02에서 줄인다
+
+### 020-02 답변 개수, default_batch_fetch_size로 답변 조회 N+1 줄이기
+- 작업: `application.yaml`에 `spring.jpa.properties.hibernate.default_batch_fetch_size: 100`
+- 이유: 020-01부터 목록의 질문마다 `answerList`를 쓰면서, 질문 10개면 답변 조회 쿼리가 10번 따로 나갔다(N+1 문제). 이 설정은 LAZY 컬렉션을 처음 쓸 때 같은 화면의 다른 질문들 것까지 최대 100개를 `in (...)` 한 번으로 모아 조회한다 (강사식, 책에는 없음)
+- 결과: dev 서버에서 `/questions?page=1` 요청 한 번에 나가는 SQL이 12개(질문 목록 1 + 전체 개수 1 + 답변 10)에서 3개(질문 목록 1 + 전체 개수 1 + 답변 1)로 줄었다. 로그에 `from answer ... where question_id in (?, ?, ...)` 쿼리가 찍힌다. 화면 결과(답변 개수 표시)는 같고 `gradlew test` 21개 통과
+- 메모: `in (...)`의 `?`가 100개 가까이 찍히는 것은 Hibernate가 쿼리 모양을 몇 가지로 고정해 재사용하려고 빈칸을 채우기 때문이다

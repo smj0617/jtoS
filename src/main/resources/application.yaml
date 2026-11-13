@@ -25,6 +25,9 @@ spring:
         highlight_sql: true
         # 003-04: 이 SQL이 어떤 JPA 동작에서 나왔는지 /* ... */ 주석으로 함께 출력
         use_sql_comments: true
+        # 020-02: LAZY 컬렉션을 처음 쓸 때 하나씩 조회하지 않고, 화면에 있는 다른 질문들의 것까지 최대 100개를 in (...) 한 번으로 모아 조회한다
+        #         목록 10개 질문의 answerList → 쿼리 10번이 1번으로 줄어든다 (N+1 완화, 강사식 설정)
+        default_batch_fetch_size: 100
 # 003-04: 어떤 로그를 얼마나 자세히 볼지 정한다
 logging:
   level:
