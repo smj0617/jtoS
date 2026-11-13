@@ -77,6 +77,9 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
                 .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")))
+                // 014-04: 질문·답변이 부트스트랩 카드로 그려지는지 확인
+                .andExpect(content().string(containsString("class=\"card my-3\"")))
+                .andExpect(content().string(containsString("class=\"btn btn-primary my-2\"")))
                 // 012-04: 답변 개수와 답변 내용이 보이는지 확인 (setUp 에서 답변 1개 저장)
                 .andExpect(content().string(containsString("1개의 답변이 있습니다.")))
                 .andExpect(content().string(containsString("스프링부트 게시판입니다.")))
