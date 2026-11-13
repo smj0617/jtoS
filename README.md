@@ -731,3 +731,9 @@
 - 작업: `org.commonmark:commonmark:0.24.0` 의존성(부트가 버전을 관리하지 않아 직접 지정). `global.markdown.MarkdownService.markdown(String)`이 commonmark `Parser`로 읽고 `HtmlRenderer`(`escapeHtml(true)`, `sanitizeUrls(true)`)로 HTML을 만든다. 테스트 `MarkdownServiceTests`(스프링 없이)
 - 이유: 질문·답변에 굵게, 목록, 코드 같은 서식을 쓰게 한다 (책 3-12의 `CommonUtil`). 강사식으로 서비스로 분리해 여러 도메인이 같이 쓴다. 책 방식 그대로면 내용에 `<script>`를 쓰면 다른 사람 브라우저에서 실행되므로(XSS), 직접 쓴 HTML은 글자로 바꾸고 `javascript:` 같은 위험한 링크 주소도 막았다
 - 결과: `**굵게**`는 `<strong>굵게</strong>`, `- 하나`는 `<li>하나</li>`, `` `code` ``는 `<code>code</code>`. `<script>alert('x')</script>`는 `<script>` 태그가 없어지고 `&lt;script&gt;` 글자로 바뀐다. `gradlew test` 64개 통과
+
+### 028-02 마크다운, 상세 화면 질문·답변 내용에 마크다운 적용
+- 작업: 상세의 질문·답변 내용을 `th:text` 대신 `th:utext="${markdownService.markdown(...)}"`로 출력(014-04의 `white-space: pre-line`은 제거). `markdownService`는 새 `global.markdown.MarkdownModelAdvice`(`@ControllerAdvice` + `@ModelAttribute("markdownService")`)가 모든 화면 모델에 넣어 준다
+- 이유: 마크다운으로 쓴 내용을 서식대로 보여 준다 (책 3-12). 처음에는 책처럼 `${@markdownService.markdown(...)}`(템플릿에서 스프링 빈 직접 호출)로 썼는데, 이 버전의 타임리프(3.1)가 `th:utext` 안의 빈 참조를 보안상 막아 "Instantiation of new objects and access to static classes or parameters is forbidden" 오류가 났다. 그래서 컨트롤러 공통 설정으로 모델에 담아 넘겼다
+- 결과: 처음 방식에서는 상세 화면을 그리는 테스트 10개가 모두 실패했고, 모델 속성 방식으로 바꾸자 모두 통과했다. 내용 `**굵게**`는 화면에 `<strong>굵게</strong>`로, 직접 쓴 `<script>alert('x')</script>`는 실행되지 않는 `&lt;script&gt;` 글자로 나온다. `gradlew test` 65개 통과
+- 메모: `th:utext`는 HTML을 그대로 넣으므로 위험하다. 028-01 `escapeHtml(true)`로 사용자가 쓴 HTML을 먼저 막아 두었기 때문에 안전하게 쓸 수 있다

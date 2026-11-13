@@ -195,6 +195,21 @@ class QuestionControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // 028-02: 상세 화면 내용 마크다운
+    @Test
+    @DisplayName("상세 화면은 내용을 마크다운으로 보여 주고, 직접 쓴 script 태그는 글자로 바꾼다")
+    void markdownContent() throws Exception {
+        Question q = new Question();
+        q.setSubject("마크다운 질문");
+        q.setContent("**굵게**\n\n<script>alert('x')</script>");
+        questionRepository.save(q);
+
+        mvc.perform(get("/questions/" + q.getId()))
+                .andExpect(content().string(containsString("<strong>굵게</strong>")))
+                .andExpect(content().string(containsString("&lt;script&gt;")))
+                .andExpect(content().string(not(containsString("<script>alert"))));
+    }
+
     // 026-03: 질문 추천
     @Test
     @DisplayName("로그인 회원이 POST /questions/{id}/votes 하면 추천 수가 오르고, 비로그인은 로그인 화면으로")

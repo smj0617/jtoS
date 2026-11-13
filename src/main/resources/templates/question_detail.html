@@ -17,7 +17,10 @@
     <!--         white-space: pre-line → 내용의 줄바꿈을 화면에도 줄바꿈으로 보여 준다 -->
     <div class="card my-3">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
+            <!-- 028-02: 내용을 마크다운으로 보여 준다. markdownService → MarkdownModelAdvice 가 모델에 넣어 준 028-01 서비스 -->
+            <!--         th:utext → 이스케이프하지 않고 HTML 그대로 넣는다(th:text 면 <strong> 이 글자로 보인다). 위험한 태그는 028-01 이 이미 막았다 -->
+            <!--         줄바꿈은 마크다운 문단이 처리하므로 014-04 의 white-space: pre-line 은 뺐다 -->
+            <div class="card-text" th:utext="${markdownService.markdown(question.content)}"></div>
             <!-- 024-07: 카드 오른쪽 아래에 글쓴이 (책 3-08). 글쓴이가 없는 옛 질문이면 th:if 로 그리지 않는다 -->
             <div class="d-flex justify-content-end" th:if="${question.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${question.author.username}"></span>
@@ -57,7 +60,10 @@
     <!-- 027-01: 답변 카드마다 id="answer_답변번호" → 주소 끝에 #answer_3 을 붙이면 브라우저가 그 카드로 바로 스크롤한다 (책 3-11 앵커) -->
     <div class="card my-3" th:each="answer : ${question.answerList}" th:id="|answer_${answer.id}|">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
+            <!-- 028-02: 내용을 마크다운으로 보여 준다. markdownService → MarkdownModelAdvice 가 모델에 넣어 준 028-01 서비스 -->
+            <!--         th:utext → 이스케이프하지 않고 HTML 그대로 넣는다(th:text 면 <strong> 이 글자로 보인다). 위험한 태그는 028-01 이 이미 막았다 -->
+            <!--         줄바꿈은 마크다운 문단이 처리하므로 014-04 의 white-space: pre-line 은 뺐다 -->
+            <div class="card-text" th:utext="${markdownService.markdown(answer.content)}"></div>
             <!-- 024-07: 답변 글쓴이 -->
             <div class="d-flex justify-content-end" th:if="${answer.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${answer.author.username}"></span>
