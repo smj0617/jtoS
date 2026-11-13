@@ -73,6 +73,17 @@ class QuestionControllerTests {
                 .andExpect(content().string(containsString("href=\"/questions/" + q1.getId() + "\"")));
     }
 
+    // 016-02: 등록 폼 화면
+    @Test
+    @DisplayName("GET /questions/new 는 질문 등록 폼을 보여 준다")
+    void showCreate() throws Exception {
+        mvc.perform(get("/questions/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("question_form"))
+                .andExpect(content().string(containsString("<title>질문 등록 | SBB</title>")))
+                .andExpect(content().string(containsString("action=\"/questions\"")));
+    }
+
     // 010-03: 상세 화면과 없는 질문의 404
     @Test
     @DisplayName("질문 상세 화면에 제목과 내용이 보이고, 없는 질문은 404")

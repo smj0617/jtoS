@@ -358,3 +358,8 @@
 - 작업: `QuestionService.create(subject, content)`(`@Transactional`) 추가와 테스트
 - 이유: 질문 등록 처리 (책 2-16). 생성일시는 004-02 Auditing이 채운다
 - 결과: 테스트 16개 통과
+
+### 016-02 질문 등록, 등록 폼 화면 GET /questions/new
+- 작업: `GET /questions/new` → `question_form.html`(제목, 내용, `POST /questions`로 보내는 폼)
+- 이유: 질문 입력 화면 (책 2-16). REST 규칙으로 `/questions/new` (책은 `/question/create`)
+- 결과: 테스트 17개 통과

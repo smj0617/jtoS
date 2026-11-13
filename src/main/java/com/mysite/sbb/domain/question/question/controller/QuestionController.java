@@ -35,6 +35,14 @@ public class QuestionController {
         return "question_list";
     }
 
+    // 016-02: 질문 등록 폼 화면 (책 2-16)
+    //         REST 규칙: 새 자원을 만드는 입력 화면은 GET /questions/new (책은 GET /question/create)
+    //         /{id} 보다 위에 두지 않아도 스프링은 글자 그대로인 /new 를 {id} 보다 먼저 맞춘다
+    @GetMapping("/new")
+    public String showCreate() {
+        return "question_form";
+    }
+
     // 010-03: 질문 상세 화면 (책 2-10)
     //         {id} → 주소의 그 자리 값을 @PathVariable 로 받는다. /question/detail/3 이면 id = 3
     //         없는 id면 getQuestion 이 DataNotFoundException 을 던져 404 가 된다
