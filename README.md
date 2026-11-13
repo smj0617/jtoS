@@ -530,3 +530,9 @@
 - 작업: `domain.member.member.service.MemberService.join(username, email, password)`. `PasswordEncoder`(022-03)를 주입받아 `passwordEncoder.encode(password)`를 저장한다. `@Transactional`. 테스트 `MemberServiceTests`
 - 이유: 회원가입 처리 (책 3-06의 `UserService.create`). 강사식으로 메서드 이름은 `join`. 컨트롤러가 아니라 서비스에서 암호화해서, 어디서 가입시키든 평문이 저장될 수 없게 한다
 - 결과: `join("user1", "user1@test.com", "1234")` 후 id와 가입일이 채워지고, DB의 비밀번호는 `"1234"`가 아닌 BCrypt 값이며 `matches("1234", 저장값)`이 true. `gradlew test` 28개 통과
+
+### 022-05 회원가입, 가입 폼 record MemberJoinForm과 검증 규칙
+- 작업: `domain.member.member.dto.MemberJoinForm` record. `username`(`@NotBlank`, `@Size(min = 3, max = 25)`), `password1`·`password2`(`@NotBlank`), `email`(`@NotBlank`, `@Email`). 테스트 `MemberJoinFormTests`는 스프링을 띄우지 않고 `Validator`로 바로 검사
+- 이유: 가입 화면의 입력값을 담고 서버에서 검증하기 위해 (책 3-06의 `UserCreateForm`). 016-05처럼 강사식 record. 아이디 최대 길이는 022-01 컬럼 길이(25)와 맞춘다
+- 결과: `("user1","1234","1234","user1@test.com")`은 오류 없음. 아이디 `"ab"`와 이메일 `"not-email"`이면 `username`, `email` 두 필드에 오류. 비밀번호 칸이 비거나 공백이면 `password1`, `password2`에 오류. `gradlew test` 31개 통과
+- 메모: "두 비밀번호가 같은가"는 필드 하나만 보는 어노테이션으로는 검사할 수 없어 022-07 컨트롤러에서 따로 비교한다
