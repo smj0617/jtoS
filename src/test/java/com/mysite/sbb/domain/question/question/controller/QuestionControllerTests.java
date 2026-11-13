@@ -59,4 +59,17 @@ class QuestionControllerTests {
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")));
     }
+
+    // 010-03: 상세 화면과 없는 질문의 404
+    @Test
+    @DisplayName("질문 상세 화면에 제목과 내용이 보이고, 없는 질문은 404")
+    void detail() throws Exception {
+        mvc.perform(get("/question/detail/" + q1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("question_detail"))
+                .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")));
+
+        mvc.perform(get("/question/detail/999999"))
+                .andExpect(status().isNotFound());
+    }
 }

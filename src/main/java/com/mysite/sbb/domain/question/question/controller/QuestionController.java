@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -25,5 +26,15 @@ public class QuestionController {
         List<Question> questionList = questionService.getList();
         model.addAttribute("questionList", questionList);
         return "question_list";
+    }
+
+    // 010-03: 질문 상세 화면 (책 2-10)
+    //         {id} → 주소의 그 자리 값을 @PathVariable 로 받는다. /question/detail/3 이면 id = 3
+    //         없는 id면 getQuestion 이 DataNotFoundException 을 던져 404 가 된다
+    @GetMapping("/question/detail/{id}")
+    public String detail(@PathVariable Integer id, Model model) {
+        Question question = questionService.getQuestion(id);
+        model.addAttribute("question", question);
+        return "question_detail";
     }
 }

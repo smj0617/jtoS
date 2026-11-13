@@ -244,3 +244,8 @@
 - 작업: `getQuestion(id)`가 `findById(id).orElseThrow(...)`로 질문을 찾고, 없으면 `DataNotFoundException("N번 질문이 없습니다.")`
 - 이유: 상세 화면에 쓸 질문 하나 조회 (책 2-10). `Optional`을 꺼낼 때 `get()` 대신 `orElseThrow`로 없는 경우를 명확히 처리
 - 결과: 테스트 10개 통과 (성공 조회, 없는 id 999999 → 예외와 메시지)
+
+### 010-03 상세, 질문 상세 화면
+- 작업: `GET /question/detail/{id}`가 `@PathVariable`로 id를 받아 `getQuestion(id)`를 `question_detail.html`로 그린다. 템플릿은 제목과 내용
+- 이유: 질문 하나를 보는 화면 (책 2-10)
+- 결과: 테스트 11개 통과. 상세 200 + 내용 포함, 없는 id 999999는 404 (010-01 예외의 `@ResponseStatus` 동작 확인)
