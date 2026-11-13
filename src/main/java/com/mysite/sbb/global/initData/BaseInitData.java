@@ -1,6 +1,6 @@
-package com.mysite.sbb;
+// 006-04: 특정 도메인이 아닌 앱 전체의 개발용 설정이라 global.initData 로 이동
+package com.mysite.sbb.global.initData;
 
-// 006-02: Question, QuestionRepository 가 질문 도메인으로 옮겨져 import 추가
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 

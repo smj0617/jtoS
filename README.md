@@ -184,3 +184,8 @@
 - 작업: `Answer` → `domain.question.answer.entity`, `AnswerRepository` → `domain.question.answer.repository`. `Question`과 `QuestionRepositoryTests`가 쓰던 답변 import를 새 위치로 바꿨다
 - 이유: 답변은 질문 없이 존재하지 않는 질문의 일부라서, 별도의 큰 도메인이 아니라 `question` 도메인의 하위 도메인으로 둔다 (강사식)
 - 결과: 답변 파일 2개 이동. `addAnswer` 후 질문만 저장해도 답변이 함께 저장되는 테스트(004-03 cascade)가 그대로 통과(6개)
+
+### 006-04 도메인별 분류, 개발용 초기 데이터 BaseInitData를 global.initData로
+- 작업: `BaseInitData`를 `global.initData`로 옮겼다
+- 이유: 특정 도메인의 기능이 아니라 앱 전체의 개발용 설정이라 `global`에 둔다 (강사식)
+- 결과: dev 서버를 켤 때 샘플 질문 2개를 넣는 동작은 그대로다. `@Configuration`은 `SbbApplication` 아래 패키지면 어디에 있어도 자동으로 등록된다. 테스트 6개 통과
