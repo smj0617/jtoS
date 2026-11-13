@@ -201,3 +201,8 @@
 - 작업: `build.gradle.kts`에 `spring-boot-starter-thymeleaf` 추가
 - 이유: 컨트롤러가 넘긴 데이터를 HTML 템플릿에 채워 화면을 만드는 템플릿 엔진이 필요하다 (책 2-07)
 - 결과: 타임리프 자동 설정이 들어와 `src/main/resources/templates/` 아래 HTML을 화면으로 쓸 수 있게 됐다. 아직 템플릿은 없어 화면 변화는 없다. 테스트 6개 통과
+
+### 007-02 질문 목록, dev에서만 템플릿 캐시 끄기
+- 작업: `application-dev.yaml`에 `spring.thymeleaf.cache: false`
+- 이유: 타임리프는 기본으로 템플릿을 캐시해서 HTML을 고쳐도 서버를 다시 켜야 반영된다. 개발 중에만 끄고 운영(기본값 true)은 그대로 둔다 (강사식, 책에는 없는 설정)
+- 결과: dev 서버에서 HTML을 고치면 새로고침만으로 반영된다. test 프로파일과 운영 설정에는 영향이 없다. 테스트 6개 통과

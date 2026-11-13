@@ -7,6 +7,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  # 007-02: 개발 중에는 템플릿 캐시를 끈다 → HTML을 고치면 서버 재시작 없이 새로고침만으로 반영된다
+  #         운영(기본값 true)에서는 캐시를 켜 두어야 빠르므로 dev 파일에만 둔다
+  thymeleaf:
+    cache: false
   # 003-03: JPA 설정 추가
   jpa:
     hibernate:
