@@ -111,7 +111,11 @@ class QuestionControllerTests {
                         .param("subject", " ")
                         .param("content", "내용"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("question_form"));
+                .andExpect(view().name("question_form"))
+                // 016-06: 오류 메시지와 빨간 테두리, 입력했던 내용이 남아 있는지 확인
+                .andExpect(content().string(containsString("제목은 필수항목입니다.")))
+                .andExpect(content().string(containsString("is-invalid")))
+                .andExpect(content().string(containsString(">내용</textarea>")));
 
         assertThat(questionRepository.count()).isEqualTo(before);
     }

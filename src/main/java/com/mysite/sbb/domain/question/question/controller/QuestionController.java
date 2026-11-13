@@ -42,8 +42,10 @@ public class QuestionController {
     // 016-02: 질문 등록 폼 화면 (책 2-16)
     //         REST 규칙: 새 자원을 만드는 입력 화면은 GET /questions/new (책은 GET /question/create)
     //         /{id} 보다 위에 두지 않아도 스프링은 글자 그대로인 /new 를 {id} 보다 먼저 맞춘다
+    // 016-06: 빈 QuestionForm 을 받아 두면 모델에 "questionForm" 이름으로 담긴다
+    //         → 템플릿의 th:object="${questionForm}" 이 처음 열 때도 쓸 객체가 생긴다 (값은 모두 null)
     @GetMapping("/new")
-    public String showCreate() {
+    public String showCreate(QuestionForm questionForm) {
         return "question_form";
     }
 
