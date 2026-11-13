@@ -65,10 +65,35 @@ class QuestionRepositoryTests {
         questionRepository.flush();
 
         PageRequest page = PageRequest.of(0, 10);
-        assertThat(questionRepository.search("스프링", page).getContent())
+        assertThat(questionRepository.search("all", "스프링", page).getContent())
                 .containsExactlyInAnyOrder(bySubject, byContent, byAnswer);
-        assertThat(questionRepository.search("searchwriter", page).getContent())
+        assertThat(questionRepository.search("all", "searchwriter", page).getContent())
                 .containsExactlyInAnyOrder(byAuthor, byAnswer);
+    }
+
+    // 029-04: 검색 대상(kwType) 별 검색
+    @Test
+    @DisplayName("kwType 이 subject 면 제목만, content 면 질문·답변 내용만, author 면 글쓴이만 찾는다")
+    void searchByType() {
+        Member writer = new Member();
+        writer.setUsername("자바왕");
+        writer.setPassword("x");
+        writer.setEmail("kw@test.com");
+        memberRepository.save(writer);
+
+        Question inSubject = saveQuestion("자바 제목", "내용");
+        Question inContent = saveQuestion("제목", "자바 내용");
+        Question inAnswer = saveQuestion("제목2", "내용");
+        inAnswer.addAnswer("자바 답변");
+        Question byAuthor = saveQuestion("제목3", "내용");
+        byAuthor.setAuthor(writer);
+        questionRepository.flush();
+
+        PageRequest page = PageRequest.of(0, 10);
+        assertThat(questionRepository.search("subject", "자바", page).getContent()).containsExactly(inSubject);
+        assertThat(questionRepository.search("content", "자바", page).getContent()).containsExactlyInAnyOrder(inContent, inAnswer);
+        assertThat(questionRepository.search("author", "자바", page).getContent()).containsExactly(byAuthor);
+        assertThat(questionRepository.search("all", "자바", page).getContent()).hasSize(4);
     }
 
     // 024-01: 질문에 글쓴이 회원을 연결해 저장하고 다시 읽을 수 있다

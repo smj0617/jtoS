@@ -753,3 +753,9 @@
 - 작업: 목록 표 위에 `GET /questions`로 보내는 검색 폼(`<input name="kw" th:value="${kw}">`, "찾기" 버튼). 페이지 이동 링크 세 곳(이전·번호·다음)을 `@{/questions(page=..., kw=${kw})}`로 바꿔 검색어를 함께 보낸다. 018-04 테스트의 링크 기대값을 `page=2&kw=`로 갱신
 - 이유: 화면에서 검색하고, 검색 결과의 다음 페이지로 가도 검색어가 유지돼야 한다 (책 3-13). 책은 숨은 폼에 page·kw를 담아 자바스크립트로 제출하지만, 평범한 GET 폼과 링크 파라미터만으로 같은 일을 할 수 있다. 주소에 검색어가 남아 새로고침·공유해도 같은 결과가 나온다
 - 결과: `/questions?kw=sbb`를 열면 검색창에 `sbb`가 채워져 있다. 검색 결과가 12개(2페이지)일 때 페이지 링크가 `/questions?page=2&kw=sbb`. 검색어가 없을 때 링크는 `/questions?page=2&kw=`. 처음엔 018-04 테스트가 옛 링크 모양(`?page=2`)을 기대해서 실패했고, 의도한 변화라 기대값을 바꿨다. `gradlew test` 68개 통과
+
+### 029-04 검색, 검색 대상 선택(전체·제목·내용·글쓴이)
+- 작업: `search(kwType, kw, pageable)` 쿼리에 대상별 조건을 넣었다(`subject` 제목만, `content` 질문·답변 내용, `author` 질문·답변 글쓴이, 그 밖의 값은 029-01 전체 조건). 서비스 `getList(page, kwType, kw)`, 컨트롤러 `@RequestParam(defaultValue = "all") String kwType`과 모델 `kwType`. 목록 검색창 앞에 `<select name="kwType">`(전체·제목·내용·글쓴이)과 페이지 링크의 `kwType`. 기존 테스트 호출·링크 기대값 갱신
+- 이유: 원하는 대상만 골라 검색한다 (강사식 검색 옵션 select). 책은 전체 대상 검색 하나만 있다
+- 결과: "자바"로 검색할 때 `subject`는 제목에 있는 질문 1개, `content`는 질문 내용·답변 내용에 있는 2개, `author`는 글쓴이 아이디가 "자바왕"인 1개, `all`은 4개 모두. 페이지 링크는 `/questions?page=2&kw=sbb&kwType=all` 형태. `gradlew test` 69개 통과
+- 메모: 선택 상자가 검색 후에도 고른 값을 유지하는 일은 029-05에서 JS로 한다. 지금은 `data-value`에 현재 값만 담아 두었다

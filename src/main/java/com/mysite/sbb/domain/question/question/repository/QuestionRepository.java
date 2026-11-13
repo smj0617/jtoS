@@ -35,11 +35,16 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             left join q.author qa
             left join q.answerList a
             left join a.author aa
-            where q.subject like %:kw%
-               or q.content like %:kw%
-               or qa.username like %:kw%
-               or a.content like %:kw%
-               or aa.username like %:kw%
+            where (:kwType = 'subject' and q.subject like %:kw%)
+               or (:kwType = 'content' and (q.content like %:kw% or a.content like %:kw%))
+               or (:kwType = 'author' and (qa.username like %:kw% or aa.username like %:kw%))
+               or (:kwType not in ('subject', 'content', 'author') and (
+                       q.subject like %:kw%
+                    or q.content like %:kw%
+                    or qa.username like %:kw%
+                    or a.content like %:kw%
+                    or aa.username like %:kw%))
             """)
-    Page<Question> search(@Param("kw") String kw, Pageable pageable);
+    // 029-04: 검색 대상(kwType) 추가. subject=제목, content=질문·답변 내용, author=질문·답변 글쓴이, 그 밖(all)=전체(029-01 조건)
+    Page<Question> search(@Param("kwType") String kwType, @Param("kw") String kw, Pageable pageable);
 }

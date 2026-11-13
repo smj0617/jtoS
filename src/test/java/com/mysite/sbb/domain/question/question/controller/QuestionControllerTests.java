@@ -127,7 +127,7 @@ class QuestionControllerTests {
                 // 019-01: 1페이지 맨 위(가장 최신)가 12번
                 .andExpect(content().string(containsString("<td>12</td>")))
                 // 018-04: 페이지 버튼 확인 (2페이지 링크, 현재 페이지 active, 1페이지라 이전은 disabled)
-                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=\""))) // 029-03: 링크에 kw(빈 값)가 붙는다
+                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=&amp;kwType=all\""))) // 029-03: 링크에 kw(빈 값)가 붙는다
                 .andExpect(content().string(containsString("page-item active")))
                 .andExpect(content().string(containsString("page-item disabled")));
     }
@@ -224,7 +224,7 @@ class QuestionControllerTests {
         }
 
         mvc.perform(get("/questions").param("kw", "sbb"))
-                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=sbb\"")));
+                .andExpect(content().string(containsString("href=\"/questions?page=2&amp;kw=sbb&amp;kwType=all\"")));
     }
 
     // 028-02: 상세 화면 내용 마크다운

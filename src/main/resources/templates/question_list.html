@@ -18,7 +18,17 @@
 <!-- 029-03: 검색창 (책 3-13). GET /questions?kw=... 로 보내는 평범한 폼 → 주소에 검색어가 남아 새로고침·공유해도 같은 결과 -->
 <!--         책은 숨은 폼과 자바스크립트로 page·kw 를 함께 보내지만, GET 폼과 링크만으로 충분하다 -->
 <form th:action="@{/questions}" method="get" class="row g-2 my-3">
-    <div class="col-6 ms-auto">
+    <!-- 029-04: 검색 대상 선택. name="kwType" → ?kwType=subject 처럼 보내진다 -->
+    <!--         지금 고른 값을 다시 선택해 두는 일은 029-05 에서 JS 로 한다 (data-value 에 현재 값을 담아 둔다) -->
+    <div class="col-auto ms-auto">
+        <select name="kwType" class="form-select" th:data-value="${kwType}">
+            <option value="all">전체</option>
+            <option value="subject">제목</option>
+            <option value="content">내용</option>
+            <option value="author">글쓴이</option>
+        </select>
+    </div>
+    <div class="col-5">
         <input type="text" name="kw" class="form-control" placeholder="검색어" th:value="${kw}">
     </div>
     <div class="col-auto">
@@ -68,7 +78,7 @@
         <!-- 018-04: 이전. 첫 페이지면 disabled(회색, 눌리지 않음). 이전 페이지의 화면 번호 = number -->
         <!--         @{/questions(page=...)} → /questions?page=값 형태의 주소를 만든다 -->
         <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-            <a class="page-link" th:href="@{/questions(page=${paging.number}, kw=${kw})}">이전</a>
+            <a class="page-link" th:href="@{/questions(page=${paging.number}, kw=${kw}, kwType=${kwType})}">이전</a>
         </li>
         <!-- 029-03: 페이지 링크마다 kw 도 붙인다 → 검색 결과의 2페이지로 가도 검색어가 유지된다 -->
         <!-- 018-04: 페이지 번호. 1부터 전체 페이지 수까지 만들되, 현재 페이지 앞뒤 5개만 보인다 -->
@@ -76,11 +86,11 @@
         <li th:each="p : ${#numbers.sequence(1, paging.totalPages)}"
             th:if="${p >= paging.number + 1 - 5 and p <= paging.number + 1 + 5}"
             th:classappend="${p == paging.number + 1} ? 'active'" class="page-item">
-            <a th:text="${p}" class="page-link" th:href="@{/questions(page=${p}, kw=${kw})}"></a>
+            <a th:text="${p}" class="page-link" th:href="@{/questions(page=${p}, kw=${kw}, kwType=${kwType})}"></a>
         </li>
         <!-- 018-04: 다음. 마지막 페이지면 disabled. 다음 페이지의 화면 번호 = number + 2 -->
         <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
-            <a class="page-link" th:href="@{/questions(page=${paging.number + 2}, kw=${kw})}">다음</a>
+            <a class="page-link" th:href="@{/questions(page=${paging.number + 2}, kw=${kw}, kwType=${kwType})}">다음</a>
         </li>
     </ul>
 </div>
