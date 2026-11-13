@@ -84,7 +84,8 @@ public class AnswerController {
             return "answer_modify";
         }
         answerService.modify(answer, answerForm.content());
-        return "redirect:/questions/%d".formatted(questionId);
+        // 027-02: 수정한 답변 위치로 돌아간다
+        return "redirect:/questions/%d#answer_%d".formatted(questionId, id);
     }
 
     // 025-10: 답변 삭제 DELETE /questions/{questionId}/answers/{id} (책 3-09의 GET /answer/delete/{id})
@@ -106,7 +107,8 @@ public class AnswerController {
         Answer answer = answerService.getAnswer(id);
         Member member = memberService.getMember(principal.getName());
         answerService.vote(answer, member);
-        return "redirect:/questions/%d".formatted(questionId);
+        // 027-02: 추천한 답변 위치로 돌아간다
+        return "redirect:/questions/%d#answer_%d".formatted(questionId, id);
     }
 
     // 025-09: 답변 글쓴이 본인인지 확인. 아니면 403 (025-03 질문과 같은 규칙)

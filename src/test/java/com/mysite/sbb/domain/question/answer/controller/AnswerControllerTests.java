@@ -90,7 +90,8 @@ class AnswerControllerTests {
         mvc.perform(post("/questions/%d/answers/%d".formatted(q.getId(), a.getId())).with(csrf()).with(user("user1"))
                         .param("_method", "put").param("content", "고친 답변"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/questions/" + q.getId()));
+                // 027-02: 수정 후 그 답변 위치로
+                .andExpect(redirectedUrl("/questions/%d#answer_%d".formatted(q.getId(), a.getId())));
         assertThat(a.getContent()).isEqualTo("고친 답변");
 
         memberService.join("other", "other@test.com", "1234");
@@ -111,7 +112,8 @@ class AnswerControllerTests {
 
         mvc.perform(post("/questions/%d/answers/%d/votes".formatted(q.getId(), a.getId())).with(csrf()).with(user("user1")))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/questions/" + q.getId()));
+                // 027-02: 추천 후 그 답변 위치로
+                .andExpect(redirectedUrl("/questions/%d#answer_%d".formatted(q.getId(), a.getId())));
         assertThat(a.getVoter()).extracting("username").containsExactly("user1");
 
         mvc.perform(get("/questions/" + q.getId()))
