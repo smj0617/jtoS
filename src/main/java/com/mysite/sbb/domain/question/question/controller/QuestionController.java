@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -99,6 +100,23 @@ public class QuestionController {
         model.addAttribute("questionForm", new QuestionForm(question.getSubject(), question.getContent()));
         model.addAttribute("questionId", id);
         return "question_modify";
+    }
+
+    // 025-04: 질문 수정 처리 PUT /questions/{id} (책 3-09의 POST /question/modify/{id})
+    //         수정 화면 폼의 POST + _method=put 을 025-01 필터가 PUT 으로 바꿔 여기로 온다
+    //         검증 실패면 수정 화면을 다시, 성공하면 그 질문 상세로 리다이렉트
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{id}")
+    public String modify(@PathVariable Integer id, @Valid QuestionForm questionForm, BindingResult bindingResult,
+                         Model model, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        checkAuthor(question, principal);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("questionId", id);
+            return "question_modify";
+        }
+        questionService.modify(question, questionForm.subject(), questionForm.content());
+        return "redirect:/questions/%d".formatted(id);
     }
 
     // 025-03: 글쓴이 본인인지 확인. 아니면 403(권한 없음)

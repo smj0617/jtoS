@@ -21,6 +21,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -191,6 +192,24 @@ class QuestionControllerTests {
         memberService.join("other", "other@test.com", "1234");
         mvc.perform(get("/questions/%d/edit".formatted(q1.getId())).with(user("other")))
                 .andExpect(status().isForbidden());
+    }
+
+    // 025-04: 수정 처리. 폼처럼 POST + _method=put 으로 보내 필터가 PUT 으로 바꾸는지까지 확인
+    @Test
+    @DisplayName("글쓴이가 POST + _method=put 으로 보내면 수정되고 상세로 이동, 다른 회원은 403")
+    void modify() throws Exception {
+        mvc.perform(post("/questions/%d".formatted(q1.getId())).with(csrf()).with(user("user1"))
+                        .param("_method", "put")
+                        .param("subject", "수정된 제목").param("content", "수정된 내용"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions/" + q1.getId()));
+        assertThat(questionRepository.findById(q1.getId()).get().getSubject()).isEqualTo("수정된 제목");
+
+        memberService.join("other", "other@test.com", "1234");
+        mvc.perform(put("/questions/%d".formatted(q1.getId())).with(csrf()).with(user("other"))
+                        .param("subject", "남의 글 수정").param("content", "x"))
+                .andExpect(status().isForbidden());
+        assertThat(questionRepository.findById(q1.getId()).get().getSubject()).isEqualTo("수정된 제목");
     }
 
     // 024-06: 로그인하지 않으면 등록 화면·등록 요청이 로그인 화면으로 보내진다

@@ -641,3 +641,8 @@
 - 이유: 질문 수정 입력 화면 (책 3-09의 `GET /question/modify/{id}`). REST 규칙에서 자원의 수정 화면은 `/{id}/edit`. 남의 글은 열 수 없어야 한다
 - 결과: 글쓴이 `user1`이 열면 200, 제목 칸에 `value="sbb가 무엇인가요?"`가 채워져 있고 `_method=put` 숨은 값과 `action="/questions/{id}"`가 있다. 다른 회원 `other`가 열면 403. `gradlew test` 50개 통과
 - 메모: 글쓴이가 없는 옛 질문(024 이전)은 아무도 수정할 수 없게 했다. 저장(PUT)은 025-04
+
+### 025-04 수정·삭제, 질문 수정 처리 PUT /questions/{id}
+- 작업: `QuestionController.modify()`(`@PreAuthorize("isAuthenticated()")`, `@PutMapping("/{id}")`)가 질문을 찾고 `checkAuthor`(025-03)로 본인 확인, `@Valid QuestionForm` 검증 실패면 수정 화면을 다시, 성공하면 `questionService.modify`(025-02) 후 `redirect:/questions/{id}`
+- 이유: 질문 수정 저장 (책 3-09의 `POST /question/modify/{id}`). REST 규칙으로 수정은 `PUT /questions/{id}`
+- 결과: 테스트에서 수정 화면 폼과 똑같이 `POST /questions/{id}` + `_method=put`으로 보내자 025-01 필터가 PUT으로 바꿔 이 메서드가 받았고, 302로 상세 이동, 제목이 "수정된 제목"으로 바뀌었다. 다른 회원이 PUT을 보내면 403이고 제목은 그대로. `gradlew test` 51개 통과
