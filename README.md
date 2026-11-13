@@ -554,3 +554,9 @@
 - 이유: 어느 화면에서든 가입 화면으로 갈 수 있게 (책 3-06). 017-01에서 기능이 생긴 뒤 넣기로 미뤄 둔 메뉴
 - 결과: 레이아웃을 쓰는 모든 화면 위 메뉴에 "회원가입"이 생겼다. dev 서버에서 직접 확인: 목록 화면 HTML에 `href="/members/new"`, 가입 폼 토큰과 함께 `devuser`로 가입하면 302로 `/` 이동, 같은 아이디로 다시 가입하면 200 + "이미 등록된 아이디 또는 이메일입니다." `gradlew test` 35개 통과
 - 메모: dev DB에 `devuser`(비밀번호 1234) 회원이 생겼다. 023 로그인 확인에 쓴다
+
+### 023-01 로그인, 시큐리티 회원 조회 MemberSecurityService
+- 작업: `domain.member.member.service.MemberSecurityService`가 `UserDetailsService`를 구현. `loadUserByUsername(username)`이 `findByUsername`(022-02)으로 회원을 찾아 시큐리티의 `User`(아이디, 암호화된 비밀번호, 권한 목록)로 돌려준다. 없으면 `UsernameNotFoundException`. 권한은 모든 회원 `ROLE_MEMBER`, 아이디가 `admin`이면 `ROLE_ADMIN` 추가
+- 이유: 로그인할 때 스프링 시큐리티가 "이 아이디의 회원 정보"를 가져갈 통로 (책 3-07의 `UserSecurityService`, 강사식 이름 Member). 빈으로 등록해 두면 023-03 폼 로그인이 자동으로 쓴다
+- 결과: `user1`(비밀번호 1234)로 가입 후 조회하면 아이디 `user1`, 비밀번호는 `matches("1234", …)`가 true인 암호값, 권한 `ROLE_MEMBER`. `admin`은 `ROLE_MEMBER`, `ROLE_ADMIN` 둘 다. 없는 아이디는 `UsernameNotFoundException`. `gradlew test` 37개 통과
+- 메모: 이 클래스는 비밀번호를 비교하지 않는다. 돌려준 암호값과 사용자가 입력한 비밀번호를 시큐리티가 `PasswordEncoder`(022-03)로 비교한다
