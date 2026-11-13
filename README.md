@@ -83,3 +83,9 @@
 - 이유: 강사(14163 2강)와 같은 최신 환경으로 시작하기 위해. JPA·H2·Thymeleaf는 책 순서대로 003·007에서 추가한다
 - 결과: `localhost:8080` 접속 시 Whitelabel Error Page(404). 컨트롤러가 없으니 정상
 - 메모: IntelliJ는 Artifact가 아니라 Name(`jtoS`)으로 메인 클래스 이름을 지어서 `JtoSApplication`이 됨 → 001-02에서 변경
+
+### 001-02 프로젝트 생성, 메인 클래스 이름을 SbbApplication으로 변경
+- 작업: `JtoSApplication` → `SbbApplication`, `JtoSApplicationTests` → `SbbApplicationTests` (IntelliJ Rename, Shift+F6), `spring.application.name`을 `sbb`로 변경
+- 이유: 책과 강의(14163 2강) 모두 `SbbApplication`을 쓰므로, 이름을 맞춰 두면 코드를 비교할 때 헷갈리지 않는다
+- 결과: `SbbApplicationTests` 통과, 실행 로그에 `Started SbbApplication`, `[sbb]` 표시
+- 메모: IntelliJ Rename의 "텍스트 속 이름도 바꾸기" 옵션 때문에 README의 001-01 메모까지 바뀌어서 원래대로 되돌림
