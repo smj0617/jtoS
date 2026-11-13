@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,10 @@ public class QuestionService {
     //         findAll(Pageable) 은 JpaRepository 에 이미 있다. limit/offset 쿼리와 전체 개수(count) 쿼리를 함께 실행한다
     //         Page 에는 이 페이지의 질문 목록 + 전체 개수·전체 페이지 수·이전/다음 페이지 여부가 들어 있다
     public Page<Question> getList(int page) {
-        Pageable pageable = PageRequest.of(page, 10);
+        // 018-02: 최신 글이 먼저 오도록 정렬 조건 추가 (책 3-02)
+        //         Sort.by(Sort.Order.desc("createDate")) → 작성일시 내림차순. "createDate" 는 엔티티의 필드 이름이다
+        //         정렬은 DB 쿼리의 order by 로 실행된다 (페이지를 자르기 전에 정렬해야 1페이지가 최신 10개가 된다)
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
         return questionRepository.findAll(pageable);
     }
 

@@ -45,6 +45,9 @@ class QuestionServiceTests {
         assertThat(first.getTotalElements()).isEqualTo(12);
         assertThat(first.getTotalPages()).isEqualTo(2);
         assertThat(questionService.getList(1).getContent()).hasSize(2);
+        // 018-02: 가장 나중에 저장한 질문12 가 첫 페이지 맨 위, 가장 먼저 저장한 질문1 은 마지막 페이지 맨 아래
+        assertThat(first.getContent().get(0).getSubject()).isEqualTo("질문12");
+        assertThat(questionService.getList(1).getContent().get(1).getSubject()).isEqualTo("질문1");
     }
 
     // 016-01: 질문 등록
