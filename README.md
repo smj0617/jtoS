@@ -536,3 +536,9 @@
 - 이유: 가입 화면의 입력값을 담고 서버에서 검증하기 위해 (책 3-06의 `UserCreateForm`). 016-05처럼 강사식 record. 아이디 최대 길이는 022-01 컬럼 길이(25)와 맞춘다
 - 결과: `("user1","1234","1234","user1@test.com")`은 오류 없음. 아이디 `"ab"`와 이메일 `"not-email"`이면 `username`, `email` 두 필드에 오류. 비밀번호 칸이 비거나 공백이면 `password1`, `password2`에 오류. `gradlew test` 31개 통과
 - 메모: "두 비밀번호가 같은가"는 필드 하나만 보는 어노테이션으로는 검사할 수 없어 022-07 컨트롤러에서 따로 비교한다
+
+### 022-06 회원가입, 가입 화면 GET /members/new
+- 작업: `domain.member.member.controller.MemberController`(`@RequestMapping("/members")`)의 `GET /members/new`가 빈 `MemberJoinForm`을 모델에 담아 `member_join.html`을 그린다. 템플릿은 레이아웃 사용, `th:object="${memberJoinForm}"`, 아이디·비밀번호·비밀번호 확인·이메일 칸과 칸 아래 오류, 폼 위의 글로벌 오류 자리, 브라우저 검증(`required`, 아이디 `minlength="3" maxlength="25"`, `type="email"`, `type="password"`)
+- 이유: 회원가입 입력 화면 (책 3-06). REST 규칙으로 입력 화면은 `/members/new`, 처리는 `POST /members`(책은 `/user/signup` 하나로 GET·POST). 016 질문 폼에서 쓴 방식을 그대로 적용
+- 결과: `GET /members/new` → 200, 탭 제목 `회원가입 | SBB`, 폼 `action="/members"`, 비밀번호 칸(`name="password1"`, 입력이 ●로 가려짐), CSRF 숨은 입력칸이 들어 있다. 아직 `POST /members`를 받는 곳이 없어 가입은 안 된다. `gradlew test` 32개 통과
+- 메모: 글로벌 오류는 특정 칸이 아닌 오류(비밀번호 불일치, 이미 있는 아이디 등)다. 022-07에서 이 자리에 보여 준다
