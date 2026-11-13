@@ -1,0 +1,18 @@
+<!-- 015-02: 새 파일. 모든 화면이 함께 쓰는 공통 틀 (강사식 Layout Dialect) -->
+<!--         xmlns:layout → layout: 문법을 쓰겠다는 선언 -->
+<!--         각 화면은 layout:decorate="~{layout}" 으로 이 틀을 쓰고, layout:fragment="content" 자리에 자기 내용을 넣는다 -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <!-- 015-02: 화면마다 반복되던 <head> 3줄을 이곳 한 군데로 옮겨 온다 (014-01, 014-02, 013-02) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/resource/global.css}">
+    <title>SBB</title>
+</head>
+<body>
+<!-- 015-02: 각 화면의 내용이 들어갈 자리 -->
+<div layout:fragment="content"></div>
+</body>
+</html>

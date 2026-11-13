@@ -328,3 +328,8 @@
 - 작업: `thymeleaf-layout-dialect` 의존성 추가 (버전은 Spring Boot가 관리)
 - 이유: 화면마다 반복되는 `<head>`와 바깥 틀을 하나로 모으기 위해 (강사식, 책 2-15는 `th:replace`)
 - 결과: 테스트 14개 통과
+
+### 015-02 레이아웃, 공통 틀 layout.html 추가
+- 작업: `templates/layout.html`에 공통 `<head>`(부트스트랩, Pretendard, `global.css`)와 내용 자리 `<div layout:fragment="content">`
+- 이유: 반복되는 `<head>`를 한 파일에 모은다 (강사식)
+- 결과: 테스트 14개 통과. 화면 적용은 015-03, 015-04
