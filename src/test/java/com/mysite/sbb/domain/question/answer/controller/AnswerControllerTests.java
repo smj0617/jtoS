@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,7 +59,10 @@ class AnswerControllerTests {
         mvc.perform(post("/questions/%d/answers".formatted(q.getId()))
                         .param("content", " "))
                 .andExpect(status().isOk())
-                .andExpect(view().name("question_detail"));
+                .andExpect(view().name("question_detail"))
+                // 016-10: 상세 화면 답변 폼에 오류 메시지와 빨간 테두리가 보이는지 확인
+                .andExpect(content().string(containsString("내용은 필수항목입니다.")))
+                .andExpect(content().string(containsString("is-invalid")));
 
         assertThat(q.getAnswerList()).isEmpty();
     }

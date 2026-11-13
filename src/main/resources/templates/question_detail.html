@@ -36,8 +36,12 @@
     <!--         th:action → 012-02 의 POST /questions/{id}/answers 로 보낸다 -->
     <!--         textarea 의 name="content" 가 컨트롤러의 @RequestParam content 로 들어간다 -->
     <!-- 014-04: form-control → 부트스트랩 입력칸 모양, btn btn-primary → 파란 버튼 -->
-    <form th:action="@{|/questions/${question.id}/answers|}" method="post" class="my-3">
-        <textarea name="content" id="content" rows="10" class="form-control"></textarea>
+    <!-- 016-10: th:object 로 answerForm 과 연결, th:field 로 name·id·value 채움 (016-06 질문 폼과 같은 방식) -->
+    <!--         오류 칸 빨간 테두리(is-invalid), 칸 아래 메시지, 브라우저 검증 required (016-07) -->
+    <!--         검증 실패로 다시 열리면 016-08 global.js 가 이 칸에 커서를 둔다 -->
+    <form th:action="@{|/questions/${question.id}/answers|}" th:object="${answerForm}" method="post" class="my-3">
+        <textarea th:field="*{content}" rows="10" class="form-control" th:errorclass="is-invalid" required></textarea>
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
         <input type="submit" value="답변등록" class="btn btn-primary my-2">
     </form>
 </div>

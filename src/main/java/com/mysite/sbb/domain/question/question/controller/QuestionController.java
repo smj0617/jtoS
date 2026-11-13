@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.question.controller;
 
+import com.mysite.sbb.domain.question.answer.dto.AnswerForm;
 import com.mysite.sbb.domain.question.question.dto.QuestionForm;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
@@ -71,8 +72,9 @@ public class QuestionController {
     //         없는 id면 getQuestion 이 DataNotFoundException 을 던져 404 가 된다
     // 011-01: "/question/detail/{id}" → "/detail/{id}"
     // 011-02: GET /questions/{id} → 질문 하나
+    // 016-10: 빈 AnswerForm 을 받아 모델에 담는다 → 상세 화면 답변 폼의 th:object="${answerForm}" 이 쓸 객체
     @GetMapping("/{id}")
-    public String detail(@PathVariable Integer id, Model model) {
+    public String detail(@PathVariable Integer id, AnswerForm answerForm, Model model) {
         Question question = questionService.getQuestion(id);
         model.addAttribute("question", question);
         return "question_detail";

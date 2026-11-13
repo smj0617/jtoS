@@ -399,3 +399,8 @@
 - 작업: `AnswerForm` record(`@NotBlank content`), `AnswerController`가 `@Valid AnswerForm` + `BindingResult`로 받고 오류면 상세 화면을 다시 그림
 - 이유: 빈 답변 방지 (책 2-16). 질문과 같은 방식
 - 결과: 테스트 20개 통과
+
+### 016-10 질문 등록, 답변 폼에 th:object·오류 표시·required
+- 작업: 상세 화면 답변 폼에 `th:object="${answerForm}"`, `th:field`, `is-invalid`, `th:errors`, `required`. 상세 GET이 빈 `AnswerForm` 제공
+- 이유: 답변 폼도 질문 폼과 같은 방식으로 오류 표시 (책 2-16)
+- 결과: 테스트 20개 통과
