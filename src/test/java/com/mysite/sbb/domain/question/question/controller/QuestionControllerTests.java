@@ -71,6 +71,9 @@ class QuestionControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
                 .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")))
+                // 012-04: 답변 개수와 답변 내용이 보이는지 확인 (setUp 에서 답변 1개 저장)
+                .andExpect(content().string(containsString("1개의 답변이 있습니다.")))
+                .andExpect(content().string(containsString("스프링부트 게시판입니다.")))
                 // 012-03: 답변 폼이 답변 등록 주소로 POST 하는지 확인
                 .andExpect(content().string(containsString("action=\"/questions/" + q1.getId() + "/answers\"")));
 

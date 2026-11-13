@@ -9,6 +9,14 @@
 <h1 th:text="${question.subject}"></h1>
 <div th:text="${question.content}"></div>
 
+<!-- 012-04: 답변 개수와 답변 목록 (책 2-12) -->
+<!--         ${#lists.size(...)} → 타임리프 유틸리티로 목록 크기를 구한다 -->
+<!--         question.answerList 는 LAZY 관계라 이 줄에서 처음 접근할 때 답변을 조회한다 (004-03) -->
+<h5 th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
+<ul>
+    <li th:each="answer : ${question.answerList}" th:text="${answer.content}"></li>
+</ul>
+
 <!-- 012-03: 답변 입력 폼 (책 2-12) -->
 <!--         th:action → 012-02 의 POST /questions/{id}/answers 로 보낸다 -->
 <!--         textarea 의 name="content" 가 컨트롤러의 @RequestParam content 로 들어간다 -->

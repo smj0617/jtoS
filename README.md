@@ -282,3 +282,9 @@
 - 작업: `question_detail.html`에 `POST /questions/{id}/answers`로 보내는 폼(`textarea name="content"`, 답변등록 버튼)
 - 이유: 상세 화면에서 답변 입력 (책 2-12). 입력칸의 `name`이 컨트롤러 `@RequestParam` 이름과 같아야 값이 들어간다
 - 결과: 테스트 13개 통과 (상세 HTML에 `action="/questions/{id}/answers"`)
+
+### 012-04 답변, 상세 화면에 답변 개수와 목록 표시
+- 작업: `question_detail.html`에 `${#lists.size(question.answerList)}개의 답변이 있습니다.`와 `th:each` 답변 목록
+- 이유: 등록된 답변 보기 (책 2-12)
+- 결과: 테스트 13개 통과 (답변 1개 → "1개의 답변이 있습니다.", 답변 내용 표시)
+- 메모: `answerList`는 LAZY라 템플릿에서 처음 쓸 때 조회된다. 화면을 그리는 동안에도 DB 연결이 열려 있는 것은 `open-in-view`(003-03 경고) 기본값 덕분이다
