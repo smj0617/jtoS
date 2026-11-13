@@ -25,6 +25,13 @@ public class MemberController {
         return "member_join";
     }
 
+    // 023-02: 로그인 화면 (책 3-07의 /user/login). 화면만 보여 준다
+    //         아이디·비밀번호 확인(POST /members/login)은 컨트롤러가 아니라 스프링 시큐리티가 처리한다 (023-03)
+    @GetMapping("/login")
+    public String showLogin() {
+        return "member_login";
+    }
+
     // 022-07: 가입 처리 POST /members (책 3-06)
     //         ① 022-05 검증 규칙 실패 → 폼 다시 표시
     //         ② 두 비밀번호가 다르면 → password2 칸 오류(rejectValue)로 폼 다시 표시

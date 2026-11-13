@@ -560,3 +560,9 @@
 - 이유: 로그인할 때 스프링 시큐리티가 "이 아이디의 회원 정보"를 가져갈 통로 (책 3-07의 `UserSecurityService`, 강사식 이름 Member). 빈으로 등록해 두면 023-03 폼 로그인이 자동으로 쓴다
 - 결과: `user1`(비밀번호 1234)로 가입 후 조회하면 아이디 `user1`, 비밀번호는 `matches("1234", …)`가 true인 암호값, 권한 `ROLE_MEMBER`. `admin`은 `ROLE_MEMBER`, `ROLE_ADMIN` 둘 다. 없는 아이디는 `UsernameNotFoundException`. `gradlew test` 37개 통과
 - 메모: 이 클래스는 비밀번호를 비교하지 않는다. 돌려준 암호값과 사용자가 입력한 비밀번호를 시큐리티가 `PasswordEncoder`(022-03)로 비교한다
+
+### 023-02 로그인, 로그인 화면 GET /members/login
+- 작업: `MemberController`에 `GET /members/login` → `member_login.html`. 템플릿은 `username`, `password` 입력칸과 `POST /members/login`으로 보내는 폼, 주소에 `?error`가 있으면 "아이디 또는 비밀번호를 확인해 주세요." 안내
+- 이유: 로그인 화면 (책 3-07의 `/user/login`). 아이디·비밀번호 확인(POST)은 스프링 시큐리티가 처리하므로(023-03) 컨트롤러에는 화면 메서드만 둔다. 입력칸 이름 `username`, `password`는 시큐리티 기본값
+- 결과: `GET /members/login` → 200, `action="/members/login"` 폼과 비밀번호 칸. 평소에는 안내 문구가 없고, `?error`로 열면 빨간 상자에 안내가 나온다. 아직 로그인 처리 설정이 없어 실제 로그인은 023-03부터. `gradlew test` 38개 통과
+- 메모: 실패 안내는 아이디가 틀렸는지 비밀번호가 틀렸는지 나누지 않는다. 나누면 어떤 아이디가 가입돼 있는지 알려 주는 셈이 된다

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,6 +49,21 @@ class MemberControllerTests {
                 .andExpect(content().string(containsString("type=\"hidden\" name=\"_csrf\"")))
                 // 022-08: 내비게이션 바에 회원가입 메뉴
                 .andExpect(content().string(containsString("href=\"/members/new\">회원가입</a>")));
+    }
+
+    // 023-02: 로그인 화면
+    @Test
+    @DisplayName("GET /members/login 은 로그인 폼을, ?error 가 있으면 안내 문구도 보여 준다")
+    void showLogin() throws Exception {
+        mvc.perform(get("/members/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("member_login"))
+                .andExpect(content().string(containsString("action=\"/members/login\"")))
+                .andExpect(content().string(containsString("name=\"password\"")))
+                .andExpect(content().string(not(containsString("아이디 또는 비밀번호를 확인해 주세요."))));
+
+        mvc.perform(get("/members/login").param("error", ""))
+                .andExpect(content().string(containsString("아이디 또는 비밀번호를 확인해 주세요.")));
     }
 
     // 022-07: 가입 처리
