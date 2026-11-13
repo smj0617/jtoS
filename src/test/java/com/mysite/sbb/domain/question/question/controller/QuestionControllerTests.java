@@ -195,6 +195,23 @@ class QuestionControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // 026-03: 질문 추천
+    @Test
+    @DisplayName("로그인 회원이 POST /questions/{id}/votes 하면 추천 수가 오르고, 비로그인은 로그인 화면으로")
+    void vote() throws Exception {
+        mvc.perform(post("/questions/%d/votes".formatted(q1.getId())).with(csrf()).with(user("user1")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions/" + q1.getId()));
+        assertThat(q1.getVoter()).extracting("username").containsExactly("user1");
+
+        mvc.perform(get("/questions/" + q1.getId()))
+                .andExpect(content().string(containsString("href=\"/questions/" + q1.getId() + "/votes\" method=\"POST\"")))
+                .andExpect(content().string(containsString("<span class=\"badge rounded-pill bg-success\">1</span>")));
+
+        mvc.perform(post("/questions/%d/votes".formatted(q1.getId())).with(csrf()))
+                .andExpect(redirectedUrl("/members/login"));
+    }
+
     // 025-06: 질문 삭제
     @Test
     @DisplayName("다른 회원의 DELETE 는 403, 글쓴이의 DELETE 는 질문과 답변을 지우고 목록으로 이동")

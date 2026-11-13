@@ -22,6 +22,14 @@
             <div class="d-flex justify-content-end" th:if="${question.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${question.author.username}"></span>
             </div>
+            <!-- 026-03: 추천 버튼과 추천 수 (책 3-10). method="POST" 링크를 global.js(025-07)가 확인창 후 POST /questions/{id}/votes 로 보낸다 -->
+            <!--         추천 수 = voter(Set) 크기. 로그인 전에 누르면 024-06 처럼 로그인 화면으로 간다 -->
+            <div class="my-2">
+                <a th:href="@{|/questions/${question.id}/votes|}" method="POST" data-confirm="정말로 추천하시겠습니까?"
+                   class="btn btn-sm btn-outline-secondary">추천
+                    <span class="badge rounded-pill bg-success" th:text="${question.voter.size()}"></span>
+                </a>
+            </div>
             <!-- 025-11: 작성일시, 그리고 수정된 적이 있으면(수정일시가 작성일시보다 늦으면) 수정일시도 (책 3-09) -->
             <!--         #temporals.format → LocalDateTime 을 원하는 모양의 글자로. 004-02 Auditing 이 두 값을 채운다 -->
             <div class="d-flex justify-content-end gap-2 small text-muted">

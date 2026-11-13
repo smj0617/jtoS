@@ -131,6 +131,17 @@ public class QuestionController {
         return "redirect:/questions";
     }
 
+    // 026-03: 질문 추천 POST /questions/{id}/votes (책 3-10의 GET /question/vote/{id})
+    //         REST 규칙: "추천 하나를 만든다" → 질문의 하위 자원 votes 에 POST. 로그인한 회원만
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/votes")
+    public String vote(@PathVariable Integer id, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        Member member = memberService.getMember(principal.getName());
+        questionService.vote(question, member);
+        return "redirect:/questions/%d".formatted(id);
+    }
+
     // 025-03: 글쓴이 본인인지 확인. 아니면 403(권한 없음)
     //         글쓴이가 없는 옛 질문(024 이전)은 누구의 것도 아니므로 아무도 수정할 수 없다
     private void checkAuthor(Question question, Principal principal) {

@@ -697,3 +697,9 @@
 - 이유: 질문 추천 (책 3-10). 회원 여러 명이 질문 여러 개를 추천하므로 `@ManyToMany`. `Set`과 026-01 `equals`로 같은 회원이 두 번 추천해도 한 표만 남는다
 - 결과: 테스트 시작 로그에 `create table question_voter (question_id integer not null, voter_id integer not null, primary key (question_id, voter_id))` 연결 테이블이 생긴다. `voter1`이 두 번, `voter2`가 한 번 추천한 뒤 다시 읽으면 추천자 2명. `gradlew test` 59개 통과
 - 메모: 연결 테이블의 기본키가 (질문, 회원) 두 칸이라 DB도 같은 회원의 중복 추천을 막는다
+
+### 026-03 추천, 질문 추천 POST /questions/{id}/votes 와 추천 버튼
+- 작업: `QuestionController.vote()`(`@PreAuthorize("isAuthenticated()")`, `@PostMapping("/{id}/votes")`)가 로그인 회원(024-03 `getMember`)으로 026-02 `vote`를 하고 상세로 리다이렉트. 상세의 질문 카드에 `<a href="/questions/{id}/votes" method="POST" data-confirm="정말로 추천하시겠습니까?">추천 <span class="badge rounded-pill bg-success">추천 수</span></a>`(추천 수 = `question.voter.size()`)
+- 이유: 질문 추천 (책 3-10의 `GET /question/vote/{id}`). REST 규칙으로 "추천 하나를 만든다" → 질문의 하위 자원 `votes`에 POST. 버튼은 025-07 `global.js`가 `method` 링크를 처리하므로 링크로 쓴다
+- 결과: `user1`이 `POST /questions/{id}/votes`를 보내면 302로 상세 이동, 추천자에 `user1`이 들어가고 상세의 추천 배지가 `1`. 로그인 전에 보내면 `/members/login`으로 이동. `gradlew test` 60개 통과
+- 메모: `_method=POST`는 필터가 바꿀 대상(PUT, DELETE, PATCH)이 아니라서 그대로 POST로 들어온다
