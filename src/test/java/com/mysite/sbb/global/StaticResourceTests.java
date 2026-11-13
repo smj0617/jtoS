@@ -26,6 +26,8 @@ class StaticResourceTests {
     void globalCss() throws Exception {
         mvc.perform(get("/resource/global.css"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("textarea")));
+                .andExpect(content().string(containsString("textarea")))
+                // 014-02: 글꼴 지정이 들어 있는지 확인
+                .andExpect(content().string(containsString("Pretendard")));
     }
 }
