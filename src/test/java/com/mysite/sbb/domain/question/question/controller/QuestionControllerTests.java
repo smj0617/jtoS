@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -39,6 +40,15 @@ class QuestionControllerTests {
         q1.setContent("sbb에 대해서 알고 싶습니다.");
         q1.addAnswer("스프링부트 게시판입니다.");
         questionRepository.save(q1);
+    }
+
+    // 008-01: 루트 URL 리다이렉트 확인
+    @Test
+    @DisplayName("/ 로 들어오면 질문 목록으로 리다이렉트된다")
+    void root() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/question/list"));
     }
 
     @Test
