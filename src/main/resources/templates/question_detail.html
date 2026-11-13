@@ -54,7 +54,8 @@
     <!--         question.answerList 는 LAZY 관계라 이 줄에서 처음 접근할 때 답변을 조회한다 (004-03) -->
     <!-- 014-04: <ul><li> 목록 → 답변마다 카드 하나. 개수 줄에도 구분선과 여백 -->
     <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
-    <div class="card my-3" th:each="answer : ${question.answerList}">
+    <!-- 027-01: 답변 카드마다 id="answer_답변번호" → 주소 끝에 #answer_3 을 붙이면 브라우저가 그 카드로 바로 스크롤한다 (책 3-11 앵커) -->
+    <div class="card my-3" th:each="answer : ${question.answerList}" th:id="|answer_${answer.id}|">
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
             <!-- 024-07: 답변 글쓴이 -->

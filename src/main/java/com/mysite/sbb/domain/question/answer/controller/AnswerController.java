@@ -52,8 +52,9 @@ public class AnswerController {
         }
         // 024-05: 로그인한 아이디로 회원을 찾아 글쓴이로 저장
         Member author = memberService.getMember(principal.getName());
-        answerService.create(question, answerForm.content(), author);
-        return "redirect:/questions/%d".formatted(questionId);
+        // 027-01: 새로 만든 답변의 id 로 #answer_id 앵커를 붙여, 등록 후 그 답변 위치로 바로 이동한다
+        Answer answer = answerService.create(question, answerForm.content(), author);
+        return "redirect:/questions/%d#answer_%d".formatted(questionId, answer.getId());
     }
 
     // 025-09: 답변 수정 화면 GET /questions/{questionId}/answers/{id}/edit (책 3-09의 GET /answer/modify/{id})

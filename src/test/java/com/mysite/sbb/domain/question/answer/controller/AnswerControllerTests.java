@@ -56,12 +56,16 @@ class AnswerControllerTests {
         q.setContent("내용");
         questionRepository.save(q);
 
-        mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf()).with(user("user1"))
+        String location = mvc.perform(post("/questions/%d/answers".formatted(q.getId())).with(csrf()).with(user("user1"))
                         .param("content", "답변입니다."))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/questions/%d".formatted(q.getId())));
+                .andReturn().getResponse().getRedirectedUrl();
 
         assertThat(q.getAnswerList()).extracting("content").containsExactly("답변입니다.");
+        // 027-01: 등록 후 새 답변 위치(#answer_id)로 이동하고, 상세 화면에 그 id 의 카드가 있다
+        Integer newId = q.getAnswerList().get(0).getId();
+        assertThat(location).isEqualTo("/questions/%d#answer_%d".formatted(q.getId(), newId));
+        mvc.perform(get("/questions/" + q.getId())).andExpect(content().string(containsString("id=\"answer_" + newId + "\"")));
         // 024-05: 로그인한 user1 이 답변 글쓴이로 저장된다
         assertThat(q.getAnswerList().get(0).getAuthor().getUsername()).isEqualTo("user1");
     }
