@@ -140,3 +140,9 @@
 - 메모 1: 자바 필드 `createDate`는 컬럼 `create_date`가 된다 (Spring Boot 기본 이름 규칙: 카멜 표기 → 밑줄 표기)
 - 메모 2: `answerList`(`@OneToMany(mappedBy)`)는 컬럼을 만들지 않는다. 외래키는 관계의 주인인 `Answer.question` 쪽 테이블에만 생긴다
 - 메모 3: 패키지는 006에서 도메인별로 옮긴다. 지금은 책 순서대로 `com.mysite.sbb`에 둔다
+
+### 004-02 엔티티, BaseEntity 도입
+- 작업: `BaseEntity`(`@MappedSuperclass`, id·`@CreatedDate createDate`·`@LastModifiedDate modifyDate`) 추가, `Question`·`Answer`가 상속. `SbbApplication`에 `@EnableJpaAuditing`
+- 이유: 모든 엔티티에 반복되는 id와 날짜 필드를 한곳에 모으고, 날짜를 직접 넣지 않아도 저장·수정 때 자동으로 채워지게 하려고 (강사식 개선)
+- 결과: `gradlew test` 통과. `question`, `answer` 테이블에 `modify_date timestamp(6)` 컬럼이 추가로 생겼다. 날짜가 실제로 채워지는지는 005 리포지터리 테스트에서 확인
+- 메모: 책은 `question.setCreateDate(LocalDateTime.now())`로 직접 넣는다. Auditing을 쓰면 이 줄이 필요 없다
