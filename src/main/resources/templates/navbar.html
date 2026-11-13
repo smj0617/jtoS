@@ -1,0 +1,23 @@
+<!-- 017-01: 새 파일. 내비게이션 바 조각 (책 3-01). 강사식: 레이아웃과 따로 파일로 분리한다 -->
+<!--         th:fragment="navbar" → 이 <nav> 를 "navbar" 라는 이름의 조각으로 등록한다 -->
+<!--         다른 템플릿에서 ~{navbar :: navbar} (파일 이름 :: 조각 이름) 으로 가져다 쓴다 (017-02) -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <!-- 017-01: 왼쪽 로고. 누르면 첫 화면(질문 목록)으로 -->
+        <a class="navbar-brand" th:href="@{/}">SBB</a>
+        <!-- 017-01: 화면이 좁을 때(lg 미만) 나타나는 햄버거 버튼. 누르면 아래 메뉴를 펼친다 (동작은 017-03) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="메뉴 펼치기">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- 017-01: 메뉴 목록. 넓은 화면에서는 가로로 펼쳐지고, 좁은 화면에서는 접힌다 -->
+        <!--         로그인·회원가입 링크는 시큐리티(021~023)를 만든 뒤 주소를 연결한다 -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/questions}">질문 목록</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

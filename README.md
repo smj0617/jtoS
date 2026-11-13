@@ -404,3 +404,8 @@
 - 작업: 상세 화면 답변 폼에 `th:object="${answerForm}"`, `th:field`, `is-invalid`, `th:errors`, `required`. 상세 GET이 빈 `AnswerForm` 제공
 - 이유: 답변 폼도 질문 폼과 같은 방식으로 오류 표시 (책 2-16)
 - 결과: 테스트 20개 통과
+
+### 017-01 내비게이션 바, navbar.html 프래그먼트 파일
+- 작업: `templates/navbar.html`에 `th:fragment="navbar"` 내비게이션 바(로고, 햄버거 버튼, 질문 목록 메뉴)
+- 이유: 공통 메뉴 (책 3-01). 레이아웃과 분리된 조각 파일로 관리(강사식)
+- 결과: 테스트 20개 통과. 연결은 017-02
