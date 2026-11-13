@@ -18,6 +18,10 @@
     <div class="card my-3">
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
+            <!-- 024-07: 카드 오른쪽 아래에 글쓴이 (책 3-08). 글쓴이가 없는 옛 질문이면 th:if 로 그리지 않는다 -->
+            <div class="d-flex justify-content-end" th:if="${question.author != null}">
+                <span class="badge bg-light text-dark p-2" th:text="${question.author.username}"></span>
+            </div>
         </div>
     </div>
 
@@ -29,6 +33,10 @@
     <div class="card my-3" th:each="answer : ${question.answerList}">
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
+            <!-- 024-07: 답변 글쓴이 -->
+            <div class="d-flex justify-content-end" th:if="${answer.author != null}">
+                <span class="badge bg-light text-dark p-2" th:text="${answer.author.username}"></span>
+            </div>
         </div>
     </div>
 

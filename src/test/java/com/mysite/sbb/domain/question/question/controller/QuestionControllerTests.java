@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.question.controller;
 
+import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
@@ -47,11 +48,13 @@ class QuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-        memberService.join("user1", "user1@test.com", "1234");
+        // 024-07: setUp 질문·답변의 글쓴이로도 쓴다
+        Member user1 = memberService.join("user1", "user1@test.com", "1234");
         q1 = new Question();
         q1.setSubject("sbb가 무엇인가요?");
         q1.setContent("sbb에 대해서 알고 싶습니다.");
-        q1.addAnswer("스프링부트 게시판입니다.");
+        q1.setAuthor(user1);
+        q1.addAnswer("스프링부트 게시판입니다.").setAuthor(user1);
         questionRepository.save(q1);
     }
 
@@ -84,6 +87,9 @@ class QuestionControllerTests {
                 .andExpect(content().string(containsString("src=\"/resource/global.js\"")))
                 // 015-05: 화면 제목과 사이트 제목이 패턴대로 합쳐지는지 확인
                 .andExpect(content().string(containsString("<title>질문 목록 | SBB</title>")))
+                // 024-07: 목록에 글쓴이 칸과 아이디
+                .andExpect(content().string(containsString("<th>글쓴이</th>")))
+                .andExpect(content().string(containsString("<td>user1</td>")))
                 // 014-03: 목록 표에 부트스트랩 클래스가 붙었는지 확인
                 .andExpect(content().string(containsString("<table class=\"table\">")))
                 // 014-01: 부트스트랩 CDN 을 불러오는지 확인
@@ -228,6 +234,8 @@ class QuestionControllerTests {
                 .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")))
                 // 015-04: 상세 화면도 레이아웃을 통해 부트스트랩 링크를 받는지 확인
                 .andExpect(content().string(containsString("bootstrap/5.3.3/css/bootstrap.min.css")))
+                // 024-07: 상세의 질문·답변 카드에 글쓴이 배지 (질문 1 + 답변 1 = 2개)
+                .andExpect(content().string(containsString("<span class=\"badge bg-light text-dark p-2\">user1</span>")))
                 // 014-04: 질문·답변이 부트스트랩 카드로 그려지는지 확인
                 .andExpect(content().string(containsString("class=\"card my-3\"")))
                 .andExpect(content().string(containsString("class=\"btn btn-primary my-2\"")))

@@ -21,6 +21,8 @@
         <!-- 019-01: 번호 칸 추가 (책 3-03). text-center → 가운데 정렬, 제목 칸은 넓게(50%) -->
         <th>번호</th>
         <th style="width:50%">제목</th>
+        <!-- 024-07: 글쓴이 칸 (책 3-08) -->
+        <th>글쓴이</th>
         <th>작성일시</th>
     </tr>
     </thead>
@@ -42,6 +44,8 @@
             <span class="text-danger small ms-2" th:if="${#lists.size(question.answerList) > 0}"
                   th:text="${#lists.size(question.answerList)}"></span>
         </td>
+        <!-- 024-07: 글쓴이 아이디. ?. → author 가 없으면(024 이전 샘플 데이터) 오류 없이 빈칸 -->
+        <td th:text="${question.author?.username}"></td>
         <td th:text="${question.createDate}"></td>
     </tr>
     </tbody>
