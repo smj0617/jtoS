@@ -260,3 +260,9 @@
 - 작업: `QuestionController` 클래스에 `@RequestMapping("/question")`, 메서드는 `/list`, `/detail/{id}`
 - 이유: 주소 앞부분을 한곳에서 관리 (책 2-11)
 - 결과: 실제 주소는 바뀌지 않아 기존 테스트 11개 그대로 통과
+
+### 011-02 URL 프리픽스, REST 주소 /questions, /questions/{id}로 변경
+- 작업: 목록 `GET /questions`, 상세 `GET /questions/{id}`. 목록 링크, 루트 리다이렉트, 테스트 주소 변경
+- 이유: 강사식 REST 규칙. 자원은 복수형 명사로 쓰고 `list`, `detail` 같은 동작은 주소에 넣지 않는다. 동작은 HTTP 메서드(GET 조회, POST 생성, PUT 수정, DELETE 삭제)로 구분한다
+- 결과: 테스트 11개 통과
+- 메모: 책은 `/question/list`, `/question/detail/{id}`를 계속 쓴다. 이후 단계의 주소는 모두 REST 규칙으로 바꿔 적용한다

@@ -43,35 +43,36 @@ class QuestionControllerTests {
     }
 
     // 008-01: 루트 URL 리다이렉트 확인
+    // 011-02: 테스트의 주소도 모두 /questions, /questions/{id} 로 변경
     @Test
     @DisplayName("/ 로 들어오면 질문 목록으로 리다이렉트된다")
     void root() throws Exception {
         mvc.perform(get("/"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/question/list"));
+                .andExpect(redirectedUrl("/questions"));
     }
 
     @Test
     @DisplayName("질문 목록 화면에 저장된 질문 제목이 보인다")
     void list() throws Exception {
-        mvc.perform(get("/question/list"))
+        mvc.perform(get("/questions"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_list"))
                 .andExpect(content().string(containsString("sbb가 무엇인가요?")))
                 // 010-04: 목록의 제목이 상세 링크인지 확인
-                .andExpect(content().string(containsString("href=\"/question/detail/" + q1.getId() + "\"")));
+                .andExpect(content().string(containsString("href=\"/questions/" + q1.getId() + "\"")));
     }
 
     // 010-03: 상세 화면과 없는 질문의 404
     @Test
     @DisplayName("질문 상세 화면에 제목과 내용이 보이고, 없는 질문은 404")
     void detail() throws Exception {
-        mvc.perform(get("/question/detail/" + q1.getId()))
+        mvc.perform(get("/questions/" + q1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("question_detail"))
                 .andExpect(content().string(containsString("sbb에 대해서 알고 싶습니다.")));
 
-        mvc.perform(get("/question/detail/999999"))
+        mvc.perform(get("/questions/999999"))
                 .andExpect(status().isNotFound());
     }
 }

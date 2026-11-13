@@ -12,7 +12,8 @@ public class MainController {
     //         002에서 만든 안내 문구는 더 이상 필요 없어 지웠다
     @GetMapping("/")
     public String index(){
-        return "redirect:/question/list";
+        // 011-02: 목록 주소가 /questions 로 바뀌었다
+        return "redirect:/questions";
     }
 
     @GetMapping("/hello")
