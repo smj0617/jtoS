@@ -664,3 +664,8 @@
 - 이유: 삭제 버튼을 링크처럼 간단히 쓰면서 실제 요청은 DELETE로 보낸다 (강사식 `<a method="DELETE">`). 책 3-09는 GET 삭제 링크에 JS로 확인창만 띄운다. 링크는 `th:action` 폼이 아니어서 CSRF 토큰이 자동으로 들어가지 않으므로 메타 태그로 넘긴다
 - 결과: dev 서버에서 `devuser`가 쓴 "글쓴이 확인 질문"(305번) 상세에 삭제 링크가 보이고, `global.js`와 같은 요청(POST + `_method=DELETE` + 메타 태그 토큰)을 보내자 302로 목록 이동, 그 뒤 `/questions/305`는 404. 테스트에서 삭제 링크와 CSRF 메타 태그, `global.js`의 `a[method]` 처리 코드 확인. `gradlew test` 53개 통과
 - 메모: 확인창과 클릭 처리는 자바스크립트라 MockMvc로는 실행할 수 없다. 서버 쪽 흐름은 같은 요청을 직접 보내 확인했다
+
+### 025-08 수정·삭제, 답변 조회·수정·삭제 서비스
+- 작업: `AnswerService`에 `getAnswer(id)`(없으면 `DataNotFoundException`), `modify(answer, content)`(값만 바꿔 변경 감지), `delete(answer)`(질문의 `answerList`에서 빼서 `orphanRemoval`로 삭제) 추가. 테스트 추가
+- 이유: 답변 수정·삭제 처리 (책 3-09). 삭제는 리포지터리로 직접 지우지 않고 질문의 목록에서 빼는 방식으로 했다. 004-03에서 답변은 질문을 통해서만 관리하기로 했고, 그래야 같은 요청 안에서 질문의 답변 목록과 DB가 어긋나지 않는다
+- 결과: 답변 "처음 답변"을 `modify`로 "고친 답변"으로 바꾸고 DB에 반영한 뒤 다시 읽으면 "고친 답변". `delete` 후 질문의 답변 목록이 비고, 같은 id로 `getAnswer`하면 `DataNotFoundException`. `gradlew test` 54개 통과

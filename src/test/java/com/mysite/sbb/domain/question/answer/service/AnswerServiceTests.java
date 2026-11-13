@@ -4,6 +4,7 @@ import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.domain.member.member.service.MemberService;
 import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.global.exception.DataNotFoundException;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 // 012-01: 새 파일. AnswerService 테스트
 @ActiveProfiles("test")
@@ -46,5 +48,27 @@ class AnswerServiceTests {
         assertThat(a.getQuestion()).isSameAs(q);
         assertThat(a.getAuthor().getUsername()).isEqualTo("writer1");
         assertThat(q.getAnswerList()).containsExactly(a);
+    }
+
+    // 025-08: 답변 조회·수정·삭제
+    @Test
+    @DisplayName("getAnswer 로 찾고, modify 로 내용을 바꾸고, delete 로 지운다")
+    void modifyAndDelete() {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+        Answer a = answerService.create(q, "처음 답변", null);
+        questionRepository.flush();
+
+        answerService.modify(answerService.getAnswer(a.getId()), "고친 답변");
+        questionRepository.flush();
+        assertThat(answerService.getAnswer(a.getId()).getContent()).isEqualTo("고친 답변");
+
+        answerService.delete(a);
+        questionRepository.flush();
+        assertThat(q.getAnswerList()).isEmpty();
+        assertThatThrownBy(() -> answerService.getAnswer(a.getId()))
+                .isInstanceOf(DataNotFoundException.class);
     }
 }

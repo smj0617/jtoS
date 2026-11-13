@@ -4,6 +4,7 @@ import com.mysite.sbb.domain.member.member.entity.Member;
 import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.answer.repository.AnswerRepository;
 import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,5 +25,24 @@ public class AnswerService {
         Answer answer = question.addAnswer(content);
         answer.setAuthor(author);
         return answerRepository.save(answer);
+    }
+
+    // 025-08: 답변 하나 조회. 없으면 404 (010-02 getQuestion 과 같은 방식)
+    public Answer getAnswer(Integer id) {
+        return answerRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("%d번 답변이 없습니다.".formatted(id)));
+    }
+
+    // 025-08: 답변 수정. 025-02 처럼 값만 바꾸면 변경 감지로 update, 수정일시는 Auditing
+    @Transactional
+    public void modify(Answer answer, String content) {
+        answer.setContent(content);
+    }
+
+    // 025-08: 답변 삭제. 질문의 answerList 에서 빼면 orphanRemoval(004-03)로 DB에서도 지워진다
+    //         answerRepository.delete 만 하면 질문 쪽 목록에는 지운 답변이 그대로 남아 같은 화면에서 어긋날 수 있다
+    @Transactional
+    public void delete(Answer answer) {
+        answer.getQuestion().getAnswerList().remove(answer);
     }
 }
