@@ -1,0 +1,50 @@
+package com.mysite.sbb;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
+
+// 005-02: 새 파일. 개발 서버를 켤 때 샘플 데이터를 넣는다 (강사식 BaseInitData)
+//         @Profile("dev") → dev 프로파일에서만 동작. 테스트(test 프로파일)에는 영향이 없다
+//         책은 테스트 코드로 데이터를 넣었지만, 화면을 만들며 확인하려면 서버 시작 때 데이터가 있는 편이 편하다
+@Profile("dev")
+@Configuration
+@RequiredArgsConstructor
+public class BaseInitData {
+    private final QuestionRepository questionRepository;
+
+    // 005-02: 자기 자신의 프록시. this.work()로 부르면 @Transactional이 적용되지 않아서 프록시를 통해 부른다
+    //         @Lazy → 자기 자신을 주입받을 때 생기는 순환 참조를 피한다
+    @Autowired
+    @Lazy
+    private BaseInitData self;
+
+    // 005-02: ApplicationRunner → 스프링 준비가 끝난 직후 한 번 실행된다
+    @Bean
+    public ApplicationRunner baseInitDataRunner() {
+        return args -> self.work();
+    }
+
+    // 005-02: 이미 데이터가 있으면 넣지 않는다 (db_dev 는 파일 DB라 재시작해도 데이터가 남는다)
+    @Transactional
+    public void work() {
+        if (questionRepository.count() > 0) return;
+
+        Question q1 = new Question();
+        q1.setSubject("sbb가 무엇인가요?");
+        q1.setContent("sbb에 대해서 알고 싶습니다.");
+        q1.addAnswer("스프링부트로 만든 질문답변 게시판입니다.");
+        questionRepository.save(q1);
+
+        Question q2 = new Question();
+        q2.setSubject("스프링부트 모델 질문입니다.");
+        q2.setContent("id는 자동으로 생성되나요?");
+        q2.addAnswer("네 자동으로 생성됩니다.");
+        questionRepository.save(q2);
+    }
+}
