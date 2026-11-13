@@ -708,3 +708,9 @@
 - 작업: `Answer`에 `@ManyToMany private Set<Member> voter = new HashSet<>();`, `AnswerService.vote(answer, member)`. 테스트 추가
 - 이유: 답변 추천 (책 3-10). 026-02 질문 추천과 같은 관계·같은 방식
 - 결과: `answer_voter(answer_id, voter_id)` 연결 테이블이 생긴다. 같은 회원 `voter1`이 두 번 추천해도 다시 읽은 답변의 추천자는 1명. `gradlew test` 61개 통과
+
+### 026-05 추천, 답변 추천 POST /questions/{qid}/answers/{id}/votes 와 추천 버튼
+- 작업: `AnswerController.vote()`(`@PreAuthorize("isAuthenticated()")`, `@PostMapping("/{id}/votes")`)가 로그인 회원으로 026-04 `vote` 후 질문 상세로 리다이렉트. 상세의 답변 카드에 `method="POST"` 추천 버튼과 추천 수 배지(`answer.voter.size()`)
+- 이유: 답변 추천 (책 3-10의 `GET /answer/vote/{id}`). 026-03 질문 추천과 같은 REST 규칙과 버튼 방식
+- 결과: 테스트에서 `user1`이 답변 votes에 POST하면 302로 질문 상세, 답변 추천자에 `user1`. dev 서버에서 `devuser`로 1번 질문과 그 1번 답변을 추천하자 상세의 추천 배지가 질문 `1`, 답변 `1`. `gradlew test` 62개 통과
+- 메모: dev 서버 확인 중 답변 추천이 처음에 404였다. 코드가 바뀔 때마다 devtools가 앱을 자동으로 다시 켜는데, 중간에 한 번 시작에 실패한 뒤 새 메서드가 반영되지 않은 상태였다. 서버를 완전히 다시 켜자 302로 정상 동작했다(코드 문제 아님, 테스트는 처음부터 통과)

@@ -94,6 +94,26 @@ class AnswerControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // 026-05: 답변 추천
+    @Test
+    @DisplayName("로그인 회원이 답변 votes 에 POST 하면 답변 추천 수가 오르고 상세에 1이 보인다")
+    void vote() throws Exception {
+        Question q = new Question();
+        q.setSubject("질문");
+        q.setContent("내용");
+        questionRepository.save(q);
+        Answer a = q.addAnswer("추천할 답변");
+        questionRepository.flush();
+
+        mvc.perform(post("/questions/%d/answers/%d/votes".formatted(q.getId(), a.getId())).with(csrf()).with(user("user1")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions/" + q.getId()));
+        assertThat(a.getVoter()).extracting("username").containsExactly("user1");
+
+        mvc.perform(get("/questions/" + q.getId()))
+                .andExpect(content().string(containsString("/answers/%d/votes\" method=\"POST\"".formatted(a.getId()))));
+    }
+
     // 025-10: 답변 삭제
     @Test
     @DisplayName("다른 회원의 답변 DELETE 는 403, 글쓴이는 삭제하고 상세로 이동. 상세에는 삭제 링크가 있다")

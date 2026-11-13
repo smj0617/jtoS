@@ -97,6 +97,17 @@ public class AnswerController {
         return "redirect:/questions/%d".formatted(questionId);
     }
 
+    // 026-05: 답변 추천 POST /questions/{questionId}/answers/{id}/votes (책 3-10의 GET /answer/vote/{id})
+    //         026-03 질문 추천과 같은 REST 규칙. 로그인 회원만, 추천 후 질문 상세로
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/votes")
+    public String vote(@PathVariable Integer questionId, @PathVariable Integer id, Principal principal) {
+        Answer answer = answerService.getAnswer(id);
+        Member member = memberService.getMember(principal.getName());
+        answerService.vote(answer, member);
+        return "redirect:/questions/%d".formatted(questionId);
+    }
+
     // 025-09: 답변 글쓴이 본인인지 확인. 아니면 403 (025-03 질문과 같은 규칙)
     private void checkAuthor(Answer answer, Principal principal) {
         if (answer.getAuthor() == null || !answer.getAuthor().getUsername().equals(principal.getName())) {

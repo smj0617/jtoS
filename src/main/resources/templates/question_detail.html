@@ -61,6 +61,13 @@
             <div class="d-flex justify-content-end" th:if="${answer.author != null}">
                 <span class="badge bg-light text-dark p-2" th:text="${answer.author.username}"></span>
             </div>
+            <!-- 026-05: 답변 추천 버튼과 추천 수 (026-03 질문과 같은 방식) -->
+            <div class="my-2">
+                <a th:href="@{|/questions/${question.id}/answers/${answer.id}/votes|}" method="POST" data-confirm="정말로 추천하시겠습니까?"
+                   class="btn btn-sm btn-outline-secondary">추천
+                    <span class="badge rounded-pill bg-success" th:text="${answer.voter.size()}"></span>
+                </a>
+            </div>
             <!-- 025-11: 작성일시, 그리고 수정된 적이 있으면(수정일시가 작성일시보다 늦으면) 수정일시도 (책 3-09) -->
             <!--         #temporals.format → LocalDateTime 을 원하는 모양의 글자로. 004-02 Auditing 이 두 값을 채운다 -->
             <div class="d-flex justify-content-end gap-2 small text-muted">
