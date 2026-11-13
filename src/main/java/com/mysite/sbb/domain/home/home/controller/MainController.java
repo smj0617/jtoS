@@ -1,4 +1,5 @@
-package com.mysite.sbb;
+// 006-05: 첫 화면(/)도 하나의 기능(home)으로 보고 domain.home.home.controller 로 이동
+package com.mysite.sbb.domain.home.home.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

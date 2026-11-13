@@ -168,6 +168,7 @@
 - 메모 1: `work()`는 `self.work()`로 부른다. `this.work()`로 부르면 스프링 프록시를 거치지 않아 `@Transactional`이 적용되지 않는다. 자기 자신을 주입받으면 순환 참조가 되므로 `@Lazy`를 붙였다
 - 메모 2: 004에서 테이블 구조가 바뀌어 기존 `db_dev.mv.db`를 지우고 새로 만들었다 (`ddl-auto: update`는 컬럼 추가는 하지만 지운 컬럼·바뀐 제약은 정리하지 않는다)
 
+
 ### 006-01 도메인별 분류, 공통 엔티티 BaseEntity를 global.jpa.entity로
 - 작업: `BaseEntity`를 `com.mysite.sbb`에서 `com.mysite.sbb.global.jpa.entity`로 옮겼다. 아직 옮기지 않은 `Question`, `Answer`(같은 패키지라 import가 없던 파일)에 새 위치의 `BaseEntity` import를 추가했다
 - 이유: 책 2-06처럼 파일을 기능별로 나누기 시작한다. 강사식 구조에서 여러 도메인이 함께 쓰는 코드는 `global` 아래에 둔다. 다른 클래스가 상속·의존하는 것부터 옮겨야 각 단계에서 컴파일이 깨지지 않는다
@@ -189,3 +190,10 @@
 - 작업: `BaseInitData`를 `global.initData`로 옮겼다
 - 이유: 특정 도메인의 기능이 아니라 앱 전체의 개발용 설정이라 `global`에 둔다 (강사식)
 - 결과: dev 서버를 켤 때 샘플 질문 2개를 넣는 동작은 그대로다. `@Configuration`은 `SbbApplication` 아래 패키지면 어디에 있어도 자동으로 등록된다. 테스트 6개 통과
+
+### 006-05 도메인별 분류, 메인 컨트롤러를 domain.home.home.controller로
+- 작업: `MainController`를 `domain.home.home.controller`로 옮겼다. 이로써 `com.mysite.sbb` 바로 아래에는 `SbbApplication`만 남는다
+- 이유: 첫 화면(`/`)도 하나의 기능(home)으로 보고 같은 3단 구조를 따른다 (강사식)
+- 결과: `/`, `/hello` 응답이 그대로 나온다. 패키지 구조 정리가 끝났다. 테스트 6개 통과
+- 메모: `@SpringBootApplication`은 자기 패키지(`com.mysite.sbb`)와 그 아래 모든 패키지를 스캔한다. 그래서 패키지를 깊게 나눠도 컨트롤러·설정 빈 등록에는 문제가 없다
+
