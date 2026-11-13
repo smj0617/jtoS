@@ -652,3 +652,9 @@
 - 이유: 수정 화면으로 가는 버튼 (책 3-09). 남에게 버튼을 보여 줘도 025-03, 025-04가 403으로 막지만, 누를 수 없는 버튼은 아예 보이지 않게 한다
 - 결과: 글쓴이 `user1`이 상세를 열면 `href="/questions/{id}/edit"` 버튼이 있고, 다른 회원 `other`나 로그인 전에는 없다. `gradlew test` 52개 통과
 - 메모: 화면에서 숨기는 것은 편의, 서버의 `checkAuthor`가 진짜 방어다(016-07 브라우저 검증과 서버 검증의 관계와 같다)
+
+### 025-06 수정·삭제, 질문 삭제 DELETE /questions/{id}
+- 작업: `QuestionService.delete(question)`(`@Transactional`, `questionRepository.delete`)와 `QuestionController.delete()`(`@PreAuthorize("isAuthenticated()")`, `@DeleteMapping("/{id}")`, `checkAuthor` 후 삭제, `redirect:/questions`)
+- 이유: 질문 삭제 (책 3-09). REST 규칙으로 삭제는 `DELETE /questions/{id}`. 책처럼 GET 링크로 삭제하면 다른 사이트의 링크·이미지 하나로 글이 지워질 수 있다
+- 결과: 다른 회원 `other`의 DELETE는 403이고 질문이 남아 있다. 글쓴이 `user1`의 DELETE는 302로 목록 이동, 질문이 사라진다(답변 1개도 004-03 cascade REMOVE로 함께 삭제). `gradlew test` 53개 통과
+- 메모: 화면의 삭제 버튼(025-07)은 `<a method="DELETE">` 링크를 `global.js`가 DELETE 요청 폼으로 바꿔 보낸다

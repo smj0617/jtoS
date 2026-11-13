@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -192,6 +193,21 @@ class QuestionControllerTests {
         memberService.join("other", "other@test.com", "1234");
         mvc.perform(get("/questions/%d/edit".formatted(q1.getId())).with(user("other")))
                 .andExpect(status().isForbidden());
+    }
+
+    // 025-06: 질문 삭제
+    @Test
+    @DisplayName("다른 회원의 DELETE 는 403, 글쓴이의 DELETE 는 질문과 답변을 지우고 목록으로 이동")
+    void delete() throws Exception {
+        memberService.join("other", "other@test.com", "1234");
+        mvc.perform(MockMvcRequestBuilders.delete("/questions/%d".formatted(q1.getId())).with(csrf()).with(user("other")))
+                .andExpect(status().isForbidden());
+        assertThat(questionRepository.findById(q1.getId())).isPresent();
+
+        mvc.perform(MockMvcRequestBuilders.delete("/questions/%d".formatted(q1.getId())).with(csrf()).with(user("user1")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/questions"));
+        assertThat(questionRepository.findById(q1.getId())).isEmpty();
     }
 
     // 025-05: 상세의 수정 버튼은 글쓴이에게만

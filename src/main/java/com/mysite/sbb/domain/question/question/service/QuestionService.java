@@ -56,6 +56,12 @@ public class QuestionService {
         question.setContent(content);
     }
 
+    // 025-06: 질문 삭제 (책 3-09). 004-03 의 cascade REMOVE 로 달린 답변도 함께 지워진다
+    @Transactional
+    public void delete(Question question) {
+        questionRepository.delete(question);
+    }
+
     // 010-02: id로 질문 하나 조회. findById 는 Optional 을 돌려주므로, 비어 있으면 DataNotFoundException(404)을 던진다
     public Question getQuestion(Integer id) {
         return questionRepository.findById(id)

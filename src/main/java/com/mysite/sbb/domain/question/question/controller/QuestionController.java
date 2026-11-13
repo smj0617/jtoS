@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -117,6 +118,17 @@ public class QuestionController {
         }
         questionService.modify(question, questionForm.subject(), questionForm.content());
         return "redirect:/questions/%d".formatted(id);
+    }
+
+    // 025-06: 질문 삭제 DELETE /questions/{id} (책 3-09의 GET /question/delete/{id})
+    //         글쓴이 본인만. 삭제 후 목록으로
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Integer id, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        checkAuthor(question, principal);
+        questionService.delete(question);
+        return "redirect:/questions";
     }
 
     // 025-03: 글쓴이 본인인지 확인. 아니면 403(권한 없음)
