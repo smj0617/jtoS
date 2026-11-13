@@ -96,11 +96,16 @@ class QuestionControllerTests {
 
         mvc.perform(get("/questions").param("page", "2"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("sbb가 무엇인가요?")));
+                .andExpect(content().string(containsString("sbb가 무엇인가요?")))
+                // 019-01: 12개 중 2페이지 = 번호 2, 1 (가장 오래된 질문이 1번)
+                .andExpect(content().string(containsString("<td>2</td>")))
+                .andExpect(content().string(containsString("<td>1</td>")));
 
         mvc.perform(get("/questions").param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("sbb가 무엇인가요?"))))
+                // 019-01: 1페이지 맨 위(가장 최신)가 12번
+                .andExpect(content().string(containsString("<td>12</td>")))
                 // 018-04: 페이지 버튼 확인 (2페이지 링크, 현재 페이지 active, 1페이지라 이전은 disabled)
                 .andExpect(content().string(containsString("href=\"/questions?page=2\"")))
                 .andExpect(content().string(containsString("page-item active")))

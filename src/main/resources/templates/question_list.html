@@ -17,18 +17,25 @@
 <div layout:fragment="content" class="container my-3">
 <table class="table">
     <thead class="table-dark">
-    <tr>
-        <th>제목</th>
+    <tr class="text-center">
+        <!-- 019-01: 번호 칸 추가 (책 3-03). text-center → 가운데 정렬, 제목 칸은 넓게(50%) -->
+        <th>번호</th>
+        <th style="width:50%">제목</th>
         <th>작성일시</th>
     </tr>
     </thead>
     <tbody>
     <!-- 018-03: 컨트롤러의 모델 이름이 paging 으로 바뀌었다. Page 를 반복하면 이 페이지의 질문들이 나온다 -->
-    <tr th:each="question : ${paging}">
+    <!-- 019-01: loop → 반복 상태 변수. loop.index 는 이 페이지 안에서 0부터 세는 순번 -->
+    <tr class="text-center" th:each="question, loop : ${paging}">
+        <!-- 019-01: 게시물 번호 = 전체 개수 - (현재 페이지 × 페이지 크기) - 페이지 안 순번 -->
+        <!--         최신 글이 가장 큰 번호를 갖고, 마지막 페이지 마지막 글이 1번이 된다. id 와 달리 삭제해도 빈 번호가 생기지 않는다 -->
+        <td th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
         <!-- 010-04: 제목을 상세 화면 링크로 바꿨다 -->
         <!-- 011-02: 링크 주소 /question/detail/{id} → /questions/{id} -->
         <!--         @{...} → 앱 기준 주소를 만든다. |...| 안에서는 문자열과 ${} 값을 이어 붙일 수 있다 -->
-        <td>
+        <!-- 019-01: 제목은 왼쪽 정렬 -->
+        <td class="text-start">
             <a th:href="@{|/questions/${question.id}|}" th:text="${question.subject}"></a>
         </td>
         <td th:text="${question.createDate}"></td>
