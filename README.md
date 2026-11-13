@@ -519,3 +519,9 @@
 - 이유: 회원을 저장하고, 023 로그인에서 입력한 아이디로 회원을 찾기 위해 (책 3-06의 `UserRepository`)
 - 결과: 저장한 `user1`을 `findByUsername("user1")`로 찾으면 이메일이 맞고, 없는 아이디는 빈 `Optional`. 같은 아이디로 두 번 저장(`saveAndFlush`)하면 022-01의 유니크 제약 때문에 `DataIntegrityViolationException`이 난다. `gradlew test` 26개 통과
 - 메모: `save`는 바로 DB에 보내지 않을 수 있어서, 중복 오류를 그 자리에서 확인하려고 즉시 반영하는 `saveAndFlush`를 썼다
+
+### 022-03 회원가입, 비밀번호 암호화 PasswordEncoder(BCrypt) 빈
+- 작업: `SecurityConfig`에 `@Bean PasswordEncoder passwordEncoder()`(`new BCryptPasswordEncoder()`). 테스트 `PasswordEncoderTests`
+- 이유: 비밀번호를 평문으로 저장하면 DB가 유출됐을 때 그대로 드러난다 (책 3-06). 빈으로 등록해 가입(022-04)에서 암호화하고 로그인(023)에서 같은 도구로 비교한다
+- 결과: `"1234"`를 두 번 암호화하면 둘 다 `$2a$`로 시작하는 서로 다른 60자 문자열이 나온다. `matches("1234", 암호)`는 true, `matches("4321", 암호)`는 false. `gradlew test` 27개 통과
+- 메모: BCrypt는 매번 무작위 솔트를 섞어서 같은 비밀번호도 결과가 다르다. 되돌릴 수 없는 해시라서 비교는 "입력값을 같은 방식으로 다시 계산해 맞춰 보는" `matches`로 한다

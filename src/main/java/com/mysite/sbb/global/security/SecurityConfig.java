@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 // 021-01: 새 파일. 스프링 시큐리티 설정 (책 3-05)
@@ -30,5 +32,13 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin()));
         return http.build();
+    }
+
+    // 022-03: 비밀번호 암호화 도구를 빈으로 등록 (책 3-06)
+    //         BCrypt → 같은 비밀번호도 매번 다른 값(솔트 포함)으로 바뀌고, 되돌릴 수 없는 해시라 DB가 털려도 원래 비밀번호를 알 수 없다
+    //         가입(022-04)에서 암호화하고, 로그인(023)에서 입력값과 저장값을 matches 로 비교한다
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
