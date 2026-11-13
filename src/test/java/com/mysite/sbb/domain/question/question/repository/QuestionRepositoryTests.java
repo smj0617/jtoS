@@ -1,4 +1,9 @@
-package com.mysite.sbb;
+// 006-02: 테스트도 질문 리포지터리와 같은 패키지로 이동
+package com.mysite.sbb.domain.question.question.repository;
+
+import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.Answer;
+import com.mysite.sbb.AnswerRepository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

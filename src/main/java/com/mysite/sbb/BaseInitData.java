@@ -1,5 +1,9 @@
 package com.mysite.sbb;
 
+// 006-02: Question, QuestionRepository 가 질문 도메인으로 옮겨져 import 추가
+import com.mysite.sbb.domain.question.question.entity.Question;
+import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

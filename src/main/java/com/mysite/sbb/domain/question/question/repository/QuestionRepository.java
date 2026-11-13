@@ -1,4 +1,7 @@
-package com.mysite.sbb;
+// 006-02: 질문 도메인으로 이동 → domain.question.question.repository
+package com.mysite.sbb.domain.question.question.repository;
+
+import com.mysite.sbb.domain.question.question.entity.Question;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

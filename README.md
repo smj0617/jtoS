@@ -173,3 +173,9 @@
 - 이유: 책 2-06처럼 파일을 기능별로 나누기 시작한다. 강사식 구조에서 여러 도메인이 함께 쓰는 코드는 `global` 아래에 둔다. 다른 클래스가 상속·의존하는 것부터 옮겨야 각 단계에서 컴파일이 깨지지 않는다
 - 결과: `global/jpa/entity/BaseEntity.java`로 이동. 질문·답변을 저장하면 생성·수정 일시가 그대로 채워진다(`QuestionRepositoryTests`의 Auditing 테스트 포함 테스트 6개 통과)
 - 메모: 같은 패키지 안의 클래스는 import 없이 쓸 수 있지만, 패키지가 달라지면 import가 필요하다. 그래서 옮긴 파일뿐 아니라 그 파일을 쓰는 쪽도 함께 고쳐야 한다
+
+### 006-02 도메인별 분류, 질문 도메인 domain.question.question으로
+- 작업: `Question` → `domain.question.question.entity`, `QuestionRepository` → `domain.question.question.repository`, 테스트 `QuestionRepositoryTests`도 같은 패키지로 옮겼다. 아직 남아 있는 `Answer`, `BaseInitData`에 새 위치의 import를 추가했다
+- 이유: 강사식 3단 구조 `도메인.하위도메인.역할`. 질문 기능 파일을 한곳에 모으고, 역할(entity, repository, 이후 service·controller)로 한 단계 더 나눈다
+- 결과: 질문 관련 파일 3개 이동. 질문 저장·목록·이름 조회·수정·삭제 테스트가 새 패키지에서 그대로 통과(6개)
+- 메모: `domain.question.question`에서 첫 `question`은 큰 도메인(질문 게시판), 두 번째 `question`은 그 안의 하위 도메인(질문)이다. 답변은 같은 큰 도메인 아래 `domain.question.answer`가 된다
