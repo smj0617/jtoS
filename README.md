@@ -623,3 +623,9 @@
 - 이유: 누가 쓴 글인지 화면에서 보여 준다 (책 3-08). 024 이전에 저장된 샘플 질문은 글쓴이가 없어서, 없을 때 오류가 나지 않게 처리했다
 - 결과: dev 서버에서 `devuser`로 로그인해 "글쓴이 확인 질문"을 등록하자 목록 맨 위 줄의 글쓴이 칸에 `devuser`가 나왔다. 글쓴이 없는 옛 샘플 질문은 빈칸. 로그인 전에 `/questions/new`를 열면 `/members/login`으로 이동(024-06). 테스트에서 목록 `<td>user1</td>`, 상세 배지 `user1` 확인. `gradlew test` 47개 통과
 - 메모: `?.`(안전 탐색)는 앞의 값이 null이면 오류 대신 null을 돌려준다. `question.author.username`으로 쓰면 글쓴이 없는 질문에서 오류가 난다
+
+### 025-01 수정·삭제, _method 숨은 값으로 PUT·DELETE 받기 (HiddenHttpMethodFilter)
+- 작업: `application.yaml`에 `spring.mvc.hiddenmethod.filter.enabled: true`. 필터 빈 등록 테스트
+- 이유: HTML 폼은 `method`에 GET, POST만 쓸 수 있다. 강사식 REST는 수정을 `PUT /questions/{id}`, 삭제를 `DELETE /questions/{id}`로 받는다(책은 `POST /question/modify/{id}`, `GET /question/delete/{id}`). 이 필터를 켜면 폼에 `<input type="hidden" name="_method" value="PUT">`을 넣은 POST를 PUT으로 바꿔 컨트롤러에 넘긴다
+- 결과: 앱에 `HiddenHttpMethodFilter` 빈이 등록된다(테스트로 확인). 실제로 쓰는 곳은 025-04(PUT), 025-06(DELETE). `gradlew test` 48개 통과
+- 메모: 스프링 부트는 이 필터를 기본으로 꺼 둔다. 설정 한 줄로 켠다
