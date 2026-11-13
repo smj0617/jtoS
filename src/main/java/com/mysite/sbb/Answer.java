@@ -2,6 +2,7 @@ package com.mysite.sbb;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,8 @@ public class Answer extends BaseEntity {
     // 004-01: 어느 질문의 답변인지. 답변 여러 개(Many)가 질문 하나(One)에 달린다
     //         → answer 테이블에 question_id 외래키(FK) 컬럼이 생긴다
     //         기본값은 즉시 로딩(EAGER)이라 답변을 읽을 때 질문도 항상 같이 읽는다. 004-03에서 LAZY로 바꾼다
-    @ManyToOne
+    // 004-03: fetch = LAZY → 답변만 읽을 때는 질문을 조회하지 않고, question을 실제로 쓰는 순간에 조회한다
+    //         EAGER는 쓰지도 않는 연관 데이터까지 매번 읽어서 쿼리가 불필요하게 늘어난다 (N+1 문제의 원인)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Question question;
 }

@@ -146,3 +146,9 @@
 - 이유: 모든 엔티티에 반복되는 id와 날짜 필드를 한곳에 모으고, 날짜를 직접 넣지 않아도 저장·수정 때 자동으로 채워지게 하려고 (강사식 개선)
 - 결과: `gradlew test` 통과. `question`, `answer` 테이블에 `modify_date timestamp(6)` 컬럼이 추가로 생겼다. 날짜가 실제로 채워지는지는 005 리포지터리 테스트에서 확인
 - 메모: 책은 `question.setCreateDate(LocalDateTime.now())`로 직접 넣는다. Auditing을 쓰면 이 줄이 필요 없다
+
+
+### 004-03 엔티티, LAZY 로딩과 cascade 정리
+- 작업: `Answer.question`을 `@ManyToOne(fetch = LAZY)`로 변경. `Question.answerList`에 `cascade = {PERSIST, REMOVE}`, `orphanRemoval = true`, `new ArrayList<>()` 초기화. 양쪽 관계를 한 번에 맞추는 `Question.addAnswer(content)` 추가
+- 이유: EAGER는 답변을 읽을 때마다 질문까지 읽어 쿼리가 늘어난다(N+1). 답변은 질문을 통해서만 추가·삭제되게 해서 관계를 한쪽에서 관리하려고 (강사식 개선)
+- 결과: `gradlew test` 통과. 실제 동작(질문 저장 시 답변 함께 저장)은 005 테스트에서 확인
